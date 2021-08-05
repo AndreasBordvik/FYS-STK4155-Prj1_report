@@ -288,8 +288,6 @@ This suggests that there may be patterns to the time series that cannot be captu
 These significant patterns are presumably related to time-reversal effects, considering the nature of bidirectional RNNs. We know that over long sequences, we have the problem of the gradient being washed out during training, and this also applies to the LSTM at some point. Taking this into account, we think that the bidirectional computation of the sequence starting at both $t = 0$ and $t = n$ (reverse order) is beneficial during the learning process due to the length of the sequence and the importance of different time-steps and how much it can learn from each time-step. The most important time-step is the time-step that is closest ($t = n-1$) to the ``current'' time-step $t = n$. One could be confident assuming that the gradient is not washed out at $t = n-1$ when considering the sequence $t = n, n-1, \dots, 0$. However, exactly why bidirectional RNNs perform so much better than other models, and for what kind of data this holds, are questions that would be interesting to investigate further.
 
 
-\subsection*{Dette er en test}
-%Dette er en test
 
 
 \printbibliography
