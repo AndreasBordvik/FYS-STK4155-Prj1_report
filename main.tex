@@ -201,7 +201,7 @@ Indeed, we can inspect visually in \cref{fig:q1-prediction-plots} that the neura
 
 The RMSEs of all the different approaches are summarised as follows:
 \begin{center}
-  \csvautobooktabular{data/q1_RMSE.csv}
+  \csvautobooktabular{data/report_data/q1_RMSE.csv}
 \end{center}
 
 See \cref{fig:q1-prediction-plots} for plots of the 4 different predictions for $f$ on the testing data for November, compared wit the actual data.
@@ -243,7 +243,7 @@ This makes sense, because we have more than 16000 measurements for a single para
 
 With all that said, consider the RMSEs of the four machine learning models on the training data:
 \begin{center}
-  \csvautobooktabular{data/q1_RMSE_training.csv}
+  \csvautobooktabular{data/report_data/q1_RMSE_training.csv}
 \end{center}
 
 As we can see, all the more advanced models outperform linear regression here, with $k$-nearest-neighbour regression and the artificial neural network model performing the best.
@@ -266,7 +266,7 @@ In particular, we experimented with multi-layer networks such as a network with 
 However, out findings suggest that the function $f$ to be learned is simple enough that a single-layer neural network already achieves the best possible result.
 
 This is unsurprising, since $f$ is a 1-dimensional function that seems very smooth on its domain.
-Indeed, a quick test shows that a degree 3 polynomial fits the training data with a RMSE of \input{data/q1_RMSE_poly_training.txt}; about as good as any of the other models.
+Indeed, a quick test shows that a degree 3 polynomial fits the training data with a RMSE of \input{data/report_data/q1_RMSE_poly_training.txt}; about as good as any of the other models.
 This shows that the power output function can be accurately described by only 4 real numbers.
 
 
