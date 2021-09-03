@@ -4,9 +4,25 @@ from sklearn.metrics import mean_squared_error as MSE
 from sklearn.metrics import mean_squared_error as R2
 
 
-class OLS():
+class Regression():
     def __init__(self):
         self.betas = None
+        
+    def fit(self, X, y):
+        pass
+        
+    def get_all_betas(self):
+        return self.betas
+    
+    def predict(self, X):        
+        y_hat = X @ self.betas
+        return y_hat    
+
+
+class OLS(Regression):
+    def __init__(self):
+        super().__init__()
+        #super().__init__(self)
         self.lambda_val = 1 # Lambda value
         
     def fit(self, X, y):
@@ -14,41 +30,27 @@ class OLS():
         X_T_X += self.lambda_val * np.eye(X_T_X.shape[0]) # Preventing the singular matix issue
         self.betas = np.linalg.inv(X_T_X) @ X.T @ y_train
         
-    def getAllBetas(self):
-        return self.betas
-    
-    def predict(self, X):        
-        y_hat = X @ self.betas
-        return y_hat
-    
 
-class Ridge():
+class LinearRegression(OLS):
+    def __init__(self)
+        super().__init__()
+        
+
+class RidgeRegression(Regression):
     def __init__(self):
-        pass
+        super().__init__()
         
     def fit(self, X, y, lambda_val):
         pass 
         
-    def getAllBetas(self):
-        pass
-    
-    def predict(self, X):        
-        pass
-        
-        
-class Lasso():
+         
+class LassoRegression(Regression):
     def __init__(self):
-        pass
+        super().__init__()
         
     def fit(self, X, y, lambda_val):
         pass 
         
-    def getAllBetas(self):
-        pass
-    
-    def predict(self, X):        
-        pass
-    
 
 def evaluate(targets, predictions):
     targets = targets.flatten()
