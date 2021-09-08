@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error as MSE
-from sklearn.metrics import mean_squared_error as R2
+from sklearn.metrics import r2_score as R2
 from sklearn.preprocessing import StandardScaler
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
