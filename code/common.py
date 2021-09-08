@@ -75,7 +75,7 @@ class LassoRegression(Regression):
         super().__init__()
         
     def fit(self, X: np.ndarray, y: np.ndarray, lambda_val:float) -> np.ndarray: 
-        pass 
+        pass
         
 
 def design_matrix(x: np.ndarray, features:int)-> np.ndarray:
@@ -89,16 +89,13 @@ def design_matrix(x: np.ndarray, features:int)-> np.ndarray:
         np.ndarray: [description]
     """
     X = np.zeros((x.shape[0], features))
-    X[:,0] = 1.0
     x = x.flatten()
-    for i in range(1, X.shape[1]):
-        X[:,i] = x ** i
-            
-        
+    for i in range(1,X.shape[1]+1):
+        X[:,i-1] = x ** i
     return X
 
     
-def prepare_data(x: np.ndarray, y: np.ndarray, features:int, test_size=0.2, shuffle=True, scale= True)-> np.ndarray:    
+def prepare_data(x: np.ndarray, y: np.ndarray, features:int, test_size=0.2, shuffle=True, scale_x= True, scale_y= False, intercept=False)-> np.ndarray:    
     """[summary]
 
     Args:
@@ -113,16 +110,28 @@ def prepare_data(x: np.ndarray, y: np.ndarray, features:int, test_size=0.2, shuf
         np.ndarray: [description]
     """
     X = design_matrix(x, features) 
-    
     # split in training and test data
     X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=test_size, shuffle=shuffle)
-    
+        
     # Scale data        
-    if(scale):
-        scaler = StandardScaler()
-        scaler.fit(X_train)
-        X_train = scaler.transform(X_train)
-        X_test = scaler.transform(X_test)
+    if(scale_x):
+        x_scaler = StandardScaler()
+        x_scaler.fit(X_train)
+        X_train = x_scaler.transform(X_train)
+        X_test = x_scaler.transform(X_test)
+    
+    if(scale_y):
+        y_scaler = StandardScaler()
+        y_scaler.fit(y_train)
+        y_train = y_scaler.transform(y_train)
+        y_test = y_scaler.transform(y_test)
+
+    if intercept: # Adding intercept to the data. Default false
+        X_train = np.expand_dims(X_train, axis=0)
+        X_train[:,0] = 1
+        X_test = np.expand_dims(X_test, axis=0)
+        X_test[:,0] = 1
+    
     return X_train, X_test, y_train, y_test
 
     
