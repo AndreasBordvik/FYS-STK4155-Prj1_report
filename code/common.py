@@ -75,7 +75,19 @@ class LassoRegression(Regression):
         super().__init__()
         
     def fit(self, X: np.ndarray, y: np.ndarray, lambda_val:float) -> np.ndarray: 
-        pass
+        """[summary]
+
+        Args:
+            X (np.ndarray): [description]
+            y (np.ndarray): [description]
+            lambda_val (float): [description]
+
+        Returns:
+            np.ndarray: [description]
+        """
+        X_T_X = X.T @ X 
+        X_T_X += lambda_val * np.eye(X_T_X.shape[0]) # beta punishing and preventing the singular matix
+        self.betas = np.linalg.inv(X_T_X) @ X.T @ y 
         
 
 def design_matrix(x: np.ndarray, features:int)-> np.ndarray:
@@ -95,7 +107,7 @@ def design_matrix(x: np.ndarray, features:int)-> np.ndarray:
     return X
 
     
-def prepare_data(x: np.ndarray, y: np.ndarray, features:int, test_size=0.2, shuffle=True, scale_x= True, scale_y= False, intercept=False)-> np.ndarray:    
+def prepare_data(x: np.ndarray, y: np.ndarray, features:int, test_size=0.2, shuffle=True, scale_x= True, scale_y= False, intercept=False, X = None)-> np.ndarray:    
     """[summary]
 
     Args:
@@ -109,7 +121,9 @@ def prepare_data(x: np.ndarray, y: np.ndarray, features:int, test_size=0.2, shuf
     Returns:
         np.ndarray: [description]
     """
-    X = design_matrix(x, features) 
+    if (X is None):
+        X = design_matrix(x, features)
+
     # split in training and test data
     X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=test_size, shuffle=shuffle)
         
@@ -201,8 +215,6 @@ def plot_franke_function():
     fig.colorbar(surf, shrink=0.5, aspect=5)
 
     plt.show()
-
-
 
     """
     def evaluate(targets, predictions):
