@@ -78,7 +78,7 @@ class LassoRegression(Regression):
         pass 
         
 
-def design_matrix(x: np.ndarray, pol_degree:int)-> np.ndarray:
+def design_matrix(x: np.ndarray, features:int)-> np.ndarray:
     """design_matrix
 
     Args:
@@ -88,7 +88,7 @@ def design_matrix(x: np.ndarray, pol_degree:int)-> np.ndarray:
     Returns:
         np.ndarray: [description]
     """
-    X = np.zeros((x.shape[0], pol_degree))
+    X = np.zeros((x.shape[0], features))
     X[:,0] = 1.0
     x = x.flatten()
     for i in range(1, X.shape[1]):
@@ -98,7 +98,7 @@ def design_matrix(x: np.ndarray, pol_degree:int)-> np.ndarray:
     return X
 
     
-def prepare_data(x: np.ndarray, y: np.ndarray, pol_degree:int, test_size=0.2, shuffle=True, scale= True)-> np.ndarray:    
+def prepare_data(x: np.ndarray, y: np.ndarray, features:int, test_size=0.2, shuffle=True, scale= True)-> np.ndarray:    
     """[summary]
 
     Args:
@@ -112,7 +112,7 @@ def prepare_data(x: np.ndarray, y: np.ndarray, pol_degree:int, test_size=0.2, sh
     Returns:
         np.ndarray: [description]
     """
-    X = design_matrix(x, pol_degree) 
+    X = design_matrix(x, features) 
     
     # split in training and test data
     X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=test_size, shuffle=shuffle)
