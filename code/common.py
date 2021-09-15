@@ -12,7 +12,7 @@ from random import random, seed
 class Regression():
     def __init__(self):
         self.betas = None
-        
+                
     def fit(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
         """[summary]
 
@@ -29,20 +29,17 @@ class Regression():
         return self.betas
     
     def predict(self, X:np.ndarray) -> np.ndarray:        
-        y_hat = X @ self.betas
-        return y_hat    
+        prediction = X @ self.betas
+        return prediction
 
 
 class OLS(Regression):
     def __init__(self):
         super().__init__()
-        #super().__init__(self)
-        self.lambda_val = 1 # Lambda value
-        
+               
     def fit(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
-        X_T_X = (X.T @ X) 
-        X_T_X += self.lambda_val * np.eye(X_T_X.shape[0]) # Preventing the singular matix issue
-        self.betas = np.linalg.inv(X_T_X) @ X.T @ y
+        self.betas = np.linalg.inv(X.T @ X) @ X.T @ y
+        
         
 
 class LinearRegression(OLS):
@@ -51,10 +48,11 @@ class LinearRegression(OLS):
         
 
 class RidgeRegression(Regression):
-    def __init__(self):
+    def __init__(self, lambda_val:float):
         super().__init__()
+        self.lam = lambda_val
         
-    def fit(self, X: np.ndarray, y: np.ndarray, lambda_val:float) -> np.ndarray: 
+    def fit(self, X: np.ndarray, y: np.ndarray) -> np.ndarray: 
         """[summary]
 
         Args:
@@ -66,7 +64,7 @@ class RidgeRegression(Regression):
             np.ndarray: [description]
         """
         X_T_X = X.T @ X 
-        X_T_X += lambda_val * np.eye(X_T_X.shape[0]) # beta punishing and preventing the singular matix
+        X_T_X += self.lam * np.eye(X_T_X.shape[0]) # beta punishing and preventing the singular matix
         self.betas = np.linalg.inv(X_T_X) @ X.T @ y 
         
          
