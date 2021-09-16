@@ -38,7 +38,7 @@ class OLS(Regression):
         super().__init__()
                
     def fit(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
-        self.betas = np.linalg.inv(X.T @ X) @ X.T @ y
+        self.betas = np.linalg.pinv(X.T @ X) @ X.T @ y
         
         
 
