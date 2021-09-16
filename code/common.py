@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.core.defchararray import index
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error as MSE
 from sklearn.metrics import r2_score as R2
@@ -189,6 +190,7 @@ def FrankeFunctionMeshgrid() -> np.ndarray:
     z = FrankeFunction(x, y)
     X = create_X(x, y, n=n)
     return X  
+
 
 def plot_franke_function():
     fig = plt.figure()
