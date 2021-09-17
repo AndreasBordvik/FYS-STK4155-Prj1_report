@@ -110,48 +110,43 @@ def design_matrix(x: np.ndarray, features:int)-> np.ndarray:
     return X
 
     
-def prepare_data(x: np.ndarray, y: np.ndarray, features:int, test_size=0.2, shuffle=True, scale_x= True, scale_y= False, intercept=False, X = None)-> np.ndarray:    
+def prepare_data(X: np.ndarray, t: np.ndarray, test_size=0.2, shuffle=True, scale_X= False, scale_t= False, random_state=None)-> np.ndarray:    
     """[summary]
 
     Args:
-        x (np.ndarray): [description]
-        y (np.ndarray): [description]
-        pol_degree (int): [description]
+        X (np.ndarray): Design Matrix
+        t (np.ndarray): Target vector
         test_size (float, optional): [description]. Defaults to 0.2.
         shuffle (bool, optional): [description]. Defaults to True.
-        scale (bool, optional): [description]. Defaults to True.
+        scale_X (bool, optional): [description]. Defaults to False.
+        scale_t (bool, optional): [description]. Defaults to False.
 
     Returns:
         np.ndarray: [description]
     """
-    if (X is None):
-        X = design_matrix(x, features)
-
     # split in training and test data
-    X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=test_size, shuffle=shuffle)
+    if random_state is None:
+        X_train, X_test, t_train, t_test = train_test_split(X, t, test_size=test_size, shuffle=shuffle)
+    else:
+        X_train, X_test, t_train, t_test = train_test_split(X, t, test_size=test_size, shuffle=shuffle, random_state=random_state)
         
     # Scale data        
-    if(scale_x):
-        x_scaler = StandardScaler()
-        x_scaler.fit(X_train)
-        X_train = x_scaler.transform(X_train)
-        X_test = x_scaler.transform(X_test)
+    if(scale_X):
+        X_scaler = StandardScaler()
+        X_scaler.fit(X_train)
+        X_train = X_scaler.transform(X_train)
+        X_test = X_scaler.transform(X_test)
     
-    if(scale_y):
-        y_scaler = StandardScaler()
-        y_scaler.fit(y_train)
-        y_train = y_scaler.transform(y_train)
-        y_test = y_scaler.transform(y_test)
+    if(scale_t):
+        t_train = np.expand_dims(t_train,axis=1)
+        t_test = np.expand_dims(t_test,axis=1)
+        t_scaler = StandardScaler()
+        t_scaler.fit(t_train)
+        t_train = t_scaler.transform(t_train)
+        t_test = t_scaler.transform(t_test)
 
-    if intercept: # Adding intercept to the data. Default false
-        X_train = np.expand_dims(X_train, axis=0)
-        X_train[:,0] = 1
-        X_test = np.expand_dims(X_test, axis=0)
-        X_test[:,0] = 1
-    
-    return X_train, X_test, y_train, y_test
+    return X_train, X_test, t_train, t_test
 
-    
 
 def FrankeFunction(x: float ,y: float) -> float:
     """[summary]
@@ -169,6 +164,7 @@ def FrankeFunction(x: float ,y: float) -> float:
     term4 = -0.2*np.exp(-(9*x-4)**2 - (9*y-7)**2)
     return term1 + term2 + term3 + term4
 
+
 def create_X(x:np.ndarray, y:np.ndarray, n:int )->np.ndarray:
 	if len(x.shape) > 1:
 		x = np.ravel(x)
@@ -185,6 +181,7 @@ def create_X(x:np.ndarray, y:np.ndarray, n:int )->np.ndarray:
 
 	return X
 
+
 def FrankeFunctionMeshgrid() -> np.ndarray:
     # Making meshgrid of datapoints and compute Franke's function
     n = 5
@@ -194,6 +191,13 @@ def FrankeFunctionMeshgrid() -> np.ndarray:
     z = FrankeFunction(x, y)
     X = create_X(x, y, n=n)
     return X  
+
+
+def bias_error_var(t_true, t_pred):
+    error = np.mean( np.mean((t_true - t_pred)**2, axis=1, keepdims=True) )
+    bias = np.mean( (t_true - np.mean(t_pred, axis=1, keepdims=True))**2 )
+    variance = np.mean( np.var(t_pred, axis=1, keepdims=True) )
+    return error, bias, variance
 
 
 def plot_franke_function():
@@ -230,6 +234,7 @@ def plot_franke_function():
         variance = None
         return MSE_score, R2_score, bias, variance
     """    
+
 
 if __name__ == '__main__':
     print("Import this file as a package")
