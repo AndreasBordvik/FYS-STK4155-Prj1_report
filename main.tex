@@ -31,83 +31,75 @@
 \begin{document}
 
 \maketitle
-\section*{Problem 1}
-....
-\newpage
-\newpage
-\section*{Examples}
-% \subsection*{Introduction}
-The main goal for this task is........
+\section*{Theory}
+MSE value between $\boldsymbol{y}$ and $\boldsymbol{\hat y}$ is defined as;
+\begin{equation}
+    MSE(\boldsymbol{y},\boldsymbol{\tilde{y}}) = \frac{1}{n}
+    \sum_{i=0}^{n-1}(y_i-\tilde{y}_i)^2
+\end{equation}
+
+The $R^2$ value between $\boldsymbol{y}$ and $\boldsymbol{\hat y}$ is defined as;
+\begin{equation}
+    R^2(\boldsymbol{y}, \tilde{\boldsymbol{y}}) = 1 - \frac{\sum_{i=0}^{n - 1} (y_i - \tilde{y}_i)^2}{\sum_{i=0}^{n - 1} (y_i - \bar{y})^2}
+\end{equation}
+
+The mean value of $\boldsymbol{y}$ is defined as;
+\begin{equation}
+    \bar{y} =  \frac{1}{n} \sum_{i=0}^{n - 1} y_i
+\end{equation}
+
+The variance of $\boldsymbol{y}$ is defined as;
+\begin{equation}
+    \mathrm{var}[\boldsymbol{x}]=\frac{1}{n}\sum_{i=0}^{n-1}(x_i- \overline{x})^2
+\end{equation}
 
 
-\subsection*{The problem}
-We consider the problem of predicting wind farm power output based on wind speed.
-Let $s$ be wind speed\footnote{Units are nowhere specified, but we presume meters per second.}, and let $p$ be power output\footnote{In watts, but normalised by some unknown amount.}. In ML we assume that there is some unknown function $f$ such that
-\begin{equation*}
-  p = f(s).
-\end{equation*}
 
-Then the RMSE between $\hat{f}$ and $f$ is defined as
-\begin{equation*}
-  \sqrt{\frac{1}{|N|} \sum_{i \in N} \left(\hat{f}(s_i) - p_i\right)^2}.
-\end{equation*}
-
-
-\subsection*{Input data and data analysis}
-\texttt{TrainData.csv}, in \cref{fig:q1-corr-analysis}.
+\section*{Exercise 1}
+\begin{figure}
+  \centering
+  \includegraphics{figures/franke_function_preview.pdf}
+  \caption{?}
+  \label{fig: ?}
+\end{figure}
 
 \begin{figure}
   \centering
-  \includegraphics{figures/q1_corr_analysis.pdf}
-  \caption{Correlation analysis of columns in \texttt{TrainData.csv}.}
-  \label{fig:q1-corr-analysis}
+  \includegraphics[scale=0.85]{figures/franke_function_fit_OLS.pdf}
+  \caption{?}
+  \label{fig: ?}
+\end{figure}
+
+
+
+\section*{Exercise 2}
+\begin{figure}
+  \centering
+  \includegraphics[scale=0.55]{figures/Franke Function Ridge fit evaluation.pdf}
+  \caption{?}
+  \label{fig: ?}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics{figures/franke_function_Ridge_fit.pdf}
+  \caption{The best fit using Ridge}
+  \label{fig: Ridge_best_fit}
 \end{figure}
 
 \begin{center}
-  \csvautobooktabular{data/report_data/q1_RMSE.csv}
+  \csvautobooktabular{data/report_data/redge_reg_lambda_-1.1.csv}
+  \label{data: Ridge_best_fit}
 \end{center}
 
-\begin{figure}
-  \centering
-  \includegraphics{figures/q1_prediction_plots.png}
-  \caption{Plots of the various predictions for $f$ against the training and test data.}
-  \label{fig:q1-prediction-plots}
-\end{figure}
-
-\begin{figure}
-  \centering
-  \includegraphics{figures/q1_forecast_plots}
-  \caption{Plots of the forecast power output in November 2013 for different machine learning models.}
-  \label{fig:q1-forecast-plots}
-\end{figure}
 
 
-\subsection*{Discussion}
-In terms of RMSE, all the models perform similarly....
-
-\subsubsection*{Accuracy of the results}
-With all that said, consider the RMSEs of the four machine learning models on the training data:
-\begin{center}
-  \csvautobooktabular{data/report_data/q1_RMSE_training.csv}
-\end{center}
-
-As we can see, all the more advanced models outperform linear regression here...
-
-
-\subsubsection*{Remark on neural network design complexity}
-$f$ is a 1-dimensional function that seems very smooth on its domain.
-Indeed, a quick test shows that a degree 3 polynomial fits the training data with a RMSE of \input{data/report_data/q1_RMSE_poly_training.txt}; about as good as any of the other models.
-This shows that the power output function can be accurately described by only 4 real numbers.
-
-
-\clearpage
+\newpage
+\newpage
 
 
 
 
-\subsection*{Discussion}
-
-Linear regression again was not......
 
 
 
