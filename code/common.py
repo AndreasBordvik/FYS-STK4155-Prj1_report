@@ -40,6 +40,10 @@ class OLS(Regression):
                
     def fit(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
         self.betas = np.linalg.pinv(X.T @ X) @ X.T @ y
+
+    def fit_SVD(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
+        # TODO:         
+        pass
         
         
 
