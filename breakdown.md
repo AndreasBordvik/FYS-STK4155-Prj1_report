@@ -9,3 +9,11 @@ Find the confidence intervals of the estimators, computing variance, MSE and R2
 The code has to include scaling for the data (explain why)
 
 Split data into train test - *PRESNT CRITICAL DISUSSION ON SCALING!*
+
+## EXERCISE 2
+
+Morten "we want you to show this equation:"
+$$
+\mathbb{E}\left[(\boldsymbol{y}-\boldsymbol{\tilde{y}})^2\right]=\mathbb{E}\left[(\boldsymbol{y}-\mathbb{E}\left[\boldsymbol{\tilde{y}}\right])^2\right]+\mathrm{Var}\left[\boldsymbol{\tilde{y}}\right]+\sigma^2,
+$$
+
