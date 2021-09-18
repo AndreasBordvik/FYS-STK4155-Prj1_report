@@ -8,4 +8,4 @@ Find the confidence intervals of the estimators, computing variance, MSE and R2
 
 The code has to include scaling for the data (explain why)
 
-Split data into train test
+Split data into train test - *PRESNT CRITICAL DISUSSION ON SCALING!*
