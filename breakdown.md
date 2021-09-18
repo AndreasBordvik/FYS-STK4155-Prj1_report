@@ -12,10 +12,11 @@ Split data into train test - *PRESNT CRITICAL DISUSSION ON SCALING!*
 
 ## EXERCISE 2
 
-+   Morten "we want you to show this equation:"
++   Morten "we want you to show this equation:"[lecture 17.sept, 47:50 min]
     $$
     \mathbb{E}\left[(\boldsymbol{y}-\boldsymbol{\tilde{y}})^2\right]=\mathbb{E}\left[(\boldsymbol{y}-\mathbb{E}\left[\boldsymbol{\tilde{y}}\right])^2\right]+\mathrm{Var}\left[\boldsymbol{\tilde{y}}\right]+\sigma^2,
     $$
 
-+   In bootstrap, only touch train data, NOT test
++   In bootstrap, ONLY touch train data, NOT test. only use test when you need to make 
+    a prediction. 
 
