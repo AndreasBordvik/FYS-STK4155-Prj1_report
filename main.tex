@@ -1,20 +1,20 @@
-\documentclass[11pt]{article}
+\documentclass[11pt, a4paper]{article}
 
 % Basic packages
-\usepackage{amsmath}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{bm,ltablex,microtype}
 \usepackage{graphicx}
+\usepackage[utf8]{inputenc}
 \usepackage{parskip}
 \usepackage[section]{placeins}
 \usepackage[capitalise, noabbrev]{cleveref}
+\usepackage{fancyvrb}
 \usepackage{csvsimple}
 \usepackage{booktabs}
 \usepackage[margin=3cm]{geometry}
 \usepackage[table,xcdraw]{xcolor}
 \usepackage{tikz}
 \usetikzlibrary{math,calc,positioning}
-
-\usepackage[backend=biber]{biblatex}
-\bibliography{bibliography}
 
 \usepackage{todonotes}
 
@@ -50,7 +50,7 @@ The mean value of $\boldsymbol{y}$ is defined as;
 
 The variance of $\boldsymbol{y}$ is defined as;
 \begin{equation}
-    \mathrm{var}[\boldsymbol{x}]=\frac{1}{n}\sum_{i=0}^{n-1}(x_i- \overline{x})^2
+    \mathrm{var}[\boldsymbol{x}]=\frac{1}{n}\sum_{i=0}^{n-1}(x_i- \overline{x})^2=\mathbb{E}\left[(\bm{y}-\bm{\tilde{y}})^2\right]
 \end{equation}
 
 
@@ -86,6 +86,68 @@ The variance of $\boldsymbol{y}$ is defined as;
 
 
 \section*{Exercise 2}
+Moving on to the bias-variance trade-off analysis, we start off by showing that 
+
+\[
+  C(\bm{X},\bm{\beta}) =\frac{1}{n}\sum_{i=0}^{n-1}(y_i-\tilde{y}_i)^2=\mathbb{E}\left[(\bm{y}-\bm{\tilde{y}})^2\right]
+\]
+
+Can be rewritten as
+
+\[
+\mathbb{E}\left[(\bm{y}-\bm{\tilde{y}})^2\right]=\frac{1}{n}\sum_i(f_i-\mathbb{E}\left[\bm{\tilde{y}}\right])^2+\frac{1}{n}\sum_i(\tilde{y}_i-\mathbb{E}\left[\bm{\tilde{y}}\right])^2+\sigma^2.
+\]
+
+where the terms are respectively $(\text{bias})^2$, variance and noise. For simplicity, assume that we have a dataset where the data is generated from a noisy model
+
+\[\bm{y} = f(\bm{x}) + \bm{\epsilon}\]
+
+Furthermore, we will assume that the residuals $\epsilon$ are independant and normally distributed $\epsilon \sim \mathcal{N}(0, \sigma^2)$. Finally, $\bm{\tilde{y}} = \bm{X}\bm{\beta}$ is our approximation to the functions $f$. Start off by adding and subtracting $\mathbb{E}\left[\bm{\tilde{y}}\right]$ inside the expectation value.
+
+\[
+  \mathbb{E}\left[(\bm{y}-\bm{\tilde{y}})^2\right] 
+  = \mathbb{E}\left[(\bm{y}-\bm{\tilde{y}} + \mathbb{E}\left[\bm{\tilde{y}}\right] - \mathbb{E}\left[\bm{\tilde{y}}\right])^2\right] 
+\]
+\[
+  = \mathbb{E}\left[((\bm{y} - \mathbb{E}\left[\bm{\tilde{y}}\right]) - (\bm{\tilde{y}} - \mathbb{E}\left[\bm{\tilde{y}}\right]))^2\right]
+\]
+By using the fact that $\bm{y} = f(\bm{x}) + \bm{\epsilon}$
+we can rewrite this as
+\[
+  = \mathbb{E}\left[((f(\bm{x}) - \mathbb{E}\left[\bm{\tilde{y}}\right]) - (\bm{\tilde{y}} - \mathbb{E}\left[\bm{\tilde{y}}\right]) + \epsilon)^2\right]
+\]
+Computing the square inside the expectation value gives us
+\[
+  = \mathbb{E}\left[(f(\bm{x}) - \mathbb{E}\left[\bm{\tilde{y}}\right])^2 + (\bm{\tilde{y}} - \mathbb{E}\left[\bm{\tilde{y}}\right])^2 + \epsilon^2 \right]\]
+  \[+ 2\left(\mathbb{E}\left[\epsilon(f(\bm{x}) - \mathbb{E}\left[\bm{\tilde{y}}\right])\right]- \mathbb{E}\left[\epsilon(\bm{\tilde{y}} - \mathbb{E}\left[\bm{\tilde{y}}\right])\right] - \mathbb{E}\left[(f(\bm{x}) - \mathbb{E}\left[\bm{\tilde{y}}\right])(\bm{\tilde{y}} - \mathbb{E}\left[\bm{\tilde{y}}\right])\right]\right)
+\]
+Moreover, as $\epsilon$ are independant variables, the expectation value involving them as a product can be written as a product of expectation values. Knowing that $\mathbb{E}\left[\epsilon\right] = 0$, the third and second to last term is equal to zero. Also, knowing that $\mathbb{E}\left[\bm{\tilde{y}}\right] = \bm{\tilde{y}}$, the last t
+
+\begin{equation}\label{eq:varbi}
+  = \mathbb{E}\left[(f(\bm{x}) - \mathbb{E}\left[\bm{\tilde{y}}\right])^2\right] + \mathbb{E}\left[(\bm{\tilde{y}} - \mathbb{E}\left[\bm{\tilde{y}}\right])^2\right] + \mathbb{E}\left[\epsilon^2 \right]
+\end{equation}
+The first term in (\ref{eq:varbi}) can be discretized as
+\[
+  \mathbb{E}\left[(f(\bm{x}) - \mathbb{E}\left[\bm{\tilde{y}}\right])^2\right] = \frac{1}{n}\sum_i(f_i - \mathbb{E}\left[\bm{\tilde{y}}\right])^2
+\]
+Which is the bias squared as we were to show.
+
+The second term in (\ref{eq:varbi}) is also discretized, yielding
+\[
+  \mathbb{E}\left[(\bm{\tilde{y}} - \mathbb{E}\left[\bm{\tilde{y}}\right])^2\right] = \frac{1}{n}\sum_i(\bm{\tilde{y}} - \mathbb{E}\left[\bm{\tilde{y}}\right])^2
+\]
+Which takes form of the variance, as was set out to show.
+
+Finally, it can be shown that $\text{var}(\bm{y}) = \text{var}(f + \epsilon) = \mathbb{E}\left[(f + \epsilon)^2\right] - (\mathbb{E}\left[(f + \epsilon)\right])^2$ = $\mathbb{E}\left[\epsilon^2\right]$ As such, we can use that \[
+  \text{var}(y) = \sigma^2 = \mathbb{E}\left[\epsilon^2\right]
+\]
+to see that the final term in (\ref{eq:varbi}) is equal to the noise. Thus we have shown that 
+\[
+\mathbb{E}\left[(\bm{y}-\bm{\tilde{y}})^2\right] = \mathbb{E}\left[(f(\bm{x}) - \mathbb{E}\left[\bm{\tilde{y}}\right])^2\right] + \mathbb{E}\left[(\bm{\tilde{y}} - \mathbb{E}\left[\bm{\tilde{y}}\right])^2\right] + \mathbb{E}\left[\epsilon^2 \right]
+\]
+\[
+=\frac{1}{n}\sum_i(f_i-\mathbb{E}\left[\bm{\tilde{y}}\right])^2+\frac{1}{n}\sum_i(\tilde{y}_i-\mathbb{E}\left[\bm{\tilde{y}}\right])^2+\sigma^2.
+\]
 
 \begin{figure}
   \centering
@@ -112,12 +174,9 @@ The variance of $\boldsymbol{y}$ is defined as;
 \newpage
 
 
+\bibliography{bibliography}
+\bibliographystyle{ieeetr}
 
-
-
-
-
-\printbibliography
 
 
 \end{document}
