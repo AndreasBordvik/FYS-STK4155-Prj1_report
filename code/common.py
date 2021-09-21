@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from random import random, seed
-
+ 
 class Regression():
     def __init__(self):
         self.betas = None
