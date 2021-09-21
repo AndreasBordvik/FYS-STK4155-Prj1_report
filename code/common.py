@@ -146,7 +146,7 @@ def prepare_data(X: np.ndarray, t: np.ndarray, test_size=0.2, shuffle=True, scal
 
     return X_train, X_test, t_train, t_test
 
-"""
+""""""
 def FrankeFunction(x: float ,y: float) -> float:
 
     term1 = 0.75*np.exp(-(0.25*(9*x-2)**2) - 0.25*((9*y-2)**2))
@@ -154,7 +154,7 @@ def FrankeFunction(x: float ,y: float) -> float:
     term3 = 0.5*np.exp(-(9*x-7)**2/4.0 - 0.25*((9*y-3)**2))
     term4 = -0.2*np.exp(-(9*x-4)**2 - (9*y-7)**2)
     return term1 + term2 + term3 + term4
-"""
+
 
 
 def create_X(x:np.ndarray, y:np.ndarray, n:int )->np.ndarray:
@@ -229,7 +229,7 @@ def plot_franke_function():
 
 
 # TODO: The methods below are temporary
-
+"""
 def FrankeFunction(x, y):
     b1 = -((9*x - 2)**2)/4 - ((9*y - 2)**2)/4
     b2 = -((9*x + 1)**2)/49 - ((9*y + 1)**2)/10
@@ -241,7 +241,7 @@ def FrankeFunction(x, y):
     a3 = 1/2 * np.exp(b3)
     a4 = -1/5 * np.exp(b4)
     return a1 + a2 + a3 + a4# + 0.25 * np.random.randn(len(x),)
-
+"""
 def SVDinv(A):
     ''' Takes as input a numpy matrix A and returns inv(A) based on singular value decomposition (SVD).
     SVD is numerically more stable than the inversion algorithms provided by
