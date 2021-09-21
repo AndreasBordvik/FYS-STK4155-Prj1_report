@@ -38,12 +38,11 @@ class OLS(Regression):
     def __init__(self):
         super().__init__()
                
-    def fit(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
-        self.betas = np.linalg.pinv(X.T @ X) @ X.T @ y
-
-    def fit_SVD(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
-        # TODO:         
-        pass
+    def fit(self, X: np.ndarray, t: np.ndarray, SVDfit=True) -> np.ndarray:
+        if SVDfit:
+            self.betas = SVDinv(X.T @ X) @ X.T @ t
+        else:
+            self.betas = np.linalg.pinv(X.T @ X) @ X.T @ t
         
         
 
@@ -147,22 +146,15 @@ def prepare_data(X: np.ndarray, t: np.ndarray, test_size=0.2, shuffle=True, scal
 
     return X_train, X_test, t_train, t_test
 
-
+"""
 def FrankeFunction(x: float ,y: float) -> float:
-    """[summary]
 
-    Args:
-        x (float): [description]
-        y (float): [description]
-
-    Returns:
-        float: [description]
-    """
     term1 = 0.75*np.exp(-(0.25*(9*x-2)**2) - 0.25*((9*y-2)**2))
     term2 = 0.75*np.exp(-((9*x+1)**2)/49.0 - 0.1*(9*y+1))
     term3 = 0.5*np.exp(-(9*x-7)**2/4.0 - 0.25*((9*y-3)**2))
     term4 = -0.2*np.exp(-(9*x-4)**2 - (9*y-7)**2)
     return term1 + term2 + term3 + term4
+"""
 
 
 def create_X(x:np.ndarray, y:np.ndarray, n:int )->np.ndarray:
@@ -234,6 +226,33 @@ def plot_franke_function():
         variance = None
         return MSE_score, R2_score, bias, variance
     """    
+
+
+# TODO: The methods below are temporary
+
+def FrankeFunction(x, y):
+    b1 = -((9*x - 2)**2)/4 - ((9*y - 2)**2)/4
+    b2 = -((9*x + 1)**2)/49 - ((9*y + 1)**2)/10
+    b3 = -((9*x - 7)**2)/4 - ((9*y - 3)**2)/4
+    b4 = -((9*x - 4)**2) - ((9*y - 7)**2)
+    
+    a1 = 3/4 * np.exp(b1)
+    a2 = 3/4 * np.exp(b2)
+    a3 = 1/2 * np.exp(b3)
+    a4 = -1/5 * np.exp(b4)
+    return a1 + a2 + a3 + a4# + 0.25 * np.random.randn(len(x),)
+
+def SVDinv(A):
+    ''' Takes as input a numpy matrix A and returns inv(A) based on singular value decomposition (SVD).
+    SVD is numerically more stable than the inversion algorithms provided by
+    numpy and scipy.linalg at the cost of being slower.
+    '''
+    U, s, VT = np.linalg.svd(A)
+    D = np.zeros((len(U),len(VT)))
+    for i in range(0,len(VT)):
+        D[i,i]=s[i]
+    UT = np.transpose(U); V = np.transpose(VT); invD = np.linalg.inv(D)
+    return np.matmul(V,np.matmul(invD,UT))
 
 
 if __name__ == '__main__':
