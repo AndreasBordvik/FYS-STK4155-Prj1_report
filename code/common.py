@@ -12,7 +12,7 @@ from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from random import random, seed
 
-# Global variables
+# Setting global variables
 INPUT_DATA = "../data/input_data/"  # Path for input data
 REPORT_DATA = "../data/report_data/" # Path for data ment for the report
 REPORT_FIGURES = "../figures/" # Path for figures ment for the report
