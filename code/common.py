@@ -226,12 +226,7 @@ def create_X(x:np.ndarray, y:np.ndarray, n:int, keep_intercept = True)->np.ndarr
 		for k in range(i+1):
 			X[:,q+k] = (x**(i-k))*(y**k)
 
-    
-	if keep_intercept:
-        return X
-    else:
-        return np.delete(X,0,1)
-
+    return X
 
 def FrankeFunctionMeshgrid() -> np.ndarray:
     # Making meshgrid of datapoints and compute Franke's function
