@@ -201,7 +201,7 @@ def prepare_data(X: np.ndarray, t: np.ndarray, test_size=0.2, shuffle=True, scal
 
     return X_train, X_test, t_train, t_test
 
-""""""
+
 def FrankeFunction(x: float ,y: float) -> float:
 
     term1 = 0.75*np.exp(-(0.25*(9*x-2)**2) - 0.25*((9*y-2)**2))
@@ -210,23 +210,38 @@ def FrankeFunction(x: float ,y: float) -> float:
     term4 = -0.2*np.exp(-(9*x-4)**2 - (9*y-7)**2)
     return term1 + term2 + term3 + term4
 
+def create_X(x:np.ndarray, y:np.ndarray, n:int)->np.ndarray:
+    if (len(x.shape)) > 1:
+        x = np.ravel(x)
+        y = np.ravel(y)
 
+    N = len(x)
+    l = int((n+1)*(n+2)/2) # Number of elements in beta
+    X = np.ones((N,l))
 
-def create_X(x:np.ndarray, y:np.ndarray, n:int, keep_intercept = True)->np.ndarray:
+    for i in range(1,n+1):
+        q = int((i)*(i+1)/2)
+        for k in range(i+1):
+            X[:,q+k] = (x**(i-k))*(y**k)
+
+    return X
+"""
+def create_X(x:np.ndarray, y:np.ndarray, n:int)->np.ndarray:
 	if len(x.shape) > 1:
 		x = np.ravel(x)
 		y = np.ravel(y)
 
 	N = len(x)
-	l = int((n+1)*(n+2)/2)		# Number of elements in beta
+	l = int((n+1)*(n+2)/2)  # Number of elements in beta
 	X = np.ones((N,l))
 
 	for i in range(1,n+1):
 		q = int((i)*(i+1)/2)
 		for k in range(i+1):
 			X[:,q+k] = (x**(i-k))*(y**k)
-
+            
     return X
+"""
 
 def FrankeFunctionMeshgrid() -> np.ndarray:
     # Making meshgrid of datapoints and compute Franke's function
