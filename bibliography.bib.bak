@@ -1,0 +1,36 @@
+% Encoding: UTF-8
+@INPROCEEDINGS{siami-namini-et-al,
+  author={Siami-Namini, Sima and Tavakoli, Neda and Namin, Akbar Siami},
+  booktitle={2019 IEEE International Conference on Big Data (Big Data)}, 
+  title={The Performance of LSTM and BiLSTM in Forecasting Time Series}, 
+  year={2019},
+  volume={},
+  number={},
+  pages={3285-3292},
+  doi={10.1109/BigData47090.2019.9005997}
+  }
+@Book{Bishop2016,
+  author    = {Bishop, Christopher M.},
+  publisher = {Springer New York},
+  title     = {Pattern Recognition and Machine Learning},
+  year      = {2016},
+  isbn      = {1493938436},
+  month     = aug,
+  ean       = {9781493938438},
+  pagetotal = {760},
+  url       = {https://www.ebook.de/de/product/29900601/christopher_m_bishop_pattern_recognition_and_machine_learning.html},
+}
+
+@Book{Hastie2009,
+  author    = {Hastie, Trevor and Tibshirani, Robert and Friedman, Jerome},
+  publisher = {SPRINGER NATURE},
+  title     = {The Elements of Statistical Learning: Data Mining, Inference, and Prediction, Second Edition},
+  year      = {2009},
+  isbn      = {0387848576},
+  month     = feb,
+  ean       = {9780387848570},
+  pagetotal = {745},
+  url       = {https://www.ebook.de/de/product/8023140/trevor_hastie_robert_tibshirani_jerome_friedman_the_elements_of_statistical_learning_data_mining_inference_and_prediction_second_edition.html},
+}
+
+@Comment{jabref-meta: databaseType:bibtex;}

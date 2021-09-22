@@ -294,6 +294,7 @@ def SVDinv(A):
 
     D = np.zeros((len(U),len(VT)))
     D = np.diag(s)
+    print(D)
     UT = np.transpose(U); V = np.transpose(VT); invD = np.linalg.inv(D)
     return V@(invD@UT)
 
