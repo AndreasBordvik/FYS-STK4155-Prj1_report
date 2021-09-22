@@ -1,4 +1,6 @@
 import numpy as np
+from numpy.random import SeedSequence
+import pandas as pd
 from numpy.core.defchararray import index
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error as MSE
@@ -10,9 +12,20 @@ from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from random import random, seed
 
+# Global variables
+INPUT_DATA = "../data/input_data/"  # Path for input data
+REPORT_DATA = "../data/report_data/" # Path for data ment for the report
+REPORT_FIGURES = "../figures/" # Path for figures ment for the report
+SEED_VALUE = 4155
+
 class Regression():
     def __init__(self):
         self.betas = None
+        self.X_train = None
+        self.t_train = None
+        self.t_hat_train = None
+        self.param = None
+        self.param_name = None
                 
     def fit(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
         """[summary]
@@ -33,31 +46,61 @@ class Regression():
         prediction = X @ self.betas
         return prediction
 
+    def summary(self):
+        # Estimated standard error for the beta coefficients
+        N, P = self.X_train.shape
+        #var_hat = (1/(N-P-1)) * np.sum((z_train - z_hat_train)**2)
+        var_hat = (1/N) * np.sum((self.t_train - self.t_hat_train)**2) # Estimated variance
+        invXTX_diag = np.diag(SVDinv(self.X_train.T @ self.X_train)) 
+        #invXTX_diag = np.diag(np.linalg.pinv(self.X_train.T @ self.X_train)) 
+        SE_betas = np.sqrt(var_hat * invXTX_diag) # Standard Error
+
+        # Calculating 95% confidence intervall
+        CI_lower_all_betas = self.betas - (1.96 * SE_betas)
+        CI_upper_all_betas = self.betas + (1.96 * SE_betas)
+
+        # Summary dataframe
+        params = np.zeros(self.betas.shape[0]); params.fill(self.param)
+        coeffs_df = pd.DataFrame.from_dict({f"{self.param_name}" :params,
+                                    "coeff name": [f"b_{i}" for i in range(1,self.betas.shape[0]+1)],
+                                    "coeff value": np.round(self.betas, decimals=4),
+                                    "Std Error": np.round(SE_betas, decimals=4),
+                                    "CI lower":np.round(CI_lower_all_betas, decimals=4), 
+                                    "CI_upper":np.round(CI_upper_all_betas, decimals=4)},
+                                    orient='index').T
+        return coeffs_df
+
 
 class OLS(Regression):
-    def __init__(self):
+    def __init__(self, degree = 1, param_name="degree"):
         super().__init__()
+        self.param = degree
+        self.param_name = param_name
                
-    def fit(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
-        self.betas = np.linalg.pinv(X.T @ X) @ X.T @ y
+    def fit(self, X: np.ndarray, t: np.ndarray, SVDfit=True) -> np.ndarray:
+        self.X_train = X
+        self.t_train = t
+        if SVDfit:
+            self.betas = SVDinv(X.T @ X) @ X.T @ t
+        else:
+            self.betas = np.linalg.pinv(X.T @ X) @ X.T @ t
+        self.t_hat_train = X @ self.betas
+        return self.t_hat_train
+    
 
-    def fit_SVD(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
-        # TODO:         
-        pass
-        
-        
-
+       
 class LinearRegression(OLS):
     def __init__(self):
         super().__init__()
         
 
 class RidgeRegression(Regression):
-    def __init__(self, lambda_val:float):
+    def __init__(self, lambda_val = 1, param_name="lambda"):
         super().__init__()
-        self.lam = lambda_val
+        self.param = self.lam = lambda_val
+        self.param_name = param_name        
         
-    def fit(self, X: np.ndarray, y: np.ndarray) -> np.ndarray: 
+    def fit(self, X: np.ndarray, t: np.ndarray, SVDfit=True) -> np.ndarray: 
         """[summary]
 
         Args:
@@ -68,9 +111,17 @@ class RidgeRegression(Regression):
         Returns:
             np.ndarray: [description]
         """
-        X_T_X = X.T @ X 
-        X_T_X += self.lam * np.eye(X_T_X.shape[0]) # beta punishing and preventing the singular matix
-        self.betas = np.linalg.inv(X_T_X) @ X.T @ y 
+        self.X_train = X
+        self.t_train = t
+        XT_X = X.T @ X 
+        XT_X += self.lam * np.eye(XT_X.shape[0]) # beta punishing and preventing the singular matix
+                
+        if SVDfit:
+            self.betas = SVDinv(XT_X) @ X.T @ t
+        else:
+            self.betas = np.linalg.pinv(XT_X) @ X.T @ t
+        self.t_hat_train = X @ self.betas
+        return self.t_hat_train 
         
          
 class LassoRegression(Regression):
@@ -110,7 +161,7 @@ def design_matrix(x: np.ndarray, features:int)-> np.ndarray:
     return X
 
     
-def prepare_data(X: np.ndarray, t: np.ndarray, test_size=0.2, shuffle=True, scale_X= False, scale_t= False, random_state=None)-> np.ndarray:    
+def prepare_data(X: np.ndarray, t: np.ndarray, test_size=0.2, shuffle=True, scale_X= False, scale_t= False, random_state=SEED_VALUE)-> np.ndarray:    
     """[summary]
 
     Args:
@@ -147,22 +198,15 @@ def prepare_data(X: np.ndarray, t: np.ndarray, test_size=0.2, shuffle=True, scal
 
     return X_train, X_test, t_train, t_test
 
-
+""""""
 def FrankeFunction(x: float ,y: float) -> float:
-    """[summary]
 
-    Args:
-        x (float): [description]
-        y (float): [description]
-
-    Returns:
-        float: [description]
-    """
     term1 = 0.75*np.exp(-(0.25*(9*x-2)**2) - 0.25*((9*y-2)**2))
     term2 = 0.75*np.exp(-((9*x+1)**2)/49.0 - 0.1*(9*y+1))
     term3 = 0.5*np.exp(-(9*x-7)**2/4.0 - 0.25*((9*y-3)**2))
     term4 = -0.2*np.exp(-(9*x-4)**2 - (9*y-7)**2)
     return term1 + term2 + term3 + term4
+
 
 
 def create_X(x:np.ndarray, y:np.ndarray, n:int )->np.ndarray:
@@ -234,6 +278,21 @@ def plot_franke_function():
         variance = None
         return MSE_score, R2_score, bias, variance
     """    
+
+
+# TODO: The methods below are temporary
+
+def SVDinv(A):
+    ''' Takes as input a numpy matrix A and returns inv(A) based on singular value decomposition (SVD).
+    SVD is numerically more stable than the inversion algorithms provided by
+    numpy and scipy.linalg at the cost of being slower.
+    '''
+    U, s, VT = np.linalg.svd(A)
+    D = np.zeros((len(U),len(VT)))
+    for i in range(0,len(VT)):
+        D[i,i]=s[i]
+    UT = np.transpose(U); V = np.transpose(VT); invD = np.linalg.inv(D)
+    return np.matmul(V,np.matmul(invD,UT))
 
 
 if __name__ == '__main__':
