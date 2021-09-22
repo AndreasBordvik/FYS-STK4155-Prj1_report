@@ -1,18 +1,21 @@
 import numpy as np
 from numpy.random import SeedSequence
 import pandas as pd
+from tqdm import tqdm
 from numpy.core.defchararray import index
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error as MSE
 from sklearn.metrics import r2_score as R2
 from sklearn.preprocessing import StandardScaler
+import sklearn.linear_model as lm
+from sklearn.utils import resample
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from random import random, seed
 
-# Global variables
+# Setting global variables
 INPUT_DATA = "../data/input_data/"  # Path for input data
 REPORT_DATA = "../data/report_data/" # Path for data ment for the report
 REPORT_FIGURES = "../figures/" # Path for figures ment for the report
@@ -288,12 +291,58 @@ def SVDinv(A):
     numpy and scipy.linalg at the cost of being slower.
     '''
     U, s, VT = np.linalg.svd(A)
-    D = np.zeros((len(U),len(VT)))
-    for i in range(0,len(VT)):
-        D[i,i]=s[i]
-    UT = np.transpose(U); V = np.transpose(VT); invD = np.linalg.inv(D)
-    return np.matmul(V,np.matmul(invD,UT))
 
+    D = np.zeros((len(U),len(VT)))
+    D = np.diag(s)
+    print(D)
+    UT = np.transpose(U); V = np.transpose(VT); invD = np.linalg.inv(D)
+    return V@(invD@UT)
+
+def Bootstrap(x, y, t, maxdegree, n_bootstraps, model='Linear', lmb=None):
+    for degree in tqdm(range(maxdegree), desc = f"Looping trhough polynomials up to {maxdegree} with {n_bootstraps}: "):
+        MSE_test = np.zeros(maxdegree)
+        MSE_train = np.zeros(maxdegree)
+        bias = np.zeros(maxdegree)
+        variance = np.zeros(maxdegree)
+
+        X = create_X(x,y, n=degree)
+        X_train, X_test, t_train, t_test = train_test_split(X, t, test_size=0.2)
+
+        t_test_ = np.reshape(t_test, newshape=(t_test.shape[0],1))
+        t_train_ = np.reshape(t_train, newshape=(t_train.shape[0],1))
+
+        scaler = StandardScaler()
+        scaler.fit(X_train)
+        X_train_scaled = scaler.transform(X_train)
+        X_test_scaled = scaler.transform(X_test)
+
+        """
+        if model == 'Linear':
+            model = lm.LinearRegression()
+        elif model == 'Ridge':
+            model = RidgeRegression(lmb)
+        elif model == 'Lasso':
+            model = Lasso(lmb)
+        else:
+            print(f"No valid model was chose, {model} is not a valid model")
+        """
+        model = lm.LinearRegression()
+
+        t_pred = np.empty((t_test.shape[0], n_bootstraps))
+        t_fit = np.empty((t_train.shape[0], n_bootstraps))
+
+        for i in range(n_bootstraps):
+            x_, t_ = resample(X_train_scaled, t_train)
+            clf = model.fit(x_, t_)
+            t_pred[:,i] = clf.predict(X_test_scaled)
+            t_fit[:,i] = clf.predict(X_train_scaled)
+
+        MSE_test[degree] = np.mean( np.mean((t_test_ - t_pred)**2, axis=1, keepdims=True))
+        MSE_train[degree] = np.mean( np.mean((t_train_ - t_fit)**2, axis=1, keepdims=True))
+        bias[degree] = np.mean((t_test - np.mean(t_pred, axis=1, keepdims=True))**2)
+        variance[degree] = np.mean(np.var(t_pred, axis=1, keepdims=True))
+    
+    return MSE_test, MSE_train, bias, variance
 
 if __name__ == '__main__':
     print("Import this file as a package")
