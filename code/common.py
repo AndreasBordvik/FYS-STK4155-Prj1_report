@@ -212,7 +212,7 @@ def FrankeFunction(x: float ,y: float) -> float:
 
 
 
-def create_X(x:np.ndarray, y:np.ndarray, n:int )->np.ndarray:
+def create_X(x:np.ndarray, y:np.ndarray, n:int, keep_intercept = True)->np.ndarray:
 	if len(x.shape) > 1:
 		x = np.ravel(x)
 		y = np.ravel(y)
@@ -226,7 +226,11 @@ def create_X(x:np.ndarray, y:np.ndarray, n:int )->np.ndarray:
 		for k in range(i+1):
 			X[:,q+k] = (x**(i-k))*(y**k)
 
-	return X
+    
+	if keep_intercept:
+        return X
+    else:
+        return np.delete(X,0,1)
 
 
 def FrankeFunctionMeshgrid() -> np.ndarray:
