@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 from numpy.core.defchararray import index
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error as MSE
@@ -35,17 +36,44 @@ class Regression():
 
 
 class OLS(Regression):
-    def __init__(self):
+    def __init__(self, degree = 1):
         super().__init__()
+        self.degree = degree
+        self.X_train = None
+        self.t_train = None
+        self.t_hat_train = None
                
     def fit(self, X: np.ndarray, t: np.ndarray, SVDfit=True) -> np.ndarray:
+        self.X_train = X
+        self.t_train = t
         if SVDfit:
             self.betas = SVDinv(X.T @ X) @ X.T @ t
         else:
             self.betas = np.linalg.pinv(X.T @ X) @ X.T @ t
-        
-        
+        self.t_hat_train = X @ self.betas
+        return self.t_hat_train
+    
+    def summary(self):
+        # Estimated standard error for the beta coefficients
+        N, P = self.X_train.shape
+        #var_hat = (1/(N-P-1)) * np.sum((z_train - z_hat_train)**2)
+        var_hat = (1/N) * np.sum((self.t_train - self.t_hat_train)**2) # Estimated variance
+        invXTX_diag = np.diag(np.linalg.pinv(self.X_train.T @ self.X_train)) 
+        SE_betas = np.sqrt(var_hat * invXTX_diag) # Standard Error
 
+        # Calculating 95% confidence intervall
+        CI_lower_all_betas = self.betas - (1.96 * SE_betas)
+        CI_upper_all_betas = self.betas + (1.96 * SE_betas)
+        degs = np.zeros(self.betas.shape[0]); degs.fill(self.degree)
+        coeffs_df = pd.DataFrame.from_dict({"degree" :degs,
+                                    "coeff name": [f"b_{i}" for i in range(1,self.betas.shape[0]+1)],
+                                    "coeff value": np.round(self.betas, decimals=4),
+                                    "Std Error": np.round(SE_betas, decimals=4),
+                                    "CI lower":np.round(CI_lower_all_betas, decimals=4), 
+                                    "CI_upper":np.round(CI_upper_all_betas, decimals=4)},
+                                    orient='index').T
+        return coeffs_df
+       
 class LinearRegression(OLS):
     def __init__(self):
         super().__init__()
