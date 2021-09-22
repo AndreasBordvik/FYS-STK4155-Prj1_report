@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.random import SeedSequence
 import pandas as pd
 from numpy.core.defchararray import index
 from sklearn.model_selection import train_test_split
@@ -10,6 +11,12 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from random import random, seed
+
+# Global variables
+INPUT_DATA = "../data/input_data/"  # Path for input data
+REPORT_DATA = "../data/report_data/" # Path for data ment for the report
+REPORT_FIGURES = "../figures/" # Path for figures ment for the report
+SEED_VALUE = 4155
 
 class Regression():
     def __init__(self):
@@ -154,7 +161,7 @@ def design_matrix(x: np.ndarray, features:int)-> np.ndarray:
     return X
 
     
-def prepare_data(X: np.ndarray, t: np.ndarray, test_size=0.2, shuffle=True, scale_X= False, scale_t= False, random_state=None)-> np.ndarray:    
+def prepare_data(X: np.ndarray, t: np.ndarray, test_size=0.2, shuffle=True, scale_X= False, scale_t= False, random_state=SEED_VALUE)-> np.ndarray:    
     """[summary]
 
     Args:
