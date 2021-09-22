@@ -212,7 +212,7 @@ def FrankeFunction(x: float ,y: float) -> float:
 
 
 
-def create_X(x:np.ndarray, y:np.ndarray, n:int )->np.ndarray:
+def create_X(x:np.ndarray, y:np.ndarray, n:int, keep_intercept = True)->np.ndarray:
 	if len(x.shape) > 1:
 		x = np.ravel(x)
 		y = np.ravel(y)
@@ -226,8 +226,7 @@ def create_X(x:np.ndarray, y:np.ndarray, n:int )->np.ndarray:
 		for k in range(i+1):
 			X[:,q+k] = (x**(i-k))*(y**k)
 
-	return X
-
+    return X
 
 def FrankeFunctionMeshgrid() -> np.ndarray:
     # Making meshgrid of datapoints and compute Franke's function
@@ -294,6 +293,7 @@ def SVDinv(A):
 
     D = np.zeros((len(U),len(VT)))
     D = np.diag(s)
+    print(D)
     UT = np.transpose(U); V = np.transpose(VT); invD = np.linalg.inv(D)
     return V@(invD@UT)
 
