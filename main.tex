@@ -3,21 +3,38 @@
 % Basic packages
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{bm,ltablex,microtype}
-\usepackage{graphicx}
+\usepackage[pdftex]{graphicx}
 \usepackage[utf8]{inputenc}
 \usepackage{parskip}
 \usepackage[section]{placeins}
-\usepackage[capitalise, noabbrev]{cleveref}
+\usepackage[table,xcdraw]{xcolor}
+%\usepackage[capitalise, noabbrev]{cleveref} Discarded in favor of hyperref
+\definecolor{linkcolor}{rgb}{0,0,0.4}
+
 \usepackage{fancyvrb}
 \usepackage{csvsimple}
 \usepackage{booktabs}
 \usepackage{multicol}
 \usepackage[margin=3cm]{geometry}
-\usepackage[table,xcdraw]{xcolor}
-\usepackage{tikz}
-\usetikzlibrary{math,calc,positioning}
+
+%\usepackage{tikz}
+%\usetikzlibrary{math,calc,positioning}
 
 \usepackage{todonotes}
+
+\usepackage{hyperref}
+\hypersetup{
+    breaklinks=true,
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=linkcolor,
+    citecolor=black,
+    filecolor=black,
+    %filecolor=blue,
+    pdfmenubar=true,
+    pdftoolbar=true,
+    bookmarksdepth=3   % Uncomment (and tweak) for PDF bookmarks with more levels than the TOC
+    }
 
 % Set up fonts
 % \usepackage{fontspec}
@@ -74,30 +91,74 @@ The variance of $\boldsymbol{y}$ is defined as;
 \end{equation}
 
 \section*{Exercise 1}
+In Machine Learning, we are studying the problem of optimization, that is, finding the optimal parameter $\beta$ such that $C(\boldsymbol{X},\boldsymbol{\beta}) = 
+{\displaystyle \min_{\boldsymbol{\beta}\in {\mathbb{R}}^{p}}}\frac{1}{n}\left\{\left(\boldsymbol{y}-\boldsymbol{X}\boldsymbol{\beta}\right)^T\left(\boldsymbol{y}-\boldsymbol{X}\boldsymbol{\beta}\right)\right\}
+$ our cost function is minimized. For the following exercise, where we will study Ordinary Least Squares regression, the previously stated cost function is the one we will minimize in order to fit the Franke Function, both without (as in Figure (\ref{fig:1})) and with noise as in Figure (\ref{fig:2}). 
 
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.75]{figures/franke_function_noise_preview.pdf}
+  \caption{\label{fig:2}Plot of the Franke Function with added stochastic noise}
+\end{figure}
 
+When constructing our OLS model, we start off by minimizing the cost function with regards to $\beta$. That is, we take the derivative of $C(\bm{X},\bm{\beta})$ and set it $0$. The following derivation shows how we end up with the optimal parameters $\bm{\hat{\beta}}$, which in turn can be used to predict new values for the function which we are fitting. 
 
+\[
+  \frac{\partial{C(\boldsymbol{X},\boldsymbol{\beta})}}{\partial{\beta}} = 0  
+\]
+\[
+  \frac{\partial{C(\boldsymbol{X},\boldsymbol{\beta})}}{\partial{\beta}} = -\frac{2}{n}\bm{X}^\text{T}\left(\bm{y} - \bm{X}\bm{\beta}\right) = 0
+\]
+\[
+  \bm{X}^\text{T}\left(\bm{y} - \bm{X}\bm{\beta}\right) = 0
+\]
+\[
+  \bm{X}^\text{T}\bm{X}\bm{\beta} = \bm{X}^\text{T}\bm{y}
+\]
+\[
+  \bm{\hat{\beta}} = \left(\bm{X}^\text{T}\bm{X}\right)^{-1}\bm{X}^\text{T}\bm{y}
+\]
+For consistency, it is noted that $\bm{\hat{\beta}} \in \mathbb{R}^p$, $\bm{y} \in \mathbb{R}^n$ and $\bm{X} \in \mathbb{R}^{n\times{p}}$.
 
+With an expression for the predictors $\hat{\beta}$ derived, fitting a new value $\tilde{y}$ is simply $\tilde{y} = \bm{X}\bm{\hat{\beta}}$.
+
+Our own implementation of Ordinary Least Sqaure regression is implemented such that its use mimics that of scikit-learn \cite{scikit-learn}. That is, we also include seperate steps for initializing our model, fitting the model and predicting using the model using the just derived mathematical expression. For further inquiry about implementation, refer to the github repository linked in the \nameref{sec:A}.
+
+\textbf{TODO} Possibly more one implementation, derivation of MSE, R2 and CI for the paramters $\beta$
+
+\subsection*{Some words on Scaling}
+Our motivation for scaling the data arise in the context of fitting a design matrix of predictors with different units. To avoid having to diregarding some predictors in favor of others based on their unit, not necessasrily their contribution to the function fit, a scaling of the data is performed. By scaling the data using one of several scaling techniques, we ensure that all predictors lie in the same reference domain, resulting in a more accurate representation of the predictors. Scikit-learn includes several different Scalers, such as the StandardScaler and MinMaxScaler \cite{scikit-learn}. For this discussion, the StandardScaler will be inspected.
+
+The idea behind scaling the data with regards of the StandardScaler method, is to subtract the mean value for each column from the same column in the design matrix. This process is what is known as zero centering. Moreover, when scaling in this way, the intercept will be scaled by the mean value of the output. Moreover, it can be shown that zero centering leads to the new $\bm{\tilde{y}} = \bm{y} - \beta_0 = \bm{y} - \bm{\bar{y}}$, where $\bm{\bar{y}}$ is used as the sample mean of $\bm{y}$. As the columns of $\bm{X}$ also has been scaled in the same fashion, we end up the following cost-Function
+\[
+  C(\boldsymbol{\beta}) = (\boldsymbol{\tilde{y}} - \tilde{X}\boldsymbol{\beta})^T(\boldsymbol{\tilde{y}} - \tilde{X}\boldsymbol{\beta}).  
+\]
+
+Before scaling the dataset, an assessment of whether to keep the intercept or not has to be made. For reference, the intercept is defined as the first column of the design matrix, and for a polynomial fit would represent where the function intercepts with the y-axis when all other features are set to zero. For ordinary least squares, there is no dependance on the intercept when fitting the model. Hence, a model trained with an unscaled dataset would attain the same mean squared error as a model trained with a scaled dataset. The difference being that the intercept of the scaled model have to be readded to the predicted value when computing the mean squared error.
+
+Furthermore, other regression methods such as Ridge and Lasso, which will be discussed in greater detail in further sections, have a dependance on the intercept through their hyperparamter when computing their regularization term. Not including the intercept when computing the regularization term would give rise to a divergence between the mean square error for the model scaled with compared to the model scaled without the intercept. Thus, by computing the regularization term $\lambda$ with disregard to the intercept, the first $\beta_j$ i.e. that of the intercept will be skipped in the computation. This will in most cases lead to a better mean square error for both Ridge and Lasso regression. 
+
+To determine whether scaling is apropriate for the current problem, that being fitting the Franke Function using oridnary least squares, an inspection of the generated data is made in light of the just discussion. For Exercise 1, the datapoints $x,y \in \left[0,1\right]$. This would indicate that the data is already scaled to a unit reference system. Moreover, as we are training a model based on the ordinary least squares, there is no dependance on the intercept during fitting. As there would be no difference in the mean squared error by leaving the intercept out before scaling, there is no necessity to scale the current data for a ordinary least squares model. 
 
 \begin{figure}
   \centering
   \includegraphics[scale=0.85]{figures/franke_function_OLS_fit.pdf}
   \caption{?}
-  \label{fig: ?}
+  \label{fig:3}
 \end{figure}
 
 \begin{figure}
   \centering
   \includegraphics[scale=0.45]{figures/franke_function_OLS_evaluate_fit.pdf}
   \caption{?}
-  \label{fig: ?}
+  \label{fig:4}
 \end{figure}
 
 \begin{figure}
   \centering
   \includegraphics[scale=0.85]{figures/franke_function_OLS_best_fit.pdf}
   \caption{?}
-  \label{fig: ?}
+  \label{fig:5}
 \end{figure}
 
 
@@ -186,7 +247,7 @@ Lastly, it should be noted that the bias-variance tradeoff measuremnet is perfor
   \centering
   \includegraphics[scale=0.85]{figures/franke_function_Ridge_best_fit.pdf}
   \caption{The best fit using Ridge}
-  \label{fig: Ridge_best_fit}
+  \label{fig: Ridge_best_fit_2}
 \end{figure}
 
 \begin{center}
@@ -195,13 +256,15 @@ Lastly, it should be noted that the bias-variance tradeoff measuremnet is perfor
 \end{center}
 
 
+\section*{Appendix\label{sec:A}}
+\textbf{TODO} her skal det ligge link til et github repo. 
 
 \newpage
 \newpage
 
-
+\bibliographystyle{plain}
 \bibliography{bibliography}
-\bibliographystyle{ieeetr}
+
 
 
 
