@@ -29,6 +29,7 @@ class Regression():
         self.t_hat_train = None
         self.param = None
         self.param_name = None
+        self.SVDfit = None
                 
     def fit(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
         """[summary]
@@ -54,8 +55,11 @@ class Regression():
         N, P = self.X_train.shape
         #var_hat = (1/(N-P-1)) * np.sum((z_train - z_hat_train)**2)
         var_hat = (1/N) * np.sum((self.t_train - self.t_hat_train)**2) # Estimated variance
-        invXTX_diag = np.diag(SVDinv(self.X_train.T @ self.X_train)) 
-        #invXTX_diag = np.diag(np.linalg.pinv(self.X_train.T @ self.X_train)) 
+        
+        if self.SVDfit:
+            invXTX_diag = np.diag(SVDinv(self.X_train.T @ self.X_train)) 
+        else:
+            invXTX_diag = np.diag(np.linalg.pinv(self.X_train.T @ self.X_train)) 
         SE_betas = np.sqrt(var_hat * invXTX_diag) # Standard Error
 
         # Calculating 95% confidence intervall
@@ -81,6 +85,7 @@ class OLS(Regression):
         self.param_name = param_name
                
     def fit(self, X: np.ndarray, t: np.ndarray, SVDfit=True) -> np.ndarray:
+        self.SVDfit = SVDfit
         self.X_train = X
         self.t_train = t
         if SVDfit:
