@@ -6,7 +6,7 @@ from numpy.core.defchararray import index
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error as MSE
 from sklearn.metrics import r2_score as R2
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 import sklearn.linear_model as lm
 from sklearn.utils import resample
 from mpl_toolkits.mplot3d import Axes3D
@@ -188,21 +188,24 @@ def prepare_data(X: np.ndarray, t: np.ndarray, test_size=0.2, shuffle=True, scal
         
     # Scale data        
     if(scale_X):
-        X_scaler = StandardScaler()
-        X_scaler.fit(X_train)
-        X_train = X_scaler.transform(X_train)
-        X_test = X_scaler.transform(X_test)
-    
+        X_train = standard_scaling(X_train)    
+        X_test = standard_scaling(X_test)    
     if(scale_t):
-        t_train = np.expand_dims(t_train,axis=1)
-        t_test = np.expand_dims(t_test,axis=1)
-        t_scaler = StandardScaler()
-        t_scaler.fit(t_train)
-        t_train = t_scaler.transform(t_train)
-        t_test = t_scaler.transform(t_test)
-
+        t_train = standard_scaling(t_train)
+        t_test = standard_scaling(t_test)
     return X_train, X_test, t_train, t_test
 
+def standard_scaling(data):
+    scaler = StandardScaler()
+    scaler.fit(data)
+    data_scaled = scaler.transform(data)
+    return data_scaled
+
+def min_max_scaling(data):
+    scaler = MinMaxScaler()
+    scaler.fit(data)
+    data_scaled = scaler.transform(data)
+    return data_scaled
 
 def FrankeFunction(x: float ,y: float) -> float:
 
