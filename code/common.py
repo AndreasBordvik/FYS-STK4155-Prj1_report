@@ -55,21 +55,20 @@ class Regression():
         N, P = self.X_train.shape
         #var_hat = (1/(N-P-1)) * np.sum((z_train - z_hat_train)**2)
         var_hat = (1/N) * np.sum((self.t_train - self.t_hat_train)**2) # Estimated variance
-        
         if self.SVDfit:
             invXTX_diag = np.diag(SVDinv(self.X_train.T @ self.X_train)) 
         else:
             invXTX_diag = np.diag(np.linalg.pinv(self.X_train.T @ self.X_train)) 
         SE_betas = np.sqrt(var_hat * invXTX_diag) # Standard Error
-
+        
         # Calculating 95% confidence intervall
         CI_lower_all_betas = self.betas - (1.96 * SE_betas)
         CI_upper_all_betas = self.betas + (1.96 * SE_betas)
-
+        
         # Summary dataframe
         params = np.zeros(self.betas.shape[0]); params.fill(self.param)
         coeffs_df = pd.DataFrame.from_dict({f"{self.param_name}" :params,
-                                    "coeff name": [f"b_{i}" for i in range(1,self.betas.shape[0]+1)],
+                                    "coeff name": [f"b_{i}" for i in range(0,self.betas.shape[0])],
                                     "coeff value": np.round(self.betas, decimals=4),
                                     "Std Error": np.round(SE_betas, decimals=4),
                                     "CI lower":np.round(CI_lower_all_betas, decimals=4), 
@@ -84,15 +83,19 @@ class OLS(Regression):
         self.param = degree
         self.param_name = param_name
                
-    def fit(self, X: np.ndarray, t: np.ndarray, SVDfit=True) -> np.ndarray:
+    def fit(self, X: np.ndarray, t: np.ndarray, SVDfit=True, keep_intercept=True) -> np.ndarray:
         self.SVDfit = SVDfit
+        if keep_intercept == False:
+            X = X[:, 1:]
         self.X_train = X
         self.t_train = t
+        
         if SVDfit:
             self.betas = SVDinv(X.T @ X) @ X.T @ t
         else:
-            self.betas = np.linalg.pinv(X.T @ X) @ X.T @ t
+            self.betas = np.linalg.pinv(X.T @ X) @ X.T @ t  
         self.t_hat_train = X @ self.betas
+        self.betas = np.squeeze(self.betas)
         return self.t_hat_train
     
 
@@ -108,20 +111,13 @@ class RidgeRegression(Regression):
         self.param = self.lam = lambda_val
         self.param_name = param_name        
         
-    def fit(self, X: np.ndarray, t: np.ndarray, SVDfit=True) -> np.ndarray: 
-        """[summary]
-
-        Args:
-            X (np.ndarray): [description]
-            y (np.ndarray): [description]
-            lambda_val (float): [description]
-
-        Returns:
-            np.ndarray: [description]
-        """
+    def fit(self, X: np.ndarray, t: np.ndarray, SVDfit=True, keep_intercept=True) -> np.ndarray: 
+        self.SVDfit = SVDfit
+        if keep_intercept == False:
+            X = X[:, 1:]
         self.X_train = X
         self.t_train = t
-        XT_X = X.T @ X 
+        XT_X = X.T @ X
         XT_X += self.lam * np.eye(XT_X.shape[0]) # beta punishing and preventing the singular matix
                 
         if SVDfit:
@@ -129,6 +125,7 @@ class RidgeRegression(Regression):
         else:
             self.betas = np.linalg.pinv(XT_X) @ X.T @ t
         self.t_hat_train = X @ self.betas
+        self.betas = np.squeeze(self.betas)
         return self.t_hat_train 
         
          
