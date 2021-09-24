@@ -31,6 +31,7 @@ class Regression():
         self.param_name = None
         self.SVDfit = None
         self.SE_betas = None
+        self.keep_intercept = None
                 
     def fit(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
         pass
@@ -41,6 +42,9 @@ class Regression():
     
     def predict(self, X:np.ndarray) -> np.ndarray:        
         #print("betas.shape in predict:",self.betas.shape)
+        #print("X.shape in predict:",X.shape)
+        if(self.keep_intercept == False):
+            X = X[:, 1:]
         prediction = X @ self.betas
         return prediction
 
@@ -109,6 +113,7 @@ class RidgeRegression(Regression):
         
     def fit(self, X: np.ndarray, t: np.ndarray, SVDfit=True, keep_intercept=True) -> np.ndarray: 
         self.SVDfit = SVDfit
+        self.keep_intercept = keep_intercept
         if keep_intercept == False:
             X = X[:, 1:]
         self.X_train = X
@@ -121,7 +126,9 @@ class RidgeRegression(Regression):
         else:
             self.betas = np.linalg.pinv(Hessian) @ X.T @ t
         self.t_hat_train = X @ self.betas
+        #print(f"Betas.shape in Ridge before:{self.betas.shape}")
         self.betas = np.squeeze(self.betas)
+        #print(f"Betas.shape in Ridge after:{self.betas.shape}")
         return self.t_hat_train 
         
 class LassoRegression(Regression):
@@ -316,7 +323,7 @@ def SVDinv(A):
     UT = np.transpose(U); V = np.transpose(VT); invD = np.linalg.inv(D)
     return V@(invD@UT)
 
-def Bootstrap(x, y, t, maxdegree, n_bootstraps, model='Linear', lmb=None):
+def bootstrap(x, y, t, maxdegree, n_bootstraps, model='Linear', lmb=None):
     for degree in tqdm(range(maxdegree), desc = f"Looping trhough polynomials up to {maxdegree} with {n_bootstraps}: "):
         MSE_test = np.zeros(maxdegree)
         MSE_train = np.zeros(maxdegree)
@@ -342,24 +349,26 @@ def Bootstrap(x, y, t, maxdegree, n_bootstraps, model='Linear', lmb=None):
         """
         #model = lm.LinearRegression() 
         model = OLS(degree=degree)
-        t_hat_train = np.empty((t_train.shape[0], n_bootstraps))
-        t_hat_test = np.empty((t_test.shape[0], n_bootstraps))
-
-        for i in range(n_bootstraps):
-            x_, t_ = resample(X_train, t_train)
-            t_hat_train = model.fit(x_, t_, SVDfit=False)
-            t_hat_test = model.predict(X_test)
-
-            # Storing predictions
-            t_hat_train[:,i] = t_hat_train.ravel()
-            t_hat_test[:,i] = t_hat_test.ravel()
+        t_hat_train, t_hat_test = bootstrapping(X_train, t_train, X_test, t_test, n_bootstraps, model)
 
         MSE_test[degree] = np.mean( np.mean((t_test_ - t_hat_test)**2, axis=1, keepdims=True))
         MSE_train[degree] = np.mean( np.mean((t_train_ - t_hat_train)**2, axis=1, keepdims=True))
         bias[degree] = np.mean((t_test - np.mean(t_hat_test, axis=1, keepdims=True))**2)
-        variance[degree] = np.mean(np.var(t_hat_test, axis=1, keepdims=True))
-    
+        variance[degree] = np.mean(np.var(t_hat_test, axis=1, keepdims=True))    
     return MSE_test, MSE_train, bias, variance
+
+def bootstrapping(X_train, t_train, X_test, t_test, n_bootstraps, model, keep_intercept=False):
+    t_hat_train = np.empty((t_train.shape[0], n_bootstraps))
+    t_hat_test = np.empty((t_test.shape[0], n_bootstraps))
+    for i in range(n_bootstraps):
+        X, t = resample(X_train, t_train)
+        t_hat_train = model.fit(X, t, SVDfit=False, keep_intercept=keep_intercept)
+        t_hat_test = model.predict(X_test)
+        # Storing predictions
+        t_hat_train[:,i] = t_hat_train.ravel()
+        t_hat_test[:,i] = t_hat_test.ravel()
+    return t_hat_train, t_hat_test
+
 
 if __name__ == '__main__':
     print("Import this file as a package")
