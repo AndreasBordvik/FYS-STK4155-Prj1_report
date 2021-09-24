@@ -33,15 +33,6 @@ class Regression():
         self.SE_betas = None
                 
     def fit(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """[summary]
-
-        Args:
-            X (np.ndarray): [description]
-            y (np.ndarray): [description]
-
-        Returns:
-            np.ndarray: [description]
-        """
         pass
 
     @property      
@@ -83,7 +74,6 @@ class Regression():
                                     orient='index').T
         return coeffs_df
 
-
 class OLS(Regression):
     def __init__(self, degree = 1, param_name="degree"):
         super().__init__()
@@ -107,13 +97,10 @@ class OLS(Regression):
         #print("betas.shape in train after squeeze:",self.betas.shape)
         return self.t_hat_train
     
-
-       
 class LinearRegression(OLS):
     def __init__(self):
         super().__init__()
         
-
 class RidgeRegression(Regression):
     def __init__(self, lambda_val = 1, param_name="lambda"):
         super().__init__()
@@ -137,7 +124,6 @@ class RidgeRegression(Regression):
         self.betas = np.squeeze(self.betas)
         return self.t_hat_train 
         
-         
 class LassoRegression(Regression):
     def __init__(self):
         super().__init__()
@@ -222,7 +208,6 @@ def min_max_scaling(data):
     return data_scaled, scaler
 
 def FrankeFunction(x: float ,y: float) -> float:
-
     term1 = 0.75*np.exp(-(0.25*(9*x-2)**2) - 0.25*((9*y-2)**2))
     term2 = 0.75*np.exp(-((9*x+1)**2)/49.0 - 0.1*(9*y+1))
     term3 = 0.5*np.exp(-(9*x-7)**2/4.0 - 0.25*((9*y-3)**2))
@@ -339,15 +324,11 @@ def Bootstrap(x, y, t, maxdegree, n_bootstraps, model='Linear', lmb=None):
         variance = np.zeros(maxdegree)
 
         X = create_X(x,y, n=degree)
-        X_train, X_test, t_train, t_test = train_test_split(X, t, test_size=0.2)
-
+        X_train, X_test, t_train, t_test = train_test_split(X, t, test_size=0.2, random_state=SEED_VALUE)
         t_test_ = np.reshape(t_test, newshape=(t_test.shape[0],1))
         t_train_ = np.reshape(t_train, newshape=(t_train.shape[0],1))
-
-        scaler = StandardScaler()
-        scaler.fit(X_train)
-        X_train_scaled = scaler.transform(X_train)
-        X_test_scaled = scaler.transform(X_test)
+        X_train = standard_scaling(X_train)
+        X_test = standard_scaling(X_test)
 
         """
         if model == 'Linear':
@@ -359,21 +340,24 @@ def Bootstrap(x, y, t, maxdegree, n_bootstraps, model='Linear', lmb=None):
         else:
             print(f"No valid model was chose, {model} is not a valid model")
         """
-        model = lm.LinearRegression()
-
-        t_pred = np.empty((t_test.shape[0], n_bootstraps))
-        t_fit = np.empty((t_train.shape[0], n_bootstraps))
+        #model = lm.LinearRegression() 
+        model = OLS(degree=degree)
+        t_hat_train = np.empty((t_train.shape[0], n_bootstraps))
+        t_hat_test = np.empty((t_test.shape[0], n_bootstraps))
 
         for i in range(n_bootstraps):
-            x_, t_ = resample(X_train_scaled, t_train)
-            clf = model.fit(x_, t_)
-            t_pred[:,i] = clf.predict(X_test_scaled)
-            t_fit[:,i] = clf.predict(X_train_scaled)
+            x_, t_ = resample(X_train, t_train)
+            t_hat_train = model.fit(x_, t_, SVDfit=False)
+            t_hat_test = model.predict(X_test)
 
-        MSE_test[degree] = np.mean( np.mean((t_test_ - t_pred)**2, axis=1, keepdims=True))
-        MSE_train[degree] = np.mean( np.mean((t_train_ - t_fit)**2, axis=1, keepdims=True))
-        bias[degree] = np.mean((t_test - np.mean(t_pred, axis=1, keepdims=True))**2)
-        variance[degree] = np.mean(np.var(t_pred, axis=1, keepdims=True))
+            # Storing predictions
+            t_hat_train[:,i] = t_hat_train.ravel()
+            t_hat_test[:,i] = t_hat_test.ravel()
+
+        MSE_test[degree] = np.mean( np.mean((t_test_ - t_hat_test)**2, axis=1, keepdims=True))
+        MSE_train[degree] = np.mean( np.mean((t_train_ - t_hat_train)**2, axis=1, keepdims=True))
+        bias[degree] = np.mean((t_test - np.mean(t_hat_test, axis=1, keepdims=True))**2)
+        variance[degree] = np.mean(np.var(t_hat_test, axis=1, keepdims=True))
     
     return MSE_test, MSE_train, bias, variance
 
