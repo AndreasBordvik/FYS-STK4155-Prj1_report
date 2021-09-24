@@ -30,6 +30,7 @@ class Regression():
         self.param = None
         self.param_name = None
         self.SVDfit = None
+        self.SE_betas = None
                 
     def fit(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
         """[summary]
@@ -42,7 +43,8 @@ class Regression():
             np.ndarray: [description]
         """
         pass
-        
+
+    @property      
     def get_all_betas(self):
         return self.betas
     
@@ -51,16 +53,20 @@ class Regression():
         prediction = X @ self.betas
         return prediction
 
+    @property
+    def SE(self):
+        var_hat = (1./self.X_train.shape[0]) * np.sum((self.t_train - self.t_hat_train)**2)
+
+        if self.SVDfit:
+            invXTX_diag = np.diag(SVDinv(self.X_train.T @ self.X_train))
+        else:
+            invXTX_diag = np.diag(np.linalg.pinv(self.X_train.T @ self.X_train))
+        return np.sqrt(var_hat * invXTX_diag) 
+
     def summary(self):
         # Estimated standard error for the beta coefficients
         N, P = self.X_train.shape
-        #var_hat = (1/(N-P-1)) * np.sum((z_train - z_hat_train)**2)
-        var_hat = (1/N) * np.sum((self.t_train - self.t_hat_train)**2) # Estimated variance
-        if self.SVDfit:
-            invXTX_diag = np.diag(SVDinv(self.X_train.T @ self.X_train)) 
-        else:
-            invXTX_diag = np.diag(np.linalg.pinv(self.X_train.T @ self.X_train)) 
-        SE_betas = np.sqrt(var_hat * invXTX_diag) # Standard Error
+        SE_betas = self.SE
         
         # Calculating 95% confidence intervall
         CI_lower_all_betas = self.betas - (1.96 * SE_betas)
@@ -184,7 +190,7 @@ def prepare_data(X: np.ndarray, t: np.ndarray, test_size=0.2, shuffle=True, scal
         else:
             X_train, _ = standard_scaling(X_train)    
             X_test, _ = standard_scaling(X_test)    
-            
+
     if(scale_t):
         if zero_center:
             t_train = manual_scaling(t_train)
@@ -321,7 +327,7 @@ def SVDinv(A):
 
     D = np.zeros((len(U),len(VT)))
     D = np.diag(s)
-    print(D)
+    #print(D)
     UT = np.transpose(U); V = np.transpose(VT); invD = np.linalg.inv(D)
     return V@(invD@UT)
 
