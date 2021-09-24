@@ -47,6 +47,7 @@ class Regression():
         return self.betas
     
     def predict(self, X:np.ndarray) -> np.ndarray:        
+        #print("betas.shape in predict:",self.betas.shape)
         prediction = X @ self.betas
         return prediction
 
@@ -95,7 +96,9 @@ class OLS(Regression):
         else:
             self.betas = np.linalg.pinv(X.T @ X) @ X.T @ t  
         self.t_hat_train = X @ self.betas
+        #print("betas.shape in train before squeeze:",self.betas.shape)
         self.betas = np.squeeze(self.betas)
+        #print("betas.shape in train after squeeze:",self.betas.shape)
         return self.t_hat_train
     
 
@@ -117,13 +120,13 @@ class RidgeRegression(Regression):
             X = X[:, 1:]
         self.X_train = X
         self.t_train = t
-        XT_X = X.T @ X
-        XT_X += self.lam * np.eye(XT_X.shape[0]) # beta punishing and preventing the singular matix
+        Hessian = X.T @ X
+        Hessian += self.lam * np.eye(Hessian.shape[0]) # beta punishing and preventing the singular matix
                 
         if SVDfit:
-            self.betas = SVDinv(XT_X) @ X.T @ t
+            self.betas = SVDinv(Hessian) @ X.T @ t
         else:
-            self.betas = np.linalg.pinv(XT_X) @ X.T @ t
+            self.betas = np.linalg.pinv(Hessian) @ X.T @ t
         self.t_hat_train = X @ self.betas
         self.betas = np.squeeze(self.betas)
         return self.t_hat_train 
@@ -167,19 +170,6 @@ def design_matrix(x: np.ndarray, features:int)-> np.ndarray:
 
     
 def prepare_data(X: np.ndarray, t: np.ndarray, test_size=0.2, shuffle=True, scale_X= False, scale_t= False, random_state=SEED_VALUE)-> np.ndarray:    
-    """[summary]
-
-    Args:
-        X (np.ndarray): Design Matrix
-        t (np.ndarray): Target vector
-        test_size (float, optional): [description]. Defaults to 0.2.
-        shuffle (bool, optional): [description]. Defaults to True.
-        scale_X (bool, optional): [description]. Defaults to False.
-        scale_t (bool, optional): [description]. Defaults to False.
-
-    Returns:
-        np.ndarray: [description]
-    """
     # split in training and test data
     if random_state is None:
         X_train, X_test, t_train, t_test = train_test_split(X, t, test_size=test_size, shuffle=shuffle)
