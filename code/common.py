@@ -188,24 +188,24 @@ def prepare_data(X: np.ndarray, t: np.ndarray, test_size=0.2, shuffle=True, scal
         
     # Scale data        
     if(scale_X):
-        X_train = standard_scaling(X_train)    
-        X_test = standard_scaling(X_test)    
+        X_train, _ = standard_scaling(X_train)    
+        X_test, _ = standard_scaling(X_test)    
     if(scale_t):
-        t_train = standard_scaling(t_train)
-        t_test = standard_scaling(t_test)
+        t_train, _ = standard_scaling(t_train)
+        t_test, _ = standard_scaling(t_test)
     return X_train, X_test, t_train, t_test
 
 def standard_scaling(data):
     scaler = StandardScaler()
     scaler.fit(data)
     data_scaled = scaler.transform(data)
-    return data_scaled
+    return data_scaled, scaler
 
 def min_max_scaling(data):
     scaler = MinMaxScaler()
     scaler.fit(data)
     data_scaled = scaler.transform(data)
-    return data_scaled
+    return data_scaled, scaler
 
 def FrankeFunction(x: float ,y: float) -> float:
 
