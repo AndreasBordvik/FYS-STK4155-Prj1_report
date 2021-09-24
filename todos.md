@@ -7,5 +7,5 @@ Critical discussion on scaling
 
 
 
-
-
+## Exercise 6
+Add noise to z for all  subtasks
