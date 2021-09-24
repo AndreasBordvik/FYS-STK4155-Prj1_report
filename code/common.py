@@ -169,7 +169,7 @@ def design_matrix(x: np.ndarray, features:int)-> np.ndarray:
     return X
 
     
-def prepare_data(X: np.ndarray, t: np.ndarray, test_size=0.2, shuffle=True, scale_X= False, scale_t= False, random_state=SEED_VALUE)-> np.ndarray:    
+def prepare_data(X: np.ndarray, t: np.ndarray, test_size=0.2, shuffle=True, scale_X= False, scale_t= False, zero_center = False, random_state=SEED_VALUE)-> np.ndarray:    
     # split in training and test data
     if random_state is None:
         X_train, X_test, t_train, t_test = train_test_split(X, t, test_size=test_size, shuffle=shuffle)
@@ -178,12 +178,30 @@ def prepare_data(X: np.ndarray, t: np.ndarray, test_size=0.2, shuffle=True, scal
         
     # Scale data        
     if(scale_X):
-        X_train, _ = standard_scaling(X_train)    
-        X_test, _ = standard_scaling(X_test)    
+        if zero_center:
+            X_train = manual_scaling(X_train)
+            X_test = manual_scaling(X_test)
+        else:
+            X_train, _ = standard_scaling(X_train)    
+            X_test, _ = standard_scaling(X_test)    
+            
     if(scale_t):
-        t_train, _ = standard_scaling(t_train)
-        t_test, _ = standard_scaling(t_test)
+        if zero_center:
+            t_train = manual_scaling(t_train)
+            t_test = manual_scaling(t_test)
+        else:
+            t_train, _ = standard_scaling(t_train)
+            t_test, _ = standard_scaling(t_test)
+            
     return X_train, X_test, t_train, t_test
+
+def manual_scaling(data):
+    """
+    Avoids the use of sklearn StandardScaler(), which also 
+    divides the scaled value by the standard deviation.
+    This scaling is essentially just a zero centering
+    """
+    return data - np.mean(data,axis=0)
 
 def standard_scaling(data):
     scaler = StandardScaler()
