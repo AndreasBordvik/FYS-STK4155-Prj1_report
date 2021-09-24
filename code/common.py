@@ -41,10 +41,12 @@ class Regression():
         return self.betas
     
     def predict(self, X:np.ndarray) -> np.ndarray:        
+        #print("from predict: self.keep_intercept:",self.keep_intercept)
+        if(self.keep_intercept == False):
+            #print(f"Predict: removing intercept")
+            X = X[:, 1:]
         #print("betas.shape in predict:",self.betas.shape)
         #print("X.shape in predict:",X.shape)
-        if(self.keep_intercept == False):
-            X = X[:, 1:]
         prediction = X @ self.betas
         return prediction
 
@@ -86,8 +88,10 @@ class OLS(Regression):
                
     def fit(self, X: np.ndarray, t: np.ndarray, SVDfit=True, keep_intercept=True) -> np.ndarray:
         self.SVDfit = SVDfit
+        self.keep_intercept = keep_intercept
         if keep_intercept == False:
             X = X[:, 1:]
+
         self.X_train = X
         self.t_train = t
         
@@ -109,8 +113,8 @@ class RidgeRegression(Regression):
     def __init__(self, lambda_val = 1, param_name="lambda"):
         super().__init__()
         self.param = self.lam = lambda_val
-        self.param_name = param_name        
-        
+        self.param_name = param_name
+                
     def fit(self, X: np.ndarray, t: np.ndarray, SVDfit=True, keep_intercept=True) -> np.ndarray: 
         self.SVDfit = SVDfit
         self.keep_intercept = keep_intercept
@@ -136,31 +140,12 @@ class LassoRegression(Regression):
         super().__init__()
         
     def fit(self, X: np.ndarray, y: np.ndarray, lambda_val:float) -> np.ndarray: 
-        """[summary]
-
-        Args:
-            X (np.ndarray): [description]
-            y (np.ndarray): [description]
-            lambda_val (float): [description]
-
-        Returns:
-            np.ndarray: [description]
-        """
         X_T_X = X.T @ X 
         X_T_X += lambda_val * np.eye(X_T_X.shape[0]) # beta punishing and preventing the singular matix
         self.betas = np.linalg.inv(X_T_X) @ X.T @ y 
         
 
 def design_matrix(x: np.ndarray, features:int)-> np.ndarray:
-    """design_matrix
-
-    Args:
-        x (np.ndarray): [description]
-        pol_degree (int): [description]
-
-    Returns:
-        np.ndarray: [description]
-    """
     X = np.zeros((x.shape[0], features))
     x = x.flatten()
     for i in range(1,X.shape[1]+1):
@@ -358,16 +343,16 @@ def bootstrap(x, y, t, maxdegree, n_bootstraps, model='Linear', lmb=None):
     return MSE_test, MSE_train, bias, variance
 
 def bootstrapping(X_train, t_train, X_test, t_test, n_bootstraps, model, keep_intercept=False):
-    t_hat_train = np.empty((t_train.shape[0], n_bootstraps))
-    t_hat_test = np.empty((t_test.shape[0], n_bootstraps))
+    t_hat_trains = np.empty((t_train.shape[0], n_bootstraps))
+    t_hat_tests = np.empty((t_test.shape[0], n_bootstraps))
     for i in range(n_bootstraps):
         X, t = resample(X_train, t_train)
         t_hat_train = model.fit(X, t, SVDfit=False, keep_intercept=keep_intercept)
         t_hat_test = model.predict(X_test)
         # Storing predictions
-        t_hat_train[:,i] = t_hat_train.ravel()
-        t_hat_test[:,i] = t_hat_test.ravel()
-    return t_hat_train, t_hat_test
+        t_hat_trains[:,i] = t_hat_train.ravel()
+        t_hat_tests[:,i] = t_hat_test.ravel()
+    return t_hat_trains, t_hat_tests
 
 
 if __name__ == '__main__':
