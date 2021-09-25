@@ -72,10 +72,10 @@ class Regression():
         # Summary dataframe
         params = np.zeros(self.betas.shape[0]); params.fill(self.param)
         coeffs_df = pd.DataFrame.from_dict({f"{self.param_name}" :params,
-                                    "coeff name": [f"b_{i}" for i in range(0,self.betas.shape[0])],
-                                    "coeff value": np.round(self.betas, decimals=4),
-                                    "Std Error": np.round(SE_betas, decimals=4),
-                                    "CI lower":np.round(CI_lower_all_betas, decimals=4), 
+                                    "coeff_name": [f"b_{i}" for i in range(0,self.betas.shape[0])],
+                                    "coeff_value": np.round(self.betas, decimals=4),
+                                    "std_error": np.round(SE_betas, decimals=4),
+                                    "CI_lower":np.round(CI_lower_all_betas, decimals=4), 
                                     "CI_upper":np.round(CI_upper_all_betas, decimals=4)},
                                     orient='index').T
         return coeffs_df
