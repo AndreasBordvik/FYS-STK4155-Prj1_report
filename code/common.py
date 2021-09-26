@@ -355,7 +355,7 @@ def bootstrapping(X_train, t_train, X_test, t_test, n_bootstraps, model, keep_in
     return t_hat_trains, t_hat_tests
 
 
-def plot_beta_errors_for_lambdas(summaries_df : pd.DataFrame()):
+def plot_beta_errors_for_lambdas(summaries_df : pd.DataFrame(), degree):
     grp_by_coeff_df = summaries_df.groupby(["coeff_name"])
     fig = plt.figure()
     i=0
@@ -379,13 +379,14 @@ def plot_beta_errors_for_lambdas(summaries_df : pd.DataFrame()):
         print("\n\n")
         i+=1
 
-    plt.title(f"Plot on Ridge coefficients variation with lambda at degree{optimal_degree}")
+    plt.title(f"Plot on Ridge coefficients variation with lambda at degree{degree}")
     plt.xlabel("Lambda values")
     plt.ylabel(r"$\beta_i$ $\pm$ SE")
     plt.xscale("log")
     plt.legend(bbox_to_anchor = (1.05, 1.1))
+    plt.show()
     #plt.tight_layout()
-    return plt
+    #return plt
 
 
 def plot_beta_CI_for_lambdas(summaries_df : pd.DataFrame(), degree):
@@ -419,17 +420,23 @@ def plot_beta_CI_for_lambdas(summaries_df : pd.DataFrame(), degree):
     plt.xscale("log")
     plt.legend(bbox_to_anchor = (1.05, 1.1))
     #plt.tight_layout()
-    return plt
+    plt.show()
+    #return plt
+    
 
 def plot_beta_errors(summaary_df : pd.DataFrame(), degree):
     fig = plt.figure()
-    plt.errorbar(np.arange(summaary_df.shape[0]), summaary_df["coeff_value"], yerr = degree["std_error"], fmt = 'o', ms=4)
+    betas = summaary_df["coeff_value"].to_numpy().astype(np.float64)
+    SE = summaary_df["std_error"].to_numpy().astype(np.float64)
+    plt.errorbar(np.arange(summaary_df.shape[0]), betas , yerr = SE, fmt = 'o', ms=4)
     plt.title(f"Beta error OLS - degree{degree}")
     plt.xlabel(r"$\beta_i$")
     plt.ylabel("Beta values with Std error")
-    plt.xticks(np.arange(degree.shape[0]))
+    plt.xticks(np.arange(summaary_df.shape[0]))
     #plt.tight_layout()
-    return plt
+    plt.show()
+    #return plt
+    
 
 
 if __name__ == '__main__':
