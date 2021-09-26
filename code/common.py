@@ -426,7 +426,7 @@ def plot_beta_CI_for_lambdas(summaries_df : pd.DataFrame(), degree):
 
     plt.title(f"Plot on Ridge coefficients variation with lambda at degree{degree}")
     plt.xlabel("Lambda values")
-    plt.ylabel(r"$\beta_i$ CI")
+    plt.ylabel(r"$\beta_i$ with $CI_{95}$")
     plt.xscale("log")
     if degree < 5:
         plt.rcParams["figure.autolayout"] = True
@@ -444,7 +444,7 @@ def plot_beta_errors(summaary_df : pd.DataFrame(), degree):
     ax = fig.add_subplot(1,1,1)
     plt.title(f"Beta error OLS - degree{degree}")
     plt.xlabel(r"$\beta_i$")
-    plt.ylabel("Beta values with Std error")
+    plt.ylabel("Beta values with std error")
     plt.xticks(np.arange(summaary_df.shape[0]))
     plt.errorbar(np.arange(summaary_df.shape[0]), betas , yerr = SE, fmt = 'o', ms=4)
     #plt.tight_layout()
