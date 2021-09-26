@@ -360,6 +360,9 @@ def bootstrapping(X_train, t_train, X_test, t_test, n_bootstraps, model, keep_in
 
 def plot_beta_errors_for_lambdas(summaries_df : pd.DataFrame(), degree):
     grp_by_coeff_df = summaries_df.groupby(["coeff_name"])
+    
+    #plt.rcParams["figure.figsize"] = [7.00, 3.50]
+
     fig = plt.figure()
     ax = fig.add_subplot(1,1,1)
     i=0
@@ -387,7 +390,9 @@ def plot_beta_errors_for_lambdas(summaries_df : pd.DataFrame(), degree):
     plt.xlabel("Lambda values")
     plt.ylabel(r"$\beta_i$ $\pm$ SE")
     plt.xscale("log")
-    plt.legend(bbox_to_anchor = (1.05, 1.1))
+    if degree < 5:
+        plt.rcParams["figure.autolayout"] = True
+        plt.legend(bbox_to_anchor = (1.05, 1.0))
     #plt.show()
     #plt.tight_layout()
     return fig
@@ -408,7 +413,7 @@ def plot_beta_CI_for_lambdas(summaries_df : pd.DataFrame(), degree):
         
         # plot beta values
         #plt.plot(lambdas, beta_values, label=f"b{i}")
-        plt.plot(lambdas, beta_values, label=fr"$\beta_{i}$$\pm SE$")
+        plt.plot(lambdas, beta_values, label=fr"$\beta_{i}$ with $CI$")
         #plt.plot(lambdas, beta_values)
         
         # plot std error
@@ -423,7 +428,9 @@ def plot_beta_CI_for_lambdas(summaries_df : pd.DataFrame(), degree):
     plt.xlabel("Lambda values")
     plt.ylabel(r"$\beta_i$ CI")
     plt.xscale("log")
-    plt.legend(bbox_to_anchor = (1.05, 1.1))
+    if degree < 5:
+        plt.rcParams["figure.autolayout"] = True
+        plt.legend(bbox_to_anchor = (1.05, 1.0))
     #plt.tight_layout()
     #plt.show()
     return fig
