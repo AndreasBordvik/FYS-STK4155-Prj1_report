@@ -355,6 +355,83 @@ def bootstrapping(X_train, t_train, X_test, t_test, n_bootstraps, model, keep_in
     return t_hat_trains, t_hat_tests
 
 
+def plot_beta_errors_for_lambdas(summaries_df : pd.DataFrame()):
+    grp_by_coeff_df = summaries_df.groupby(["coeff_name"])
+    fig = plt.figure()
+    i=0
+    for key, item in grp_by_coeff_df:
+        df = grp_by_coeff_df.get_group(key)
+        #display(df_tmp)
+        lambdas = df["lambda"].to_numpy().astype(np.float64)
+        beta_values = df["coeff_value"].to_numpy().astype(np.float64)
+        beta_SE = df["std_error"].to_numpy().astype(np.float64)
+        
+        # plot beta values
+        #plt.plot(lambdas, beta_values, label=f"b{i}")
+        plt.plot(lambdas, beta_values, label=fr"$\beta_{i}$$\pm SE$")
+        #plt.plot(lambdas, beta_values)
+        
+        # plot std error
+        plt.fill_between(lambdas, beta_values-beta_SE, beta_values+beta_SE, alpha = 0.2)
+        
+        # 95% CI
+        #plt.fill_between(lambdas, CI_lower, CI_upper, alpha = 0.2)
+        print("\n\n")
+        i+=1
+
+    plt.title(f"Plot on Ridge coefficients variation with lambda at degree{optimal_degree}")
+    plt.xlabel("Lambda values")
+    plt.ylabel(r"$\beta_i$ $\pm$ SE")
+    plt.xscale("log")
+    plt.legend(bbox_to_anchor = (1.05, 1.1))
+    #plt.tight_layout()
+    return plt
+
+
+def plot_beta_CI_for_lambdas(summaries_df : pd.DataFrame(), degree):
+    grp_by_coeff_df = summaries_df.groupby(["coeff_name"])
+    fig = plt.figure()
+    i=0
+    for key, item in grp_by_coeff_df:
+        df = grp_by_coeff_df.get_group(key)
+        #display(df_tmp)
+        lambdas = df["lambda"].to_numpy().astype(np.float64)
+        beta_values = df["coeff_value"].to_numpy().astype(np.float64)
+        CI_lower = df["CI_lower"].to_numpy().astype(np.float64)
+        CI_upper = df["CI_upper"].to_numpy().astype(np.float64)
+        
+        # plot beta values
+        #plt.plot(lambdas, beta_values, label=f"b{i}")
+        plt.plot(lambdas, beta_values, label=fr"$\beta_{i}$$\pm SE$")
+        #plt.plot(lambdas, beta_values)
+        
+        # plot std error
+        plt.fill_between(lambdas, CI_lower, CI_upper, alpha = 0.2)
+        
+        # 95% CI
+        #plt.fill_between(lambdas, CI_lower, CI_upper, alpha = 0.2)
+        print("\n\n")
+        i+=1
+
+    plt.title(f"Plot on Ridge coefficients variation with lambda at degree{degree}")
+    plt.xlabel("Lambda values")
+    plt.ylabel(r"$\beta_i$ CI")
+    plt.xscale("log")
+    plt.legend(bbox_to_anchor = (1.05, 1.1))
+    #plt.tight_layout()
+    return plt
+
+def plot_beta_errors(summaary_df : pd.DataFrame(), degree):
+    fig = plt.figure()
+    plt.errorbar(np.arange(summaary_df.shape[0]), summaary_df["coeff_value"], yerr = degree["std_error"], fmt = 'o', ms=4)
+    plt.title(f"Beta error OLS - degree{degree}")
+    plt.xlabel(r"$\beta_i$")
+    plt.ylabel("Beta values with Std error")
+    plt.xticks(np.arange(degree.shape[0]))
+    #plt.tight_layout()
+    return plt
+
+
 if __name__ == '__main__':
     print("Import this file as a package")
     
