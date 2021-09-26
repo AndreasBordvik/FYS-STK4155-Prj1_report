@@ -20,6 +20,9 @@ INPUT_DATA = "../data/input_data/"  # Path for input data
 REPORT_DATA = "../data/report_data/" # Path for data ment for the report
 REPORT_FIGURES = "../figures/" # Path for figures ment for the report
 SEED_VALUE = 4155
+EX1 = "EX1_"; EX2 = "EX2_"; EX3 = "EX3_"; EX4 = "EX4_"; EX5 = "EX5_"
+EX6 = "EX6_"; EX6_1 = f"{EX6}{EX1}"; EX6_2 = f"{EX6}{EX2}"; 
+EX6_3 = f"{EX6}{EX3}"; EX6_4 = f"{EX6}{EX4}"; EX6_5 = f"{EX6}{EX5}"
 
 class Regression():
     def __init__(self):
@@ -358,6 +361,7 @@ def bootstrapping(X_train, t_train, X_test, t_test, n_bootstraps, model, keep_in
 def plot_beta_errors_for_lambdas(summaries_df : pd.DataFrame(), degree):
     grp_by_coeff_df = summaries_df.groupby(["coeff_name"])
     fig = plt.figure()
+    ax = fig.add_subplot(1,1,1)
     i=0
     for key, item in grp_by_coeff_df:
         df = grp_by_coeff_df.get_group(key)
@@ -384,14 +388,15 @@ def plot_beta_errors_for_lambdas(summaries_df : pd.DataFrame(), degree):
     plt.ylabel(r"$\beta_i$ $\pm$ SE")
     plt.xscale("log")
     plt.legend(bbox_to_anchor = (1.05, 1.1))
-    plt.show()
+    #plt.show()
     #plt.tight_layout()
-    #return plt
+    return fig
 
 
 def plot_beta_CI_for_lambdas(summaries_df : pd.DataFrame(), degree):
     grp_by_coeff_df = summaries_df.groupby(["coeff_name"])
     fig = plt.figure()
+    ax = fig.add_subplot(1,1,1)
     i=0
     for key, item in grp_by_coeff_df:
         df = grp_by_coeff_df.get_group(key)
@@ -420,22 +425,24 @@ def plot_beta_CI_for_lambdas(summaries_df : pd.DataFrame(), degree):
     plt.xscale("log")
     plt.legend(bbox_to_anchor = (1.05, 1.1))
     #plt.tight_layout()
-    plt.show()
-    #return plt
+    #plt.show()
+    return fig
     
 
 def plot_beta_errors(summaary_df : pd.DataFrame(), degree):
-    fig = plt.figure()
     betas = summaary_df["coeff_value"].to_numpy().astype(np.float64)
     SE = summaary_df["std_error"].to_numpy().astype(np.float64)
-    plt.errorbar(np.arange(summaary_df.shape[0]), betas , yerr = SE, fmt = 'o', ms=4)
+    
+    fig = plt.figure()
+    ax = fig.add_subplot(1,1,1)
     plt.title(f"Beta error OLS - degree{degree}")
     plt.xlabel(r"$\beta_i$")
     plt.ylabel("Beta values with Std error")
     plt.xticks(np.arange(summaary_df.shape[0]))
+    plt.errorbar(np.arange(summaary_df.shape[0]), betas , yerr = SE, fmt = 'o', ms=4)
     #plt.tight_layout()
-    plt.show()
-    #return plt
+    #plt.show()
+    return fig
     
 
 
