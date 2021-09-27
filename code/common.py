@@ -1,3 +1,4 @@
+import time
 import numpy as np
 from numpy.random import SeedSequence
 import pandas as pd
@@ -253,6 +254,18 @@ def FrankeFunction(x: float, y: float) -> float:
     term4 = -0.2*np.exp(-(9*x-4)**2 - (9*y-7)**2)
     return term1 + term2 + term3 + term4
 
+def timer(func) -> float:
+    """
+    Simple timer that can be used as a decorator to time functions
+    """
+    def timer_inner(*args, **kwargs):
+        t0: float = time.time()
+        func(*args, **kwargs)
+        t1: float = time.time()
+        print(
+            f"Elapsed time {1000*(t1 - t0):6.4f}ms in function {func.__name__}"
+        )
+    return timer_inner
 
 """
 def create_X(x:np.ndarray, y:np.ndarray, n:int)->np.ndarray:
