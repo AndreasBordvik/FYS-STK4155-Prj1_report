@@ -17,10 +17,37 @@
 \usepackage{multicol}
 \usepackage[margin=3cm]{geometry}
 
+\usepackage{listings}
+\lstset{
+    language=Python,
+    inputencoding=utf8,
+    extendedchars=true,
+    literate={ø}{{\o}}1 {å}{{\r a}}1 {Å}{{\r A}}1 {æ}{{\ae}}1,
+    backgroundcolor=\color{white!88!black},
+    basicstyle=\footnotesize\ttfamily,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    commentstyle=\itshape\color{purple!60!black},
+    frame=single,
+    %identifierstyle=\color{orange},
+    keepspaces=true,
+    keywordstyle=\bfseries\color{violet},
+    numbers=left,
+    numbersep=5pt,
+    numberstyle=\tiny\color{black},
+    rulecolor=\color{black},
+    showstringspaces=false,
+    showtabs=false,
+    stepnumber=1,
+    stringstyle=\color{purple!60!black},
+    tabsize=2,
+    title=\lstname
+  }
 %\usepackage{tikz}
 %\usetikzlibrary{math,calc,positioning}
 
-\usepackage{todonotes}
+%\usepackage{todonotes}
 
 \usepackage{hyperref}
 \hypersetup{
@@ -97,7 +124,7 @@ $ our cost function is minimized. For the following exercise, where we will stud
 
 \begin{figure}[h]
   \centering
-  \includegraphics[scale=0.75]{figures/franke_function_noise_preview.pdf}
+  \includegraphics[scale=0.75]{figures/EX1_franke_function_noise_preview.pdf}
   \caption{\label{fig:2}Plot of the Franke Function with added stochastic noise}
 \end{figure}
 
@@ -122,14 +149,35 @@ For consistency, it is noted that $\bm{\hat{\beta}} \in \mathbb{R}^p$, $\bm{y} \
 
 With an expression for the predictors $\hat{\beta}$ derived, fitting a new value $\tilde{y}$ is simply $\tilde{y} = \bm{X}\bm{\hat{\beta}}$.
 
-Our own implementation of Ordinary Least Sqaure regression is implemented such that its use mimics that of scikit-learn \cite{scikit-learn}. That is, we also include seperate steps for initializing our model, fitting the model and predicting using the model using the just derived mathematical expression. For further inquiry about implementation, refer to the github repository linked in the \nameref{sec:A}.
+Our own implementation of Ordinary Least Square regression is implemented such that its use mimics that of SciKit-learn \cite{scikit-learn}. That is, we also include separate steps for initializing our model, fitting the model and predicting using the model using the just derived mathematical expression. For further inquiry about implementation, refer to the github repository linked in the \nameref{sec:A}.
 
-\textbf{TODO} Possibly more one implementation, derivation of MSE, R2 and CI for the paramters $\beta$
+\subsection*{Confidence Intervals}
+Confidence intervals can be used to asses the uncertainty of a parameter. In our case, we will define confidence limits following the understanding of a Confidence Interval given in "Bootstrap Methods and their Application". That is, given a computed confidence region, any value inside the confidence region should be more likely than all values outside the confidence region \cite{Davison1997}.
+
+Furthermore, when computing the confidence interval for the parameters $\beta$, we first compute the variance $\bm{\sigma^2}(\beta_j) = \bm{\sigma^2}\left[(\bm{X}\bm{X^\text{T}})^{-1}\right]_\text{jj}$. Where $\bm{X}\bm{X^\text{T}}$ is the Hessian matrix. Furthermore, it can be shown that the Hessian matrix can be given as the second derivative of the Cost function with respect to $\beta$. I.e. 
+\[
+  \frac{\partial^2C}{\partial{\bm{\beta^\text{T}}}\partial{\bm{\beta}}} = \frac{2}{n}\bm{X}\bm{X^\text{T}}
+\]
+
+\subsection*{Mean Squared Error and R2 score}
+Two metrics that can be used to asses the quality of a model is its Mean Square Error (MSE) and R2 score. The MSE for any estimator is defined as 
+\[
+  \text{MSE}(\boldsymbol{y},\boldsymbol{\tilde{y}}) = \frac{1}{n}
+  \sum_{i=0}^{n-1}(y_i-\tilde{y}_i)^2
+\]
+It will be shown later that the MSE can be broken into two components, namely the variance and the squared bias. When analyzing model output, we want the MSE to be low as that would indicate a better fit by the model.
+
+The R2 score (coefficient of determination) is another metric that can be related to how the model covers its own variance. Defined as, 
+\[
+  \text{R}^2(\boldsymbol{y}, \tilde{\boldsymbol{y}}) = 1 - \frac{\sum_{i=0}^{n - 1} (y_i - \tilde{y}_i)^2}{\sum_{i=0}^{n - 1} (y_i - \bar{y})^2}
+\] the closer the R2 score is to its maximum value 1, the more the variance of the model is explained by the model parameters. The R2 score gives a measure of model skill as a higher R2 generally indicates that the model is better at making new predictions. However, a perfect R2 score of 1 would result in the model covering it's entire variance, thus the model is overfitted and will not perform well in a general use case beyond the scope of it's initial training-data.
+
+\textbf{TODO} Possibly more one implementation
 
 \subsection*{Some words on Scaling}
-Our motivation for scaling the data arise in the context of fitting a design matrix of predictors with different units. To avoid having to diregarding some predictors in favor of others based on their unit, not necessasrily their contribution to the function fit, a scaling of the data is performed. By scaling the data using one of several scaling techniques, we ensure that all predictors lie in the same reference domain, resulting in a more accurate representation of the predictors. Scikit-learn includes several different Scalers, such as the StandardScaler and MinMaxScaler \cite{scikit-learn}. For this discussion, the StandardScaler will be inspected.
+Our motivation for scaling the data arise in the context of fitting a design matrix of predictors with different units. To avoid having to disregard some predictors in favor of others based on their unit, not necessarily their contribution to the function fit, a scaling of the data is performed. By scaling the data using one of several scaling techniques, we ensure that all predictors lie in the same reference domain, resulting in a more accurate representation of the predictors. SciKit-learn includes several different Scalers, such as the StandardScaler and MinMaxScaler \cite{scikit-learn}. For this discussion, the StandardScaler will be inspected.
 
-The idea behind scaling the data with regards of the StandardScaler method, is to subtract the mean value for each column from the same column in the design matrix. This process is what is known as zero centering. Moreover, when scaling in this way, the intercept will be scaled by the mean value of the output. Moreover, it can be shown that zero centering leads to the new $\bm{\tilde{y}} = \bm{y} - \beta_0 = \bm{y} - \bm{\bar{y}}$, where $\bm{\bar{y}}$ is used as the sample mean of $\bm{y}$. As the columns of $\bm{X}$ also has been scaled in the same fashion, we end up the following cost-Function
+The idea behind scaling the data with regards to the StandardScaler method, is to subtract the mean value for each column from the same column in the design matrix. This process is what is known as zero centering. Moreover, when scaling in this way, the intercept will be scaled by the mean value of the output. Moreover, it can be shown that zero centering leads to the new $\bm{\tilde{y}} = \bm{y} - \beta_0 = \bm{y} - \bm{\bar{y}}$, where $\bm{\bar{y}}$ is used as the sample mean of $\bm{y}$. As the columns of $\bm{X}$ also has been scaled in the same fashion, we end up the following Cost-Function
 \[
   C(\boldsymbol{\beta}) = (\boldsymbol{\tilde{y}} - \tilde{X}\boldsymbol{\beta})^T(\boldsymbol{\tilde{y}} - \tilde{X}\boldsymbol{\beta}).  
 \]
@@ -140,26 +188,56 @@ Furthermore, other regression methods such as Ridge and Lasso, which will be dis
 
 To determine whether scaling is apropriate for the current problem, that being fitting the Franke Function using oridnary least squares, an inspection of the generated data is made in light of the just discussion. For Exercise 1, the datapoints $x,y \in \left[0,1\right]$. This would indicate that the data is already scaled to a unit reference system. Moreover, as we are training a model based on the ordinary least squares, there is no dependance on the intercept during fitting. As there would be no difference in the mean squared error by leaving the intercept out before scaling, there is no necessity to scale the current data for a ordinary least squares model. 
 
-\begin{figure}
+\subsection*{Comparing our OLS implementation to the one delivered by SciKit-learn}
+With our Ordinary Least Squares model implemented as described above, we start off by benchmarking our implementation to the LeastSquares method found in SciKit-learn \cite{scikit-learn}. We start off by setting up a uniform 2-dimensional grid and initialize a Franke Function with some added stochastic noise.
+
+\begin{lstlisting}
+  np.random.seed(4155)
+  n = 100
+  x = np.sort(np.random.uniform(0, 1, n))
+  y = np.sort(np.random.uniform(0, 1, n))
+  x, y = np.meshgrid(x,y)
+  z = FrankeFunction(x, y) 
+  noise = 0.5 * np.random.randn(n,n)
+  z += noise
+\end{lstlisting}
+
+For this initial run, we are interested in studying the least squares fit of the Franke Function up to the fifth order. 
+
+\begin{figure}[h]
   \centering
-  \includegraphics[scale=0.85]{figures/franke_function_OLS_fit.pdf}
-  \caption{?}
-  \label{fig:3}
+  \includegraphics[scale=0.5]{figures/EX1_franke_function_OLS_evaluate_fit_1.pdf}
+  \caption{\label{fig:OLS_franke_1} Benchmark run with degree up to the fifth order of our OLS implementation compared to the similar LinearRegression() from SciKit-learn}
 \end{figure}
 
+By inspecting Figure (\ref{fig:OLS_franke_1}), we can see that there are no visual differences between our implementation of OLS compared to the SciKit-learn implementation. Moreover, there seem to a reduction in MSE as model complexity increases. The Confidence Interval for the predictors $\beta_j$ is constructed for the fit using up to fifth order polynomials. As the predictors are based not only of the x and y parameters in isolation, but also their interaction terms, a fifth order fitted model includes 21 different predictors. The result of computing the Confidence Interval for the 21 different predictors can be seen in Figure \ref{fig:OLS_beta_1}. Note that the predictors  From Figure \ref{fig:OLS_beta_1}, it can be seen that the lowermost and higher order terms have the smallest confidence intervals. Leaving the predictors of order 3 and 4 with a higher uncertainty.
+\textbf{TODO} FIGURE (\ref{fig:OLS_beta_1}) THIS IS A PLOT OF STANDARD ERRORS, NOT STD!!!!!
 \begin{figure}
   \centering
-  \includegraphics[scale=0.45]{figures/franke_function_OLS_evaluate_fit.pdf}
-  \caption{?}
-  \label{fig:4}
+  \includegraphics[scale=.85]{figures/EX1_OLS_beta_error_degree5.pdf}
+  \caption{\label{fig:OLS_beta_1} Confidence intervals for the predictors of an OLS model with polynomials up to the fifth order.}
 \end{figure}
 
-\begin{figure}
-  \centering
-  \includegraphics[scale=0.85]{figures/franke_function_OLS_best_fit.pdf}
-  \caption{?}
-  \label{fig:5}
-\end{figure}
+%\begin{figure}
+%  \centering
+%  \includegraphics[scale=0.85]{figures/franke_function_OLS_fit.pdf}
+%  \caption{?}
+%  \label{fig:3}
+%\end{figure}
+
+%\begin{figure}
+%  \centering
+%  \includegraphics[scale=0.45]{figures/franke_function_OLS_evaluate_fit.pdf}
+%  \caption{?}
+%  \label{fig:4}
+%\end{figure}
+
+%\begin{figure}
+%  \centering
+%  \includegraphics[scale=0.85]{figures/franke_function_OLS_best_fit.pdf}
+%  \caption{?}
+%  \label{fig:5}
+%\end{figure}
 
 
 \section*{Exercise 2}
@@ -236,19 +314,19 @@ Furthermore, the problem of overfitting can also be discussed in light of the bi
 
 Lastly, it should be noted that the bias-variance tradeoff measuremnet is performed for a single dataset of limited size. As such, if there were more datapoints to train the model with, the model would attain a better overall fit. Moreover, a greater amount of training data would reduce the level of overfitting for a given model complexity. \cite{Bishop2016} Though there are some limitations to the measurement, the bias-variance tradeoff can be used to estimate where the trained model is general enough to both avoid under -and overfitting (i.e. too high bias or too high variance).
 
-\begin{figure}
-  \centering
-  \includegraphics[scale=0.45]{figures/franke_function_Ridge_evaluate_fit.pdf}
-  \caption{The best fit using Ridge}
-  \label{fig: Ridge_best_fit}
-\end{figure}
+%\begin{figure}
+%  \centering
+%  \includegraphics[scale=0.45]{figures/franke_function_Ridge_evaluate_fit.pdf}
+%  \caption{The best fit using Ridge}
+%  \label{fig: Ridge_best_fit}
+%\end{figure}
 
-\begin{figure}
-  \centering
-  \includegraphics[scale=0.85]{figures/franke_function_Ridge_best_fit.pdf}
-  \caption{The best fit using Ridge}
-  \label{fig: Ridge_best_fit_2}
-\end{figure}
+%\begin{figure}
+%  \centering
+%  \includegraphics[scale=0.85]{figures/franke_function_Ridge_best_fit.pdf}
+%  \caption{The best fit using Ridge}
+%  \label{fig: Ridge_best_fit_2}
+%\end{figure}
 
 \begin{center}
   \csvautobooktabular{data/report_data/redge_reg_lambda_-1.1.csv}

@@ -260,11 +260,12 @@ def timer(func) -> float:
     """
     def timer_inner(*args, **kwargs):
         t0: float = time.time()
-        func(*args, **kwargs)
+        result = func(*args, **kwargs)
         t1: float = time.time()
         print(
             f"Elapsed time {1000*(t1 - t0):6.4f}ms in function {func.__name__}"
         )
+        return result
     return timer_inner
 
 """
@@ -357,44 +358,29 @@ def SVDinv(A):
     invD = np.linalg.inv(D)
     return V@(invD@UT)
 
+@timer
+def bootstrap(x, y, t, maxdegree, n_bootstraps, model, scale_X=False, scale_t=False):
 
-def bootstrap(x, y, t, maxdegree, n_bootstraps, model='Linear', lmb=None):
-    for degree in tqdm(range(maxdegree), desc=f"Looping trhough polynomials up to {maxdegree} with {n_bootstraps}: "):
-        MSE_test = np.zeros(maxdegree)
-        MSE_train = np.zeros(maxdegree)
-        bias = np.zeros(maxdegree)
-        variance = np.zeros(maxdegree)
+    MSE_test = np.zeros(maxdegree)
+    MSE_train = np.zeros(maxdegree)
+    bias = np.zeros(maxdegree)
+    variance = np.zeros(maxdegree)
+    t_flat = t.ravel().reshape(-1,1)
 
+    for degree in tqdm(range(1, maxdegree+1), desc=f"Looping trhough polynomials up to {maxdegree} with {n_bootstraps}: "):
         X = create_X(x, y, n=degree)
-        X_train, X_test, t_train, t_test = train_test_split(
-            X, t, test_size=0.2, random_state=SEED_VALUE)
-        t_test_ = np.reshape(t_test, newshape=(t_test.shape[0], 1))
-        t_train_ = np.reshape(t_train, newshape=(t_train.shape[0], 1))
-        X_train = standard_scaling(X_train)
-        X_test = standard_scaling(X_test)
+        X_train, X_test, t_train, t_test = prepare_data(X, t_flat, test_size=0.2, shuffle=True, scale_X=scale_X, scale_t = scale_t, random_state=SEED_VALUE)
 
-        """
-        if model == 'Linear':
-            model = lm.LinearRegression()
-        elif model == 'Ridge':
-            model = RidgeRegression(lmb)
-        elif model == 'Lasso':
-            model = Lasso(lmb)
-        else:
-            print(f"No valid model was chose, {model} is not a valid model")
-        """
-        #model = lm.LinearRegression()
-        model = OLS(degree=degree)
         t_hat_train, t_hat_test = bootstrapping(
-            X_train, t_train, X_test, t_test, n_bootstraps, model)
+            X_train, t_train, X_test, t_test, n_bootstraps, model, keep_intercept=True)
 
-        MSE_test[degree] = np.mean(
-            np.mean((t_test_ - t_hat_test)**2, axis=1, keepdims=True))
-        MSE_train[degree] = np.mean(
-            np.mean((t_train_ - t_hat_train)**2, axis=1, keepdims=True))
-        bias[degree] = np.mean(
+        MSE_test[degree-1] = np.mean(
+            np.mean((t_test - t_hat_test)**2, axis=1, keepdims=True))
+        MSE_train[degree-1] = np.mean(
+            np.mean((t_train - t_hat_train)**2, axis=1, keepdims=True))
+        bias[degree-1] = np.mean(
             (t_test - np.mean(t_hat_test, axis=1, keepdims=True))**2)
-        variance[degree] = np.mean(np.var(t_hat_test, axis=1, keepdims=True))
+        variance[degree-1] = np.mean(np.var(t_hat_test, axis=1, keepdims=True))
     return MSE_test, MSE_train, bias, variance
 
 
@@ -497,12 +483,29 @@ def plot_beta_errors(summaary_df: pd.DataFrame(), degree):
     betas = summaary_df["coeff_value"].to_numpy().astype(np.float64)
     SE = summaary_df["std_error"].to_numpy().astype(np.float64)
 
+    # Computing x-ticks
+    x_ticks = ["1"]
+    for i in range(1, degree+1):
+        for k in range(i+1):
+            x_ticks.append(f"({i-k})({k})")
+
     fig = plt.figure()
-    ax = fig.add_subplot(1, 1, 1)
+    ax = plt.axes()
     plt.title(f"Beta error OLS - degree{degree}")
-    plt.xlabel(r"$\beta_i$")
+    plt.xlabel(r"$\beta_i$ as power of x and y")
     plt.ylabel("Beta values with std error")
-    plt.xticks(np.arange(summaary_df.shape[0]))
+    ax.set_xticks(np.arange(summaary_df.shape[0]))
+    ax.set_xticklabels(x_ticks)
+    plt.gca().margins(x=0)
+    plt.gcf().canvas.draw()
+    tl = plt.gca().get_xticklabels()
+    maxsize = max([t.get_window_extent().width for t in tl])
+    m = 0.2 # inch margin
+    s = maxsize/plt.gcf().dpi*summaary_df.shape[0]+2*m
+    margin = m/plt.gcf().get_size_inches()[0]
+
+    plt.gcf().subplots_adjust(left=margin, right=1.-margin)
+    plt.gcf().set_size_inches(s, plt.gcf().get_size_inches()[1])
     plt.errorbar(
         np.arange(summaary_df.shape[0]), betas, yerr=SE, fmt='o', ms=4)
     # plt.tight_layout()
