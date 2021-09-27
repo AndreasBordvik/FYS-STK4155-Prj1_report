@@ -15,6 +15,7 @@ from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from random import random, seed
 from sklearn.model_selection import KFold
+from sklearn import linear_model
 
 
 # Setting global variables
@@ -243,6 +244,14 @@ def create_X(x: np.ndarray, y: np.ndarray, n: int) -> np.ndarray:
             X[:, q+k] = (x**(i-k))*(y**k)
 
     return X
+
+
+def FrankeFunction(x: float, y: float) -> float:
+    term1 = 0.75*np.exp(-(0.25*(9*x-2)**2) - 0.25*((9*y-2)**2))
+    term2 = 0.75*np.exp(-((9*x+1)**2)/49.0 - 0.1*(9*y+1))
+    term3 = 0.5*np.exp(-(9*x-7)**2/4.0 - 0.25*((9*y-3)**2))
+    term4 = -0.2*np.exp(-(9*x-4)**2 - (9*y-7)**2)
+    return term1 + term2 + term3 + term4
 
 
 """
@@ -488,25 +497,25 @@ def plot_beta_errors(summaary_df: pd.DataFrame(), degree):
     return fig
 
 
-def cross_val(k: int, model: str, lmb: int, X: np.ndarray, z: np.ndarray) -> np.ndarray:
+def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None) -> np.ndarray:
     """Function for cross validating on k folds
 
     Args:
         k (int): Number of folds
         model (str): Linear regression model
-        lmb (int): lambda value
         X (np.ndarray): Design matrix
         z (np.ndarray): target values
+        lmb (Optional): lambda value
 
     Returns:
-        np.ndarray: Mean score of MSE on all k folds
+        np.ndarray: Scores of MSE on all k folds
     """
     if model == "Ridge":
         model = RidgeRegression(lambda_val=lmb)
     elif model == "Lasso":
         model = LassoRegression(lambda_val=lmb)
     elif model == "OLS":
-        model = OLS()
+        model = LinearRegression()
     else:
         "Provide a valid model as a string(Ridge/Lasso/OLS) "
 
@@ -528,7 +537,7 @@ def cross_val(k: int, model: str, lmb: int, X: np.ndarray, z: np.ndarray) -> np.
         scores_KFold[j] = np.sum((ypred - ytest)**2)/np.size(ypred)
         j += 1
 
-    return np.mean(scores_KFold)
+    return scores_KFold
 
 
 if __name__ == '__main__':
