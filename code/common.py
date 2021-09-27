@@ -513,7 +513,7 @@ def plot_beta_errors(summaary_df: pd.DataFrame(), degree):
     return fig
 
 
-def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None) -> np.ndarray:
+def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffle=False) -> np.ndarray:
     """Function for cross validating on k folds
 
     Args:
@@ -535,7 +535,7 @@ def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None) -> np.
     else:
         "Provide a valid model as a string(Ridge/Lasso/OLS) "
 
-    kfold = KFold(n_splits=k)
+    kfold = KFold(n_splits=k, shuffle=shuffle)
     scores_KFold = np.zeros(k)
     z = z.ravel()
     # scores_KFold idx counter
