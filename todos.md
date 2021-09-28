@@ -8,7 +8,7 @@ Critical discussion on scaling
 Discussion on beta_i confidence interval
 
 ## Exercise 2
-Compare own bootstrap to sklearn
+
 
 ## Exercise 3
 Compare own CV to sklearn
@@ -22,6 +22,9 @@ studere effekt av scaling med og uten intercept
 
 plotte vertikal linje for optimal lambda i beta-plot
 
+Note that $\lambda$ is regularization parameter
+Discuss the importance of regularization, for feature selection. 
+Discuss bootstrap and cv with and without regularization.
 
 ## Exercise 6
-Add noise to z for all  subtasks
+Add noise to z for all subtasks
