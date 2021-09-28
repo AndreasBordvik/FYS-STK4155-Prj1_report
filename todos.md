@@ -11,7 +11,8 @@ Discussion on beta_i confidence interval
 Compare own bootstrap to sklearn
 
 ## Exercise 3
-Compare own CV to sklearn
+Why does not own implemented and scikit != for degree>5???
+compare CV with bootstrap
 
 ## Exercise 4-5
 vår fit opp mot sklearn
