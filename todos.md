@@ -41,3 +41,5 @@ Discuss bootstrap and cv with and without regularization.
 Add noise to z for all subtasks
 
 Tenk på funksjonen man fitter som en kompresjon av terrenget. 
+
+Curse of dimensionality, "The more dimensions the training data set has, the greater the risk of overfitting is"[Hands on scikit p215]

@@ -194,6 +194,8 @@ def prepare_data(X: np.ndarray, t: np.ndarray, test_size=0.2, shuffle=True, scal
             X_test = manual_scaling(X_test)
         else:
             X_train, X_test = standard_scaling(X_train, X_test)
+            X_train[:,0] = 1
+            X_test[:,0] = 1
 
     if(scale_t):
         if zero_center: # This should NEVER happen
@@ -513,7 +515,7 @@ def plot_beta_errors(summaary_df: pd.DataFrame(), degree):
     plt.gcf().subplots_adjust(left=margin, right=1.-margin)
     plt.gcf().set_size_inches(s, plt.gcf().get_size_inches()[1])
     plt.errorbar(
-        np.arange(summaary_df.shape[0]), betas, yerr=SE, fmt='o', ms=4)
+        np.arange(summaary_df.shape[0]), betas, yerr=1.96*SE, fmt='o', ms=4)
     # plt.tight_layout()
     # plt.show()
     return fig

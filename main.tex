@@ -96,17 +96,6 @@ with a 3-dimensional plot given in Figure \ref{fig:1}
 \end{figure}
 
 \section*{Theory}
-MSE value between $\boldsymbol{y}$ and $\boldsymbol{\hat y}$ is defined as;
-\begin{equation}
-    MSE(\boldsymbol{y},\boldsymbol{\tilde{y}}) = \frac{1}{n}
-    \sum_{i=0}^{n-1}(y_i-\tilde{y}_i)^2
-\end{equation}
-
-The $R^2$ value between $\boldsymbol{y}$ and $\boldsymbol{\hat y}$ is defined as;
-\begin{equation}
-    R^2(\boldsymbol{y}, \tilde{\boldsymbol{y}}) = 1 - \frac{\sum_{i=0}^{n - 1} (y_i - \tilde{y}_i)^2}{\sum_{i=0}^{n - 1} (y_i - \bar{y})^2}
-\end{equation}
-
 The mean value of $\boldsymbol{y}$ is defined as;
 \begin{equation}
     \bar{y} =  \frac{1}{n} \sum_{i=0}^{n - 1} y_i
@@ -182,11 +171,18 @@ The idea behind scaling the data with regards to the StandardScaler method, is t
   C(\boldsymbol{\beta}) = (\boldsymbol{\tilde{y}} - \tilde{X}\boldsymbol{\beta})^T(\boldsymbol{\tilde{y}} - \tilde{X}\boldsymbol{\beta}).  
 \]
 
-Before scaling the dataset, an assessment of whether to keep the intercept or not has to be made. For reference, the intercept is defined as the first column of the design matrix, and for a polynomial fit would represent where the function intercepts with the y-axis when all other features are set to zero. For ordinary least squares, there is no dependance on the intercept when fitting the model. Hence, a model trained with an unscaled dataset would attain the same mean squared error as a model trained with a scaled dataset. The difference being that the intercept of the scaled model have to be readded to the predicted value when computing the mean squared error.
+Before scaling the dataset, an assessment of how to deal with the intercept has to be made. For reference, the intercept is defined as the first column of the design matrix, and for a polynomial fit would represent where the function intercepts with the y-axis when all other features are set to zero. Moreover, the intercept is a constant value (1), thus zero centering the intercept would result in a singular matrix, rendering the optimization problem unsolvable. Throughout this assignment, we are going to readd the intercept after scaling, essentially leaving the intercept untouched as to avoid any singular matrices. Moreover, for ordinary least squares regression, as there is no regularization of the predictors during the model fit, a model fitted on scaled contra unscaled data would attain the same mean squared error.
 
-Furthermore, other regression methods such as Ridge and Lasso, which will be discussed in greater detail in further sections, have a dependance on the intercept through their hyperparamter when computing their regularization term. Not including the intercept when computing the regularization term would give rise to a divergence between the mean square error for the model scaled with compared to the model scaled without the intercept. Thus, by computing the regularization term $\lambda$ with disregard to the intercept, the first $\beta_j$ i.e. that of the intercept will be skipped in the computation. This will in most cases lead to a better mean square error for both Ridge and Lasso regression. 
+However, other regression methods such as Ridge and Lasso, which will be discussed in greater detail in further sections, have a dependance on the intercept through the hyperparamter $\lambda$ when computing their regularization term. Not including the intercept when computing the regularization term would give rise to a divergence between the mean square error for the model scaled with compared to the model scaled without the intercept. Thus, by computing the regularization term with disregard to the intercept, the first $\beta_j$ i.e. that of the intercept will be skipped in the computation. This will in most cases lead to a better mean square error for both Ridge and Lasso regression. Skipping the intercept when computing the regularization term also follows the definition of Ridge regression as in \cite{Geron2019}.
 
-To determine whether scaling is apropriate for the current problem, that being fitting the Franke Function using oridnary least squares, an inspection of the generated data is made in light of the just discussion. For Exercise 1, the datapoints $x,y \in \left[0,1\right]$. This would indicate that the data is already scaled to a unit reference system. Moreover, as we are training a model based on the ordinary least squares, there is no dependance on the intercept during fitting. As there would be no difference in the mean squared error by leaving the intercept out before scaling, there is no necessity to scale the current data for a ordinary least squares model. 
+Furthermore, while on the topic of Ridge and Lasso regression, scaling of the data should always be performed. This is due to the regularized linear models such as Ridge and Lasso being sensitive to the scale of the input features \cite{Geron2019}. 
+
+To determine whether scaling is apropriate for the current problem, that being fitting the Franke Function using oridnary least squares, an inspection of the generated data is made in light of the just discussion. For Exercise 1, the datapoints $x,y \in \left[0,1\right]$. This would indicate that the data is already scaled to a unit reference system. Moreover, as we are training a model based on the ordinary least squares, there is no dependance on scale of the input features as for regularized linear models. However, for consistency with further models, the data will be scaled with respect to the training data. However, the target variables however will not be scaled.
+
+\subsubsection*{Splitting the data}
+As we want our model to perform well in general cases, we split the data into a training and testing set to simulate model prediction using new data. This is achieved by the aforementioned split, since the training and test data are kept entirely separated. In practice, we fit the model using the training data, then perform a test of the model using the test data. The error rate for new cases predicted by the model using the test data, can be used to understand how the model will perform on new untrained data \cite{Geron2019}. Moreover, by assessing the deviation between training error and test error, it can be seen whether the model is overfitting or not. It would be a case of overfitting if the training error is low, whereas the test error is high.
+
+Throughout this assignment, we will split the data into a train and test set. The data could be split into an additional validation set, which is normally used for hyperparamter adjustment. However, as we don't see any practical use for a validation set for this assignment, we will skip out on splitting the data into an additional validation set. Though a validation set could be used for tuning the hyperparameter to select an optimal model, it could also lead to suboptimal model selection caused by imprecise prediction from a too small validation set \cite{Geron2019}. Though our data consists of potentially unlimited data points, due to computational time constraints, we will resort to relatively sparse data. Hence, we split into a training and test set to avoid sacrificing the training data in favor of a sufficient validation set.
 
 \subsection*{Comparing our OLS implementation to the one delivered by SciKit-learn}
 With our Ordinary Least Squares model implemented as described above, we start off by benchmarking our implementation to the LeastSquares method found in SciKit-learn \cite{scikit-learn}. We start off by setting up a uniform 2-dimensional grid and initialize a Franke Function with some added stochastic noise.
@@ -211,11 +207,11 @@ For this initial run, we are interested in studying the least squares fit of the
 \end{figure}
 
 By inspecting Figure (\ref{fig:OLS_franke_1}), we can see that there are no visual differences between our implementation of OLS compared to the SciKit-learn implementation. Moreover, there seem to a reduction in MSE as model complexity increases. The Confidence Interval for the predictors $\beta_j$ is constructed for the fit using up to fifth order polynomials. As the predictors are based not only of the x and y parameters in isolation, but also their interaction terms, a fifth order fitted model includes 21 different predictors. The result of computing the Confidence Interval for the 21 different predictors can be seen in Figure \ref{fig:OLS_beta_1}. Note that the predictors  From Figure \ref{fig:OLS_beta_1}, it can be seen that the lowermost and higher order terms have the smallest confidence intervals. Leaving the predictors of order 3 and 4 with a higher uncertainty.
-\textbf{TODO} FIGURE (\ref{fig:OLS_beta_1}) THIS IS A PLOT OF STANDARD ERRORS, NOT STD!!!!!
+
 \begin{figure}
   \centering
   \includegraphics[scale=.85]{figures/EX1_OLS_beta_error_degree5.pdf}
-  \caption{\label{fig:OLS_beta_1} Confidence intervals for the predictors of an OLS model with polynomials up to the fifth order.}
+  \caption{\label{fig:OLS_beta_1} 95\% Confidence intervals for the predictors of an OLS model with polynomials up to the fifth order.}
 \end{figure}
 
 %\begin{figure}
