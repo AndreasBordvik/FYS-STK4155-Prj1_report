@@ -14,8 +14,6 @@ feil konvergerer som 1/sqrt(n) (kanskje). (MonteCarlo)
 sett i lys av computational heavy
 
 ## Exercise 3
-Why does not own implemented and scikit != for degree>5???
-compare CV with bootstrap
 
 Complexity degree 6, low variance between kfold splits
 
@@ -23,6 +21,10 @@ Compare bootstrap MSE for one degree with all kfold mean MSE for one degree.
 
 Støyete vs. lite støyete datasett, ("Det har ikke så mye å si")
 Usikkerheten går opp med flere og flere folds, for antall datapunkter går ned. 
+
+Test bootstrap for n > 100. MSE for bootstrap blir mye bedre fordi sjansen for å sample samme punkt 2 
+ganger blir mye mindre med større dataset! 
+
 
 ## Exercise 4-5
 vår fit opp mot sklearn

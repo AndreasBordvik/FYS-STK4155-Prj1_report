@@ -189,7 +189,7 @@ def prepare_data(X: np.ndarray, t: np.ndarray, test_size=0.2, shuffle=True, scal
 
     # Scale data
     if(scale_X):
-        if zero_center: # This should NEVER happen
+        if zero_center:  # This should NEVER happen
             X_train = manual_scaling(X_train)
             X_test = manual_scaling(X_test)
         else:
@@ -198,12 +198,11 @@ def prepare_data(X: np.ndarray, t: np.ndarray, test_size=0.2, shuffle=True, scal
             X_test[:,0] = 1
 
     if(scale_t):
-        if zero_center: # This should NEVER happen
+        if zero_center:  # This should NEVER happen
             t_train = manual_scaling(t_train)
             t_test = manual_scaling(t_test)
         else:
             t_train, t_test = standard_scaling(t_train, t_test)
-
 
     return X_train, X_test, t_train, t_test
 
@@ -224,6 +223,11 @@ def standard_scaling(train, test):
     test_scaled = scaler.transform(test)
     return train_scaled, test_scaled
 
+def standard_scaling_single(data):
+    scaler = StandardScaler()
+    scaler.fit(data)
+    data_scaled = scaler.transform(data)
+    return data_scaled, scaler
 
 def min_max_scaling(data):
     scaler = MinMaxScaler()
@@ -545,6 +549,8 @@ def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffl
     else:
         "Provide a valid model as a string(Ridge/Lasso/OLS) "
 
+
+
     kfold = KFold(n_splits=k, shuffle=shuffle, random_state=SEED_VALUE)
     scores_KFold = np.zeros(k)
     z = z.ravel()
@@ -566,7 +572,10 @@ def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffl
         xtrain_scaled[:, 0] = 1
         xtest_scaled[:, 0] = 1
 
-        model.fit(xtrain_scaled, ytrain)
+        if model == "Ridge":
+            model.fit(xtrain_scaled, ytrain, keep_intercept=False)
+        else:
+            model.fit(xtrain_scaled, ytrain)
 
         ypred = model.predict(xtest_scaled)
         scores_KFold[j] = np.sum((ypred - ytest)**2)/np.size(ypred)
