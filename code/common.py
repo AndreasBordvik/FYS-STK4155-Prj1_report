@@ -254,6 +254,7 @@ def FrankeFunction(x: float, y: float) -> float:
     term4 = -0.2*np.exp(-(9*x-4)**2 - (9*y-7)**2)
     return term1 + term2 + term3 + term4
 
+
 def timer(func) -> float:
     """
     Simple timer that can be used as a decorator to time functions
@@ -267,6 +268,7 @@ def timer(func) -> float:
         )
         return result
     return timer_inner
+
 
 """
 def create_X(x:np.ndarray, y:np.ndarray, n:int)->np.ndarray:
@@ -358,6 +360,7 @@ def SVDinv(A):
     invD = np.linalg.inv(D)
     return V@(invD@UT)
 
+
 @timer
 def bootstrap(x, y, t, maxdegree, n_bootstraps, model, scale_X=False, scale_t=False):
 
@@ -365,11 +368,12 @@ def bootstrap(x, y, t, maxdegree, n_bootstraps, model, scale_X=False, scale_t=Fa
     MSE_train = np.zeros(maxdegree)
     bias = np.zeros(maxdegree)
     variance = np.zeros(maxdegree)
-    t_flat = t.ravel().reshape(-1,1)
+    t_flat = t.ravel().reshape(-1, 1)
 
     for degree in tqdm(range(1, maxdegree+1), desc=f"Looping trhough polynomials up to {maxdegree} with {n_bootstraps}: "):
         X = create_X(x, y, n=degree)
-        X_train, X_test, t_train, t_test = prepare_data(X, t_flat, test_size=0.2, shuffle=True, scale_X=scale_X, scale_t = scale_t, random_state=SEED_VALUE)
+        X_train, X_test, t_train, t_test = prepare_data(
+            X, t_flat, test_size=0.2, shuffle=True, scale_X=scale_X, scale_t=scale_t, random_state=SEED_VALUE)
 
         t_hat_train, t_hat_test = bootstrapping(
             X_train, t_train, X_test, t_test, n_bootstraps, model, keep_intercept=True)
@@ -500,7 +504,7 @@ def plot_beta_errors(summaary_df: pd.DataFrame(), degree):
     plt.gcf().canvas.draw()
     tl = plt.gca().get_xticklabels()
     maxsize = max([t.get_window_extent().width for t in tl])
-    m = 0.2 # inch margin
+    m = 0.2  # inch margin
     s = maxsize/plt.gcf().dpi*summaary_df.shape[0]+2*m
     margin = m/plt.gcf().get_size_inches()[0]
 
@@ -529,9 +533,13 @@ def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffl
     if model == "Ridge":
         model = RidgeRegression(lambda_val=lmb)
     elif model == "Lasso":
-        model = LassoRegression(lambda_val=lmb)
+        model = lm.Lasso(alpha=lmb)
     elif model == "OLS":
         model = LinearRegression()
+    elif model == "OLS":
+        model = LinearRegression()
+    elif model == "sk_OLS":
+        model = lm.LinearRegression()
     else:
         "Provide a valid model as a string(Ridge/Lasso/OLS) "
 
@@ -548,7 +556,6 @@ def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffl
         # get all cols and selected test_inds rows:
         xtest = X[test_inds, :]
         ytest = z[test_inds]
-        model.fit(xtrain, ytrain)
         ypred = model.predict(xtest)
         scores_KFold[j] = np.sum((ypred - ytest)**2)/np.size(ypred)
         j += 1
