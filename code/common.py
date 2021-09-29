@@ -189,20 +189,19 @@ def prepare_data(X: np.ndarray, t: np.ndarray, test_size=0.2, shuffle=True, scal
 
     # Scale data
     if(scale_X):
-        if zero_center:
+        if zero_center: # This should NEVER happen
             X_train = manual_scaling(X_train)
             X_test = manual_scaling(X_test)
         else:
-            X_train, _ = standard_scaling(X_train)
-            X_test, _ = standard_scaling(X_test)
+            X_train, X_test = standard_scaling(X_train, X_test)
 
     if(scale_t):
-        if zero_center:
+        if zero_center: # This should NEVER happen
             t_train = manual_scaling(t_train)
             t_test = manual_scaling(t_test)
         else:
-            t_train, _ = standard_scaling(t_train)
-            t_test, _ = standard_scaling(t_test)
+            t_train, t_test = standard_scaling(t_train, t_test)
+
 
     return X_train, X_test, t_train, t_test
 
@@ -216,11 +215,12 @@ def manual_scaling(data):
     return data - np.mean(data, axis=0)
 
 
-def standard_scaling(data):
+def standard_scaling(train, test):
     scaler = StandardScaler()
-    scaler.fit(data)
-    data_scaled = scaler.transform(data)
-    return data_scaled, scaler
+    scaler.fit(train)
+    train_scaled = scaler.transform(train)
+    test_scaled = scaler.transform(test)
+    return train_scaled, test_scaled
 
 
 def min_max_scaling(data):
