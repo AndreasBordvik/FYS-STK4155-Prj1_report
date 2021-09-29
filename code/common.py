@@ -519,8 +519,8 @@ def plot_beta_errors(summaary_df: pd.DataFrame(), degree):
     return fig
 
 
-def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffle=False, scale = False) -> np.ndarray:
-    """Function for cross validating on k folds
+def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffle=False) -> np.ndarray:
+    """Function for cross validating on k folds. Scales data after split(standarscaler).
 
     Args:
         k (int): Number of folds
@@ -528,7 +528,7 @@ def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffl
         X (np.ndarray): Design matrix
         z (np.ndarray): target values
         lmb (Optional): lambda value
-        scale (boolean): 
+        shuffle (boolean): deafault False. 
 
     Returns:
         np.ndarray: Scores of MSE on all k folds
@@ -550,14 +550,12 @@ def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffl
     j = 0
     for train_inds, test_inds in kfold.split(X, z):
 
-
         # get all cols and selected train_inds rows/elements:
         xtrain = X[train_inds, :]
         ytrain = z[train_inds]
         # get all cols and selected test_inds rows/elements:
         xtest = X[test_inds, :]
         ytest = z[test_inds]
-        # TODO:add scaling!
 
         scaler = StandardScaler()
         scaler.fit(xtrain)
@@ -574,8 +572,10 @@ def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffl
 
     return scores_KFold
 
+
 def noise_factor(n, factor=0.3):
-    return factor*np.random.normal(0, size = n)
+    return factor*np.random.normal(0, size=n)
+
 
 if __name__ == '__main__':
     print("Import this file as a package")
