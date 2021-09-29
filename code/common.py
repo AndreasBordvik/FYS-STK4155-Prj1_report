@@ -535,11 +535,8 @@ def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffl
     elif model == "Lasso":
         model = lm.Lasso(alpha=lmb)
     elif model == "OLS":
-        model = LinearRegression()
-    elif model == "OLS":
-        model = LinearRegression()
-    elif model == "sk_OLS":
-        model = lm.LinearRegression()
+        model = OLS()
+
     else:
         "Provide a valid model as a string(Ridge/Lasso/OLS) "
 
@@ -556,6 +553,8 @@ def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffl
         # get all cols and selected test_inds rows:
         xtest = X[test_inds, :]
         ytest = z[test_inds]
+        model.fit(xtrain, ytrain)
+
         ypred = model.predict(xtest)
         scores_KFold[j] = np.sum((ypred - ytest)**2)/np.size(ypred)
         j += 1
