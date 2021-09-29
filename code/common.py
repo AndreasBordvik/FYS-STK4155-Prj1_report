@@ -540,7 +540,7 @@ def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffl
     else:
         "Provide a valid model as a string(Ridge/Lasso/OLS) "
 
-    kfold = KFold(n_splits=k, shuffle=shuffle)
+    kfold = KFold(n_splits=k, shuffle=shuffle, random_state=SEED_VALUE)
     scores_KFold = np.zeros(k)
     z = z.ravel()
     # scores_KFold idx counter
