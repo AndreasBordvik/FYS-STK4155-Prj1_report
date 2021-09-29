@@ -221,6 +221,11 @@ def standard_scaling(train, test):
     test_scaled = scaler.transform(test)
     return train_scaled, test_scaled
 
+def standard_scaling_single(data):
+    scaler = StandardScaler()
+    scaler.fit(data)
+    data_scaled = scaler.transform(data)
+    return data_scaled, scaler
 
 def min_max_scaling(data):
     scaler = MinMaxScaler()
@@ -542,6 +547,8 @@ def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffl
     else:
         "Provide a valid model as a string(Ridge/Lasso/OLS) "
 
+
+
     kfold = KFold(n_splits=k, shuffle=shuffle, random_state=SEED_VALUE)
     scores_KFold = np.zeros(k)
     z = z.ravel()
@@ -563,7 +570,10 @@ def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffl
         xtrain_scaled[:, 0] = 1
         xtest_scaled[:, 0] = 1
 
-        model.fit(xtrain_scaled, ytrain)
+        if model == "Ridge":
+            model.fit(xtrain_scaled, ytrain, keep_intercept=False)
+        else:
+            model.fit(xtrain_scaled, ytrain)
 
         ypred = model.predict(xtest_scaled)
         scores_KFold[j] = np.sum((ypred - ytest)**2)/np.size(ypred)
