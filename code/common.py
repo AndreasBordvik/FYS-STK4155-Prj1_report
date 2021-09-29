@@ -57,12 +57,12 @@ class Regression():
         return self.betas
 
     def predict(self, X: np.ndarray) -> np.ndarray:
-        #print("from predict: self.keep_intercept:",self.keep_intercept)
+        # print("from predict: self.keep_intercept:",self.keep_intercept)
         if(self.keep_intercept == False):
-            #print(f"Predict: removing intercept")
+            # print(f"Predict: removing intercept")
             X = X[:, 1:]
-        #print("betas.shape in predict:",self.betas.shape)
-        #print("X.shape in predict:",X.shape)
+        # print("betas.shape in predict:",self.betas.shape)
+        # print("X.shape in predict:",X.shape)
         prediction = X @ self.betas
         return prediction
 
@@ -120,9 +120,9 @@ class OLS(Regression):
         else:
             self.betas = np.linalg.pinv(X.T @ X) @ X.T @ t
         self.t_hat_train = X @ self.betas
-        #print("betas.shape in train before squeeze:",self.betas.shape)
+        # print("betas.shape in train before squeeze:",self.betas.shape)
         self.betas = np.squeeze(self.betas)
-        #print("betas.shape in train after squeeze:",self.betas.shape)
+        # print("betas.shape in train after squeeze:",self.betas.shape)
         return self.t_hat_train
 
 
@@ -153,9 +153,9 @@ class RidgeRegression(Regression):
         else:
             self.betas = np.linalg.pinv(Hessian) @ X.T @ t
         self.t_hat_train = X @ self.betas
-        #print(f"Betas.shape in Ridge before:{self.betas.shape}")
+        # print(f"Betas.shape in Ridge before:{self.betas.shape}")
         self.betas = np.squeeze(self.betas)
-        #print(f"Betas.shape in Ridge after:{self.betas.shape}")
+        # print(f"Betas.shape in Ridge after:{self.betas.shape}")
         return self.t_hat_train
 
 
@@ -208,7 +208,7 @@ def prepare_data(X: np.ndarray, t: np.ndarray, test_size=0.2, shuffle=True, scal
 
 def manual_scaling(data):
     """
-    Avoids the use of sklearn StandardScaler(), which also 
+    Avoids the use of sklearn StandardScaler(), which also
     divides the scaled value by the standard deviation.
     This scaling is essentially just a zero centering
     """
@@ -284,7 +284,7 @@ def create_X(x:np.ndarray, y:np.ndarray, n:int)->np.ndarray:
 		q = int((i)*(i+1)/2)
 		for k in range(i+1):
 			X[:,q+k] = (x**(i-k))*(y**k)
-            
+
     return X
 """
 
@@ -335,8 +335,10 @@ def plot_franke_function():
     def evaluate(targets, predictions):
         targets = targets.flatten()
         predictions = predictions.flatten()
-        MSE_score = MSE(targets, predictions) # Can we use sklearn or de we have to write it from scratch?
-        R2_score = R2(targets, predictions) # Can we use sklearn or de we have to write it from scratch?
+        # Can we use sklearn or de we have to write it from scratch?
+        MSE_score = MSE(targets, predictions)
+        # Can we use sklearn or de we have to write it from scratch?
+        R2_score = R2(targets, predictions)
         bias = None
         variance = None
         return MSE_score, R2_score, bias, variance
@@ -405,7 +407,7 @@ def bootstrapping(X_train, t_train, X_test, t_test, n_bootstraps, model, keep_in
 def plot_beta_errors_for_lambdas(summaries_df: pd.DataFrame(), degree):
     grp_by_coeff_df = summaries_df.groupby(["coeff_name"])
 
-    #plt.rcParams["figure.figsize"] = [7.00, 3.50]
+    # plt.rcParams["figure.figsize"] = [7.00, 3.50]
 
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
@@ -418,16 +420,16 @@ def plot_beta_errors_for_lambdas(summaries_df: pd.DataFrame(), degree):
         beta_SE = df["std_error"].to_numpy().astype(np.float64)
 
         # plot beta values
-        #plt.plot(lambdas, beta_values, label=f"b{i}")
+        # plt.plot(lambdas, beta_values, label=f"b{i}")
         plt.plot(lambdas, beta_values, label=fr"$\beta_{i}$$\pm SE$")
-        #plt.plot(lambdas, beta_values)
+        # plt.plot(lambdas, beta_values)
 
         # plot std error
         plt.fill_between(lambdas, beta_values-beta_SE,
                          beta_values+beta_SE, alpha=0.2)
 
         # 95% CI
-        #plt.fill_between(lambdas, CI_lower, CI_upper, alpha = 0.2)
+        # plt.fill_between(lambdas, CI_lower, CI_upper, alpha = 0.2)
         print("\n\n")
         i += 1
 
@@ -458,15 +460,15 @@ def plot_beta_CI_for_lambdas(summaries_df: pd.DataFrame(), degree):
         CI_upper = df["CI_upper"].to_numpy().astype(np.float64)
 
         # plot beta values
-        #plt.plot(lambdas, beta_values, label=f"b{i}")
+        # plt.plot(lambdas, beta_values, label=f"b{i}")
         plt.plot(lambdas, beta_values, label=fr"$\beta_{i}$ with $CI$")
-        #plt.plot(lambdas, beta_values)
+        # plt.plot(lambdas, beta_values)
 
         # plot std error
         plt.fill_between(lambdas, CI_lower, CI_upper, alpha=0.2)
 
         # 95% CI
-        #plt.fill_between(lambdas, CI_lower, CI_upper, alpha = 0.2)
+        # plt.fill_between(lambdas, CI_lower, CI_upper, alpha = 0.2)
         print("\n\n")
         i += 1
 
@@ -517,7 +519,7 @@ def plot_beta_errors(summaary_df: pd.DataFrame(), degree):
     return fig
 
 
-def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffle=False) -> np.ndarray:
+def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffle=False, scale = False) -> np.ndarray:
     """Function for cross validating on k folds
 
     Args:
@@ -526,6 +528,7 @@ def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffl
         X (np.ndarray): Design matrix
         z (np.ndarray): target values
         lmb (Optional): lambda value
+        scale (boolean): 
 
     Returns:
         np.ndarray: Scores of MSE on all k folds
@@ -547,15 +550,25 @@ def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffl
     j = 0
     for train_inds, test_inds in kfold.split(X, z):
 
+
         # get all cols and selected train_inds rows/elements:
         xtrain = X[train_inds, :]
         ytrain = z[train_inds]
         # get all cols and selected test_inds rows/elements:
         xtest = X[test_inds, :]
         ytest = z[test_inds]
-        model.fit(xtrain, ytrain)
+        # TODO:add scaling!
 
-        ypred = model.predict(xtest)
+        scaler = StandardScaler()
+        scaler.fit(xtrain)
+        xtrain_scaled = scaler.transform(xtrain)
+        xtest_scaled = scaler.transform(xtest)
+        xtrain_scaled[:, 0] = 1
+        xtest_scaled[:, 0] = 1
+
+        model.fit(xtrain_scaled, ytrain)
+
+        ypred = model.predict(xtest_scaled)
         scores_KFold[j] = np.sum((ypred - ytest)**2)/np.size(ypred)
         j += 1
 
