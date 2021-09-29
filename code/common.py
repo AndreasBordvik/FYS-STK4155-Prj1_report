@@ -574,6 +574,8 @@ def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffl
 
     return scores_KFold
 
+def noise_factor(n, factor=0.3):
+    return factor*np.random.normal(0, size = n)
 
 if __name__ == '__main__':
     print("Import this file as a package")
