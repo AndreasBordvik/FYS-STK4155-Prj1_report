@@ -540,17 +540,17 @@ def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffl
     else:
         "Provide a valid model as a string(Ridge/Lasso/OLS) "
 
-    kfold = KFold(n_splits=k, shuffle=shuffle)
+    kfold = KFold(n_splits=k, shuffle=shuffle, random_state=SEED_VALUE)
     scores_KFold = np.zeros(k)
     z = z.ravel()
     # scores_KFold idx counter
     j = 0
     for train_inds, test_inds in kfold.split(X, z):
 
-        # get all cols and selected train_inds rows:
+        # get all cols and selected train_inds rows/elements:
         xtrain = X[train_inds, :]
         ytrain = z[train_inds]
-        # get all cols and selected test_inds rows:
+        # get all cols and selected test_inds rows/elements:
         xtest = X[test_inds, :]
         ytest = z[test_inds]
         model.fit(xtrain, ytrain)
