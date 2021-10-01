@@ -13,6 +13,14 @@ ALLTID SCALE DATA
 feil konvergerer som 1/sqrt(n) (kanskje). (MonteCarlo)
 sett i lys av computational heavy
 
+What separates Machine Learning from optimization
+- low generalization error as well (Goodfellow p.107).
+- Motivation for bootstrap (and kfold CV)
+
+note about iid assumption
+
+underfitting and overfitting
+
 ## Exercise 3
 
 Complexity degree 6, low variance between kfold splits
@@ -27,6 +35,11 @@ ganger blir mye mindre med større dataset!
 
 
 ## Exercise 4-5
+Relate model selection to the no free lunch theorem
+(scikit p.33, Goodfellow p.113)
+
+Section 5.2.2 in Goodfellow
+
 vår fit opp mot sklearn
 bootstrap for varierende degree lambda
 CV for degree lambda

@@ -194,6 +194,7 @@ def prepare_data(X: np.ndarray, t: np.ndarray, test_size=0.2, shuffle=True, scal
             X_test = manual_scaling(X_test)
         else:
             X_train, X_test = standard_scaling(X_train, X_test)
+            # Readd the intercept to avoid singularities
             X_train[:,0] = 1
             X_test[:,0] = 1
 
@@ -585,7 +586,33 @@ def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffl
 
 
 def noise_factor(n, factor=0.3):
-    return factor*np.random.normal(0, size=n)
+    return factor*np.random.randn(n, n) # Stochastic noise
+
+def MSE(y_data,y_model):
+    """Simple Morten function to compute MSE
+
+    Args:
+        y_data ([type]): [description]
+        y_model ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
+    n = np.size(y_model)
+    return np.sum((y_data-y_model)**2)/n
+
+
+def R2(y_data, y_model):
+    """Simple Morten function to compute R2
+
+    Args:
+        y_data ([type]): [description]
+        y_model ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
+    return 1 - np.sum((y_data - y_model) ** 2) / np.sum((y_data - np.mean(y_data)) ** 2)
 
 
 if __name__ == '__main__':

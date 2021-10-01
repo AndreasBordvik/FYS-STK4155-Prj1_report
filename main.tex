@@ -80,7 +80,7 @@
 \section*{Motivation}
 In Project 1, we are tasked to study various regressions methods, such as Ordinary Least Squares, Ridge and Lasso. Our first area of study is how to fit polynomials to a specific two-dimensional function called Franke's Function. Our motivation behind fitting polynomials to Frank's function is to test the implementation of our regression algorithms, as well as studying various techniques such as bootstrapping and measurements such as the bias-variance tradeoff. Finally, we will move on to use real digital terrain data for our analysis.
 
-Frank's function is given on the form
+The Franke Function is given on the form
 
 \begin{align*}
   f(x,y) &= \frac{3}{4}\exp{\left(-\frac{(9x-2)^2}{4} - \frac{(9y-2)^2}{4}\right)}+\frac{3}{4}\exp{\left(-\frac{(9x+1)^2}{49}- \frac{(9y+1)}{10}\right)} \\
@@ -91,17 +91,17 @@ with a 3-dimensional plot given in Figure \ref{fig:1}
 
 \begin{figure}[h]
   \centering
-  \includegraphics[scale=0.75]{figures/franke_function_preview_nonoise.pdf}
+  \includegraphics[scale=0.75]{figures/EX1_franke_function_nonoise_preview.pdf}
   \caption{\label{fig:1}Plot of the Franke Function}
 \end{figure}
 
 \section*{Theory}
-The mean value of $\boldsymbol{y}$ is defined as;
+The sample mean value of $\boldsymbol{y}$ is defined as;
 \begin{equation}
     \bar{y} =  \frac{1}{n} \sum_{i=0}^{n - 1} y_i
 \end{equation}
 
-The variance of $\boldsymbol{y}$ is defined as;
+The sample variance of $\boldsymbol{y}$ is defined as;
 \begin{equation}
     \mathrm{var}[\boldsymbol{x}]=\frac{1}{n}\sum_{i=0}^{n-1}(x_i- \overline{x})^2=\mathbb{E}\left[(\bm{y}-\bm{\tilde{y}})^2\right]
 \end{equation}
@@ -138,10 +138,10 @@ For consistency, it is noted that $\bm{\hat{\beta}} \in \mathbb{R}^p$, $\bm{y} \
 
 With an expression for the predictors $\hat{\beta}$ derived, fitting a new value $\tilde{y}$ is simply $\tilde{y} = \bm{X}\bm{\hat{\beta}}$.
 
-Our own implementation of Ordinary Least Square regression is implemented such that its use mimics that of SciKit-learn \cite{scikit-learn}. That is, we also include separate steps for initializing our model, fitting the model and predicting using the model using the just derived mathematical expression. For further inquiry about implementation, refer to the github repository linked in the \nameref{sec:A}.
+Our own implementation of Ordinary Least Square regression is implemented such that its use mimics that of SciKit-learn. \cite{scikit-learn} That is, we also include separate steps for initializing our model, fitting the model and predicting using the model using the just derived mathematical expression. For further inquiry about implementation, refer to the github repository linked in the \nameref{sec:A}.
 
 \subsection*{Confidence Intervals}
-Confidence intervals can be used to asses the uncertainty of a parameter. In our case, we will define confidence limits following the understanding of a Confidence Interval given in "Bootstrap Methods and their Application". That is, given a computed confidence region, any value inside the confidence region should be more likely than all values outside the confidence region \cite{Davison1997}.
+Confidence intervals can be used to asses the uncertainty of a parameter. In our case, we will define confidence limits following the understanding of a Confidence Interval given in "Bootstrap Methods and their Application". That is, given a computed confidence region, any value inside the confidence region should be more likely than all values outside the confidence region. \cite{Davison1997}
 
 Furthermore, when computing the confidence interval for the parameters $\beta$, we first compute the variance $\bm{\sigma^2}(\beta_j) = \bm{\sigma^2}\left[(\bm{X}\bm{X^\text{T}})^{-1}\right]_\text{jj}$. Where $\bm{X}\bm{X^\text{T}}$ is the Hessian matrix. Furthermore, it can be shown that the Hessian matrix can be given as the second derivative of the Cost function with respect to $\beta$. I.e. 
 \[
@@ -154,7 +154,7 @@ Two metrics that can be used to asses the quality of a model is its Mean Square 
   \text{MSE}(\boldsymbol{y},\boldsymbol{\tilde{y}}) = \frac{1}{n}
   \sum_{i=0}^{n-1}(y_i-\tilde{y}_i)^2
 \]
-It will be shown later that the MSE can be broken into two components, namely the variance and the squared bias. When analyzing model output, we want the MSE to be low as that would indicate a better fit by the model.
+It will be shown later that the MSE can be broken into two components, namely the variance and the squared bias. As can be seen from the equation, the MSE would attain the value of 0 if $y_i = \tilde{y}_i$. Moreover, by rewriting the mean squared error as $\text{MSE} = \frac{1}{m}\left\lVert \bm{y} - \bm{\tilde{y}}\right\rVert_2^2$, it can be seen that the error increases as the Euclidean distance between the prediction targets increase. \cite{Goodfellow2016}
 
 The R2 score (coefficient of determination) is another metric that can be related to how the model covers its own variance. Defined as, 
 \[
@@ -164,7 +164,7 @@ The R2 score (coefficient of determination) is another metric that can be relate
 \textbf{TODO} Possibly more one implementation
 
 \subsection*{Some words on Scaling}
-Our motivation for scaling the data arise in the context of fitting a design matrix of predictors with different units. To avoid having to disregard some predictors in favor of others based on their unit, not necessarily their contribution to the function fit, a scaling of the data is performed. By scaling the data using one of several scaling techniques, we ensure that all predictors lie in the same reference domain, resulting in a more accurate representation of the predictors. SciKit-learn includes several different Scalers, such as the StandardScaler and MinMaxScaler \cite{scikit-learn}. For this discussion, the StandardScaler will be inspected.
+Our motivation for scaling the data arise in the context of fitting a design matrix of predictors with different units. To avoid having to disregard some predictors in favor of others based on their unit, not necessarily their contribution to the function fit, a scaling of the data is performed. By scaling the data using one of several scaling techniques, we ensure that all predictors lie in the same reference domain, resulting in a more accurate representation of the predictors. SciKit-learn includes several different Scalers, such as the StandardScaler and MinMaxScaler. \cite{scikit-learn} For this discussion, the StandardScaler will be inspected.
 
 The idea behind scaling the data with regards to the StandardScaler method, is to subtract the mean value for each column from the same column in the design matrix. This process is what is known as zero centering. Moreover, when scaling in this way, the intercept will be scaled by the mean value of the output. Moreover, it can be shown that zero centering leads to the new $\bm{\tilde{y}} = \bm{y} - \beta_0 = \bm{y} - \bm{\bar{y}}$, where $\bm{\bar{y}}$ is used as the sample mean of $\bm{y}$. As the columns of $\bm{X}$ also has been scaled in the same fashion, we end up the following Cost-Function
 \[
@@ -173,19 +173,21 @@ The idea behind scaling the data with regards to the StandardScaler method, is t
 
 Before scaling the dataset, an assessment of how to deal with the intercept has to be made. For reference, the intercept is defined as the first column of the design matrix, and for a polynomial fit would represent where the function intercepts with the y-axis when all other features are set to zero. Moreover, the intercept is a constant value (1), thus zero centering the intercept would result in a singular matrix, rendering the optimization problem unsolvable. Throughout this assignment, we are going to readd the intercept after scaling, essentially leaving the intercept untouched as to avoid any singular matrices. Moreover, for ordinary least squares regression, as there is no regularization of the predictors during the model fit, a model fitted on scaled contra unscaled data would attain the same mean squared error.
 
-However, other regression methods such as Ridge and Lasso, which will be discussed in greater detail in further sections, have a dependance on the intercept through the hyperparamter $\lambda$ when computing their regularization term. Not including the intercept when computing the regularization term would give rise to a divergence between the mean square error for the model scaled with compared to the model scaled without the intercept. Thus, by computing the regularization term with disregard to the intercept, the first $\beta_j$ i.e. that of the intercept will be skipped in the computation. This will in most cases lead to a better mean square error for both Ridge and Lasso regression. Skipping the intercept when computing the regularization term also follows the definition of Ridge regression as in \cite{Geron2019}.
+However, other regression methods such as Ridge and Lasso, which will be discussed in greater detail in further sections, have a dependance on the intercept through the hyperparamter $\lambda$ when computing their regularization term. Not including the intercept when computing the regularization term would give rise to a divergence between the mean square error for the model scaled with compared to the model scaled without the intercept. Thus, by computing the regularization term with disregard to the intercept, the first $\beta_j$ i.e. that of the intercept will be skipped in the computation. This will in most cases lead to a better mean square error for both Ridge and Lasso regression. Skipping the intercept when computing the regularization term also follows the definition of Ridge regression as in. \cite{Geron2019}
 
-Furthermore, while on the topic of Ridge and Lasso regression, scaling of the data should always be performed. This is due to the regularized linear models such as Ridge and Lasso being sensitive to the scale of the input features \cite{Geron2019}. 
+Furthermore, while on the topic of Ridge and Lasso regression, scaling of the data should always be performed. This is due to the regularized linear models such as Ridge and Lasso being sensitive to the scale of the input features. \cite{Geron2019}
 
 To determine whether scaling is apropriate for the current problem, that being fitting the Franke Function using oridnary least squares, an inspection of the generated data is made in light of the just discussion. For Exercise 1, the datapoints $x,y \in \left[0,1\right]$. This would indicate that the data is already scaled to a unit reference system. Moreover, as we are training a model based on the ordinary least squares, there is no dependance on scale of the input features as for regularized linear models. However, for consistency with further models, the data will be scaled with respect to the training data. However, the target variables however will not be scaled.
 
 \subsubsection*{Splitting the data}
-As we want our model to perform well in general cases, we split the data into a training and testing set to simulate model prediction using new data. This is achieved by the aforementioned split, since the training and test data are kept entirely separated. In practice, we fit the model using the training data, then perform a test of the model using the test data. The error rate for new cases predicted by the model using the test data, can be used to understand how the model will perform on new untrained data \cite{Geron2019}. Moreover, by assessing the deviation between training error and test error, it can be seen whether the model is overfitting or not. It would be a case of overfitting if the training error is low, whereas the test error is high.
+As we want our model to perform well in general cases, we split the data into a training and testing set to simulate model prediction using new data. This is achieved by the aforementioned split, since the training and test data are kept entirely separated. In practice, we fit the model using the training data, then perform a test of the model using the test data. The error rate for new cases predicted by the model using the test data, can be used to understand how the model will perform on new untrained data. \cite{Geron2019} Moreover, by assessing the deviation between training error and test error, it can be seen whether the model is overfitting or not. It would be a case of overfitting if the training error is low, whereas the test error is high.
 
-Throughout this assignment, we will split the data into a train and test set. The data could be split into an additional validation set, which is normally used for hyperparamter adjustment. However, as we don't see any practical use for a validation set for this assignment, we will skip out on splitting the data into an additional validation set. Though a validation set could be used for tuning the hyperparameter to select an optimal model, it could also lead to suboptimal model selection caused by imprecise prediction from a too small validation set \cite{Geron2019}. Though our data consists of potentially unlimited data points, due to computational time constraints, we will resort to relatively sparse data. Hence, we split into a training and test set to avoid sacrificing the training data in favor of a sufficient validation set.
+Throughout this assignment, we will split the data into a train and test set. The data could be split into an additional validation set, which is normally used for hyperparamter adjustment. However, as we don't see any practical use for a validation set for this assignment, we will skip out on splitting the data into an additional validation set. Though a validation set could be used for tuning the hyperparameter to select an optimal model, it could also lead to suboptimal model selection caused by imprecise prediction from a too small validation set. \cite{Geron2019} Though our data consists of potentially unlimited data points, due to computational time constraints, we will resort to a relatively sparse dataset. Hence, we split into a training and test set to avoid sacrificing the training data in favor of a sufficient validation set.
+
+Had we not omitted the validation set for hyperparameter tuning, the process of studying regularized models would have deviated somewhat from the study of the ordinary least squares regression. The process would then be that we split the data into a train-test split, as before. Moreover, the training data would have been split once more into a train and validation set, with an approximate ratio of 80 - 20 percent respectively. Furthermore, the hyperparameters are tuned with the MSE obtained from predicting using the validation set. However, as the validation set typically reports a lower error than the test set, the generalization error of the optimized model is studied using the test set. \cite{Goodfellow2016}
 
 \subsection*{Comparing our OLS implementation to the one delivered by SciKit-learn}
-With our Ordinary Least Squares model implemented as described above, we start off by benchmarking our implementation to the LeastSquares method found in SciKit-learn \cite{scikit-learn}. We start off by setting up a uniform 2-dimensional grid and initialize a Franke Function with some added stochastic noise.
+With our Ordinary Least Squares model implemented as described above, we start off by benchmarking our implementation to the LeastSquares method found in SciKit-learn. \cite{scikit-learn} We start off by setting up a uniform 2-dimensional grid and initialize a Franke Function with some added stochastic noise.
 
 \begin{lstlisting}
   np.random.seed(4155)
