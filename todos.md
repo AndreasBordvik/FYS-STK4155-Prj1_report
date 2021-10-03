@@ -2,12 +2,6 @@
 
 
 ## Exercise 1
-Analysis part. Analyse training and test metrics. Why degree 5 is yields the best fit, etc. 
-Critical discussion on scaling
-
-Discussion on beta_i confidence interval
-
-ALLTID SCALE DATA
 
 ## Exercise 2
 feil konvergerer som 1/sqrt(n) (kanskje). (MonteCarlo)
@@ -51,6 +45,8 @@ plotte vertikal linje for optimal lambda i beta-plot
 Note that $\lambda$ is regularization parameter
 Discuss the importance of regularization, for feature selection. 
 Discuss bootstrap and cv with and without regularization.
+
+Note regularization both with and without noise.
 
 ## Exercise 6
 Add noise to z for all subtasks
