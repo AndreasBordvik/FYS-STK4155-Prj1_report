@@ -27,6 +27,8 @@ Usikkerheten går opp med flere og flere folds, for antall datapunkter går ned.
 Test bootstrap for n > 100. MSE for bootstrap blir mye bedre fordi sjansen for å sample samme punkt 2 
 ganger blir mye mindre med større dataset! 
 
+Compare and plot with sk_learn!!!
+
 
 ## Exercise 4-5
 Relate model selection to the no free lunch theorem
