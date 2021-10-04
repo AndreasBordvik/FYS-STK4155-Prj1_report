@@ -15,6 +15,8 @@ note about iid assumption
 
 underfitting and overfitting
 
+relate the bias-variance discussion to figure 2.11 Hastie
+
 ## Exercise 3
 
 Complexity degree 6, low variance between kfold splits
