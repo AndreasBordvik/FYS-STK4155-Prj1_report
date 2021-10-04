@@ -82,10 +82,12 @@ In Project 1, we are tasked to study various regressions methods, such as Ordina
 
 The Franke Function is given on the form
 
+%\begin{equation}
 \begin{align*}
-  f(x,y) &= \frac{3}{4}\exp{\left(-\frac{(9x-2)^2}{4} - \frac{(9y-2)^2}{4}\right)}+\frac{3}{4}\exp{\left(-\frac{(9x+1)^2}{49}- \frac{(9y+1)}{10}\right)} \\
-  &+\frac{1}{2}\exp{\left(-\frac{(9x-7)^2}{4} - \frac{(9y-3)^2}{4}\right)} -\frac{1}{5}\exp{\left(-(9x-4)^2 - (9y-7)^2\right) }
+f(x,y) &= \frac{3}{4}\exp{\left(-\frac{(9x-2)^2}{4} - \frac{(9y-2)^2}{4}\right)}+\frac{3}{4}\exp{\left(-\frac{(9x+1)^2}{49}- \frac{(9y+1)}{10}\right)} \\
+&+\frac{1}{2}\exp{\left(-\frac{(9x-7)^2}{4} - \frac{(9y-3)^2}{4}\right)} -\frac{1}{5}\exp{\left(-(9x-4)^2 - (9y-7)^2\right) }
 \end{align*}
+%\end{equation}
 
 with a 3-dimensional plot given in Figure \ref{fig:1}
 
@@ -376,6 +378,21 @@ As there are no universally best learning algorithm for fitting the problem at h
 The Cost function for Ridge regression can be seen as the Cost function for Ordinary Least Squares with an added weight decay term $\lambda\bm{\beta}^\text{T}\bm{\beta}$. The parameter $\lambda$ is known as a hyperparameter, i.e. the parameter can be controlled before fitting the model and changes how the model behaves during fitting and predicting. \cite{Goodfellow2016} Moreover, $\lambda \geq 0$, such that $\lambda$ close to $0$ implies Ordinary Least Squares and $\lambda$ large implies that the predictors are close to $0$. Hence weight decay, as the hyperparamter can be tuned to enforce some predictors (weights) to be excluded from the model fit.
 
 For this Exercise, we will analyse the effect of the weight decay when fitting the Franke Function using Ridge regression. We will analyse the polynomial of optimal degree that we determined in the previous exercises through assessing the bias-variance tradeoff for an increased model complexity. Firstly with the bootstrap resampling technique, then compared the bootstrap MSE with what was obtained using the k-fold cross validation. With the model complexity  
+
+
+\section*{Exercise 6}
+The main goal of exercise 6 is to analyze the performance of our models on real digital terrain data using the approach conducted in previous exercises 1-5. Before commencing model analysis in exercise 6, we had to understand the terrain data's nature and how it differs from the constructed franke function dataset. 
+To recap on the franke function; one must decide on the number of points for x and y at a certain range, construct a meshgrid of x and y, then z is created based on the franke function. For the franke function we randomly and uniformly chose $x,y$ such that $\forall x,y  \in{[0.0,1.0]}$.
+Comparing the franke function to the terrain data, we get the z variable from the terrain image itself. The values of the z variable in the terrain data represent height or depth similarly as for the franke function. However, the height or depth in the terrain data image represents
+the real height in the actual topographical terrain having an entirely different scale comparing the constructed range between 0-1 of the franke function. Looking at the image data, the x and y variables must be constructed as a meshgrid spanning the entire range of all x and y pixel positions within the terrain image. 
+Since the range of x and y is determined by the span of pixel positions corresponding to the image width and height, we must scale both the x and y variables from the terrain data. The terrain input data utilized is of dimension 3601x1801, inducing 6485401 data points for the entire dataset. The terrain image is therefore not quadratic meaning the range of x and y is not equal. 
+This motivates scaling of x and y to prevent one feature, by its magnitude, from dominating over the other. One must avoid the model to favor features by their magnitude since the contribution from features of smaller magnitude can be equally strong or important. 
+Hence, the x-direction in real terrain is equally important as the y-direction even though the higher end of x is at 3600 and the higher end of y is at 1800. Another approach to level out the importance of the x and y variable (features) is to resize the image into a quadratic form where image height equals image width. 
+However, resizing the entire image into a quadratic form will transform and distort the nature of the topographical terrain we try to fit. We solved this by first resizing while keeping the scale factor between width and height to make the number of data points feasible to work with. While keeping the terrain structures intact, we rescaled the image down to 20\% of its original size.
+Moreover, we created 8 patches of image data from the resized images where each patch being quadratic of dimension 180x180 (32400 data points). This preprocessing serves the purpose of feeding the model with only one patch at a time, making the problem more digestible for obtaining a good fit concering subproblems instead. 
+
+Another difference separating the terrain data from the synthetically created franke function data is that noise is incorporated within the image itself. For the franke function, we had to add noise in order for us to analyze the robustness of the models and to which degree the models were generalized. 
+However, having control over the influence and magnitude of the noise is a luxury situation in real data situations, and for the real terrain image data, the noise stems from sensors and the assembly or construction of the image. 
 
 
 
