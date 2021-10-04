@@ -388,13 +388,60 @@ the real height in the actual topographical terrain having an entirely different
 Since the range of x and y is determined by the span of pixel positions corresponding to the image width and height, we must scale both the x and y variables from the terrain data. The terrain input data utilized is of dimension 3601x1801, inducing 6485401 data points for the entire dataset. The terrain image is therefore not quadratic meaning the range of x and y is not equal. 
 This motivates scaling of x and y to prevent one feature, by its magnitude, from dominating over the other. One must avoid the model to favor features by their magnitude since the contribution from features of smaller magnitude can be equally strong or important. 
 Hence, the x-direction in real terrain is equally important as the y-direction even though the higher end of x is at 3600 and the higher end of y is at 1800. Another approach to level out the importance of the x and y variable (features) is to resize the image into a quadratic form where image height equals image width. 
-However, resizing the entire image into a quadratic form will transform and distort the nature of the topographical terrain we try to fit. We solved this by first resizing while keeping the scale factor between width and height to make the number of data points feasible to work with. While keeping the terrain structures intact, we rescaled the image down to 20\% of its original size.
-Moreover, we created 8 patches of image data from the resized images where each patch being quadratic of dimension 180x180 (32400 data points). This preprocessing serves the purpose of feeding the model with only one patch at a time, making the problem more digestible for obtaining a good fit concering subproblems instead. 
-
+However, resizing the entire image into a quadratic form will transform and distort the nature of the topographical terrain we try to fit. We solved this by first resizing while keeping the scale factor between width and height to make the number of data points feasible to work with. While keeping the terrain structures intact, we rescaled the image down to 20\% of its original size , figure \ref{fig:terrain_resized}.
+Moreover, we created 8 patches of image data from the resized images where each patch being quadratic of dimension 180x180 (32400 data points), figure \ref{fig:terrain_patches}. This preprocessing serves the purpose of feeding the model with only one patch at a time, making the problem more digestible for obtaining a good fit concering subproblems instead. 
 Another difference separating the terrain data from the synthetically created franke function data is that noise is incorporated within the image itself. For the franke function, we had to add noise in order for us to analyze the robustness of the models and to which degree the models were generalized. 
 However, having control over the influence and magnitude of the noise is a luxury situation in real data situations, and for the real terrain image data, the noise stems from sensors and the assembly or construction of the image. 
 
+After investagating the different patches we concluded on mainy focusing on two different patches shown in figure \ref{fig:terrain_patches_focus} 
 
+\begin{figure}
+  \centering
+  \includegraphics[scale=0.75]{figures/EX6_terrain_data_resized.pdf}
+  \caption{Terrain data resized}
+  \label{fig:terrain_resized}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \subfloat{{\includegraphics[width=7cm]{figures/EX6_Terrain1 patches.pdf} }}%
+  \subfloat{{\includegraphics[width=7cm]{figures/EX6_Terrain2 patches.pdf} }}%
+  \caption{Terrain patches}%
+  \label{fig:terrain_patches}%
+\end{figure}
+
+\begin{figure}
+  \centering
+  \subfloat{{\includegraphics[width=14cm]{figures/EX6_terrain_patch_to_fit_2D.pdf} }}%
+  \subfloat{{\includegraphics[width=15cm]{figures/EX6_terrain_patch_to_fit_3D.pdf} }}%
+  \caption{Chosen terrain patches}%
+  \label{fig:terrain_patches_focus}%
+\end{figure}
+
+
+\subsection*{Exercise 6.1 (Exercise 1 approach)}
+In this task we conducted a OLS fit on the the terrain1 patch using the same appraoch as done in exercise1.
+
+\begin{figure}
+  \centering
+  \includegraphics[scale=0.75]{figures/EX6_EX1_terrain_patch_OLS_evaluate_fit.pdf}
+  \caption{Model complexity vs prediction error using OLS}
+  \label{fig:EX6_1_OLS_fit}
+\end{figure}
+
+\begin{table}
+  \centering
+  \csvautobooktabular{data/report_data/EX6_EX1_OLS_beta_error_degree4.csv}
+  \caption{Coefficient summary of OLS fit}
+  \label{data:EX6_1_OLS_betas}
+\end{table}
+
+\begin{figure}
+  \centering
+  \includegraphics[scale=0.9]{figures/EX6_EX1_OLS_beta_error_degree4.pdf}
+  \caption{Plot of OLS coefficients including standard error}
+  \label{fig:EX6_1_OLS_betas_plot}
+\end{figure}
 
 
 \section*{Appendix\label{sec:A}}

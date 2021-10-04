@@ -90,13 +90,15 @@ class Regression():
         # Summary dataframe
         params = np.zeros(self.betas.shape[0])
         params.fill(self.param)
+        
         coeffs_df = pd.DataFrame.from_dict({f"{self.param_name}": params,
-                                            "coeff_name": [f"b_{i}" for i in range(0, self.betas.shape[0])],
-                                            "coeff_value": np.round(self.betas, decimals=4),
-                                            "std_error": np.round(SE_betas, decimals=4),
-                                            "CI_lower": np.round(CI_lower_all_betas, decimals=4),
-                                            "CI_upper": np.round(CI_upper_all_betas, decimals=4)},
+                                            "coeff name": [rf"$\beta${i}" for i in range(0, self.betas.shape[0])],
+                                            "coeff value": np.round(self.betas, decimals=4),
+                                            "std error": np.round(SE_betas, decimals=4),
+                                            "CI lower": np.round(CI_lower_all_betas, decimals=4),
+                                            "CI upper": np.round(CI_upper_all_betas, decimals=4)},
                                            orient='index').T
+        
         return coeffs_df
 
 
@@ -412,7 +414,7 @@ def bootstrapping(X_train, t_train, X_test, t_test, n_bootstraps, model, keep_in
 
 
 def plot_beta_errors_for_lambdas(summaries_df: pd.DataFrame(), degree):
-    grp_by_coeff_df = summaries_df.groupby(["coeff_name"])
+    grp_by_coeff_df = summaries_df.groupby(["coeff name"])
 
     # plt.rcParams["figure.figsize"] = [7.00, 3.50]
 
@@ -423,8 +425,8 @@ def plot_beta_errors_for_lambdas(summaries_df: pd.DataFrame(), degree):
         df = grp_by_coeff_df.get_group(key)
         # display(df_tmp)
         lambdas = df["lambda"].to_numpy().astype(np.float64)
-        beta_values = df["coeff_value"].to_numpy().astype(np.float64)
-        beta_SE = df["std_error"].to_numpy().astype(np.float64)
+        beta_values = df["coeff value"].to_numpy().astype(np.float64)
+        beta_SE = df["std error"].to_numpy().astype(np.float64)
 
         # plot beta values
         # plt.plot(lambdas, beta_values, label=f"b{i}")
@@ -454,7 +456,7 @@ def plot_beta_errors_for_lambdas(summaries_df: pd.DataFrame(), degree):
 
 
 def plot_beta_CI_for_lambdas(summaries_df: pd.DataFrame(), degree):
-    grp_by_coeff_df = summaries_df.groupby(["coeff_name"])
+    grp_by_coeff_df = summaries_df.groupby(["coeff name"])
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     i = 0
@@ -462,9 +464,9 @@ def plot_beta_CI_for_lambdas(summaries_df: pd.DataFrame(), degree):
         df = grp_by_coeff_df.get_group(key)
         # display(df_tmp)
         lambdas = df["lambda"].to_numpy().astype(np.float64)
-        beta_values = df["coeff_value"].to_numpy().astype(np.float64)
-        CI_lower = df["CI_lower"].to_numpy().astype(np.float64)
-        CI_upper = df["CI_upper"].to_numpy().astype(np.float64)
+        beta_values = df["coeff value"].to_numpy().astype(np.float64)
+        CI_lower = df["CI lower"].to_numpy().astype(np.float64)
+        CI_upper = df["CI upper"].to_numpy().astype(np.float64)
 
         # plot beta values
         # plt.plot(lambdas, beta_values, label=f"b{i}")
@@ -493,8 +495,8 @@ def plot_beta_CI_for_lambdas(summaries_df: pd.DataFrame(), degree):
 
 
 def plot_beta_errors(summaary_df: pd.DataFrame(), degree):
-    betas = summaary_df["coeff_value"].to_numpy().astype(np.float64)
-    SE = summaary_df["std_error"].to_numpy().astype(np.float64)
+    betas = summaary_df["coeff value"].to_numpy().astype(np.float64)
+    SE = summaary_df["std error"].to_numpy().astype(np.float64)
 
     # Computing x-ticks
     x_ticks = ["1"]
