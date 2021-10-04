@@ -218,7 +218,7 @@ def manual_scaling(data):
 
 
 def standard_scaling(train, test):
-    scaler = StandardScaler()
+    scaler = StandardScaler(with_std=False)
     scaler.fit(train)
     train_scaled = scaler.transform(train)
     test_scaled = scaler.transform(test)
