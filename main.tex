@@ -261,7 +261,37 @@ Following the comparison of Figure (\ref{fig:OLS_franke_1}) and (\ref{fig:OLS_fr
 
 \section*{Exercise 2}
 \subsection*{Some words on bootstrapping}
+As described in the preceding task, we split our data into several subsets used for different purposes. The overall objective is to train a model on a given subset and then measure how well it performs on a new unseen data set. *Figure 3* illustrates the results of this method, where the average prediction error is plotted against the model complexity. However, a dilemma that may emerge from this approach is that our data only represents a sample from an unknown distribution. We run the risk of measuring a predicted error that deviates from the actual probability by iterating through our data points only once. 
 
+Therefore, we impose resampling methods on our data to produce a more realistic estimate of the error. The following algorithm will demonstrate how *bootstrap* is performed to achieve this\cite{ref_forelesning}:
+
+We have some data: 
+
+$$D = [x_1,x_2,...,x_n]$$
+
+(I) A new sample is then drawn. This dataset will have the same dimension as D, but as it is drawn with replacements, they will differ from eachother as the latter has a high probability of drawing the same sample mulitple times:
+
+$$X^* = x_{1}^{*}, x_{2}^{*}, ... ,x_{n}^{*}$$
+
+(II)This sample is then used to create new set of predictors: 
+\[
+  \bm{\hat{\beta}}^* = \left(\bm{X}^\text{*T}\bm{X}^*\right)^{-1}\bm{X}^\text{T*}\bm{y}
+\]
+
+(III)which in turn is used to predict new values:
+
+$$\tilde{y}^* = \bm{X}\bm{\hat{\beta}}$$.
+
+(IV)We then compute the error in our predictions:
+\[
+  \text{MSE}(\boldsymbol{y},\boldsymbol{\tilde{y}^*}) = \frac{1}{n}
+  \sum_{i=0}^{n-1}(y_i-\tilde{y}^{*}_i)^2
+\]
+
+Step I-IV is then repeated $B$ times, while keeping track of each sample MSE.
+
+
+\subsection*{The bias-variance trade-off analysis}
 
 Moving on to the bias-variance trade-off analysis, we start off by showing that 
 
@@ -355,6 +385,13 @@ Lastly, it should be noted that the bias-variance tradeoff measuremnet is perfor
 %  \label{data: Ridge_best_fit}
 %\end{center}
 
+\section*{Exercise 3}
+In this project, an infinite number of data points could easily be created by simply adjusting the number of *n* decimals created in the span [0,1] for x and y. Setting a large *n* could then, in turn, yield a test set of substantial size, which ables the prediction of estimated average test error with statistical certainty. 
+
+However, for real-life purposes, this is rarely the case. More often than not, the challenges related to the validation of models in question lies in the limitations of available data.  A widely used approach for combating these issues is implementing cross-validation, which will ensure a better approximation of the generalization error. 
+
+
+
 \section*{Exercise 4}
 Throughout Exercise 1 - 3, we have studied function fitting using the Ordinary Least Squares regression. When comparing models, we have plotted the test error as a function of the model complexity and chosen a model based on the bias-variance tradeoff. The bias-variance tradeoff has also been studied in light of resampling techniques such as the bootstrap and k-fold cross-validation. As we have seen when interpreting the result of the resampling, an increased degree of freedom for the model will make the model more prone to overfit.
 
@@ -376,7 +413,7 @@ As further motivation as to why we want to apply Ridge (and further on also Lass
 As there are no universally best learning algorithm for fitting the problem at hand, we expand our analysis of Fitting the Franke Function in light the No Free Lunch Theorem to also include an assessment of Ridge and Lasso Regression. Both models handles feature selection through the introduction of the regularization parameter lambda, thus potentially achieving a lower MSE than for Ordinary Least Squares. Introducing several models also follows the implications of the Free Lunch Theorem, notably that we have to fine tune and assess our models to perform well on the current problem. \cite{Goodfellow2016}
 
 \subsection*{Weight Decay}
-The Cost function for Ridge regression can be seen as the Cost function for Ordinary Least Squares with an added weight decay term $\lambda\bm{\beta}^\text{T}\bm{\beta}$. The parameter $\lambda$ is known as a hyperparameter, i.e. the parameter can be controlled before fitting the model and changes how the model behaves during fitting and predicting. \cite{Goodfellow2016} Moreover, $\lambda \geq 0$, such that $\lambda$ close to $0$ implies Ordinary Least Squares and $\lambda$ large implies that the predictors are close to $0$. Hence weight decay, as the hyperparamter can be tuned to enforce some predictors (weights) to be excluded from the model fit.
+The Cost function for Ridge regression can be seen as th≈e Cost function for Ordinary Least Squares with an added weight decay term $\lambda\bm{\beta}^\text{T}\bm{\beta}$. The parameter $\lambda$ is known as a hyperparameter, i.e. the parameter can be controlled before fitting the model and changes how the model behaves during fitting and predicting. \cite{Goodfellow2016} Moreover, $\lambda \geq 0$, such that $\lambda$ close to $0$ implies Ordinary Least Squares and $\lambda$ large implies that the predictors are close to $0$. Hence weight decay, as the hyperparamter can be tuned to enforce some predictors (weights) to be excluded from the model fit.
 
 For this Exercise, we will analyse the effect of the weight decay when fitting the Franke Function using Ridge regression. We will analyse the polynomial of optimal degree that we determined in the previous exercises through assessing the bias-variance tradeoff for an increased model complexity. Firstly with the bootstrap resampling technique, then compared the bootstrap MSE with what was obtained using the k-fold cross validation. With the model complexity  
 
