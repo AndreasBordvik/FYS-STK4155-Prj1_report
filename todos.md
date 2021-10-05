@@ -15,6 +15,8 @@ note about iid assumption
 
 underfitting and overfitting
 
+relate the bias-variance discussion to figure 2.11 Hastie
+
 ## Exercise 3
 
 Complexity degree 6, low variance between kfold splits
@@ -31,16 +33,11 @@ Compare and plot with sk_learn!!!
 
 
 ## Exercise 4-5
-Relate model selection to the no free lunch theorem
-(scikit p.33, Goodfellow p.113)
-
 Section 5.2.2 in Goodfellow
 
 vår fit opp mot sklearn
 bootstrap for varierende degree lambda
 CV for degree lambda
-studere effekt med og uten scaling
-studere effekt av scaling med og uten intercept
 
 plotte vertikal linje for optimal lambda i beta-plot
 
