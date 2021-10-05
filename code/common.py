@@ -500,11 +500,13 @@ def plot_beta_errors(summaary_df: pd.DataFrame(), degree):
 
     # Computing x-ticks
     x_ticks_values = np.arange(summaary_df.shape[0])
+    """
     x_ticks = ["1"]
     for i in range(1, degree+1):
         for k in range(i+1):
             x_ticks.append(f"({i-k},{k})")
-
+    """
+    
 
     fig = plt.figure()
     ax = plt.axes()
@@ -512,7 +514,8 @@ def plot_beta_errors(summaary_df: pd.DataFrame(), degree):
     plt.xlabel(r"$\beta_i$ as power of (x,y)")
     plt.ylabel("Beta values with std error")
     ax.set_xticks(np.arange(summaary_df.shape[0]))
-    ax.set_xticklabels(x_ticks)
+    # ax.set_xticklabels(x_ticks)
+    ax.set_xticklabels(rf"$\beta${i}" for i in x_ticks_values)
     plt.gca().margins(x=0)
     plt.gcf().canvas.draw()
     tl = plt.gca().get_xticklabels()
@@ -520,7 +523,7 @@ def plot_beta_errors(summaary_df: pd.DataFrame(), degree):
     m = 0.2  # inch margin
     s = maxsize/plt.gcf().dpi*summaary_df.shape[0]+2*m
     margin = m/plt.gcf().get_size_inches()[0]
-
+ 
     plt.gcf().subplots_adjust(left=margin, right=1.-margin)
     plt.gcf().set_size_inches(s, plt.gcf().get_size_inches()[1])
     plt.errorbar(x_ticks_values, betas, yerr=1.96*SE, fmt='o', ms=4)
