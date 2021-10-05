@@ -499,15 +499,17 @@ def plot_beta_errors(summaary_df: pd.DataFrame(), degree):
     SE = summaary_df["std error"].to_numpy().astype(np.float64)
 
     # Computing x-ticks
+    x_ticks_values = np.arange(summaary_df.shape[0])
     x_ticks = ["1"]
     for i in range(1, degree+1):
         for k in range(i+1):
-            x_ticks.append(f"({i-k})({k})")
+            x_ticks.append(f"({i-k},{k})")
+
 
     fig = plt.figure()
     ax = plt.axes()
     plt.title(f"Beta error OLS - degree{degree}")
-    plt.xlabel(r"$\beta_i$ as power of x and y")
+    plt.xlabel(r"$\beta_i$ as power of (x,y)")
     plt.ylabel("Beta values with std error")
     ax.set_xticks(np.arange(summaary_df.shape[0]))
     ax.set_xticklabels(x_ticks)
@@ -521,8 +523,9 @@ def plot_beta_errors(summaary_df: pd.DataFrame(), degree):
 
     plt.gcf().subplots_adjust(left=margin, right=1.-margin)
     plt.gcf().set_size_inches(s, plt.gcf().get_size_inches()[1])
-    plt.errorbar(
-        np.arange(summaary_df.shape[0]), betas, yerr=1.96*SE, fmt='o', ms=4)
+    plt.errorbar(x_ticks_values, betas, yerr=1.96*SE, fmt='o', ms=4)
+    #for i, txt in enumerate(x_ticks):
+    #    plt.annotate(f"{txt}", (x_ticks_values[i], betas[i]))
     # plt.tight_layout()
     # plt.show()
     return fig
