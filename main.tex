@@ -265,30 +265,35 @@ As described in the preceding task, we split our data into several subsets used 
 
 Therefore, we impose resampling methods on our data to produce a more realistic estimate of the error. The following algorithm will demonstrate how *bootstrap* is performed to achieve this\cite{ref_forelesning}:
 
-We have some data: 
+We have some data, which consists of training data: 
 
-$$D = [x_1,x_2,...,x_n]$$
+$$X = [x_1,x_2,...,x_n]$$
+ and their respective target labels:
+ $$\bm{y} = [y_1,y_2,...,y_n]$$
+
 
 (I) A new sample is then drawn. This dataset will have the same dimension as D, but as it is drawn with replacements, they will differ from eachother as the latter has a high probability of drawing the same sample mulitple times:
 
 $$X^* = x_{1}^{*}, x_{2}^{*}, ... ,x_{n}^{*}$$
+$$\bm{y}^*= y_{1}^{*}, y_{2}^{*}, ... ,y_{n}^{*}$$
 
 (II)This sample is then used to create new set of predictors: 
 \[
-  \bm{\hat{\beta}}^* = \left(\bm{X}^\text{*T}\bm{X}^*\right)^{-1}\bm{X}^\text{T*}\bm{y}
+  \bm{\hat{\beta}}^* = \left(\bm{X}^\text{*T}\bm{X}^*\right)^{-1}\bm{X}^\text{*T}\bm{y}^*
 \]
 
-(III)which in turn is used to predict new values:
+(III)which in turn is used to predict new values on our test data. It is of great importance to emphasize that that $X_{test}$ is completly seperated from the rest of data, and only used to predict the new values for each sample.
 
-$$\tilde{y}^* = \bm{X}\bm{\hat{\beta}}$$.
+
+$$\tilde{y}^* = \bm{X}_{test}\bm{\hat{\beta}^*}$$.
 
 (IV)We then compute the error in our predictions:
 \[
   \text{MSE}(\boldsymbol{y},\boldsymbol{\tilde{y}^*}) = \frac{1}{n}
   \sum_{i=0}^{n-1}(y_i-\tilde{y}^{*}_i)^2
 \]
-
-Step I-IV is then repeated $B$ times, while keeping track of each sample MSE.
+ 
+Step I-IV is then repeated $B$ times, while keeping track of each sample MSE. After the completion of B bootstraps, an average of all MSE´s is calculated. Ideally, B is less than the number of datapoints.
 
 
 \subsection*{The bias-variance trade-off analysis}
@@ -384,6 +389,14 @@ Lastly, it should be noted that the bias-variance tradeoff measuremnet is perfor
 %  \csvautobooktabular{data/report_data/redge_reg_lambda_-1.1.csv}
 %  \label{data: Ridge_best_fit}
 %\end{center}
+
+\subsection*{Bias-variance trade-off as function of model complexity}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.75]{figures/EX2_model_complexity_using_bootstrap_function.pdf}
+  \caption{\label{fig:?}bias and variance trade-off as function of model complexity}
+\end{figure}
 
 \section*{Exercise 3}
 In this project, an infinite number of data points could easily be created by simply adjusting the number of *n* decimals created in the span [0,1] for x and y. Setting a large *n* could then, in turn, yield a test set of substantial size, which ables the prediction of estimated average test error with statistical certainty. 

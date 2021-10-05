@@ -16,6 +16,7 @@
 \usepackage{booktabs}
 \usepackage{multicol}
 \usepackage[margin=3cm]{geometry}
+\usepackage{subfig}
 
 \usepackage{listings}
 \lstset{
@@ -264,30 +265,35 @@ As described in the preceding task, we split our data into several subsets used 
 
 Therefore, we impose resampling methods on our data to produce a more realistic estimate of the error. The following algorithm will demonstrate how *bootstrap* is performed to achieve this\cite{ref_forelesning}:
 
-We have some data: 
+We have some data, which consists of training data: 
 
-$$D = [x_1,x_2,...,x_n]$$
+$$X = [x_1,x_2,...,x_n]$$
+ and their respective target labels:
+ $$\bm{y} = [y_1,y_2,...,y_n]$$
+
 
 (I) A new sample is then drawn. This dataset will have the same dimension as D, but as it is drawn with replacements, they will differ from eachother as the latter has a high probability of drawing the same sample mulitple times:
 
 $$X^* = x_{1}^{*}, x_{2}^{*}, ... ,x_{n}^{*}$$
+$$\bm{y}^*= y_{1}^{*}, y_{2}^{*}, ... ,y_{n}^{*}$$
 
 (II)This sample is then used to create new set of predictors: 
 \[
-  \bm{\hat{\beta}}^* = \left(\bm{X}^\text{*T}\bm{X}^*\right)^{-1}\bm{X}^\text{T*}\bm{y}
+  \bm{\hat{\beta}}^* = \left(\bm{X}^\text{*T}\bm{X}^*\right)^{-1}\bm{X}^\text{*T}\bm{y}^*
 \]
 
-(III)which in turn is used to predict new values:
+(III)which in turn is used to predict new values on our test data. It is of great importance to emphasize that that $X_{test}$ is completly seperated from the rest of data, and only used to predict the new values for each sample.
 
-$$\tilde{y}^* = \bm{X}\bm{\hat{\beta}}$$.
+
+$$\tilde{y}^* = \bm{X}_{test}\bm{\hat{\beta}^*}$$.
 
 (IV)We then compute the error in our predictions:
 \[
   \text{MSE}(\boldsymbol{y},\boldsymbol{\tilde{y}^*}) = \frac{1}{n}
   \sum_{i=0}^{n-1}(y_i-\tilde{y}^{*}_i)^2
 \]
-
-Step I-IV is then repeated $B$ times, while keeping track of each sample MSE.
+ 
+Step I-IV is then repeated $B$ times, while keeping track of each sample MSE. After the completion of B bootstraps, an average of all MSE´s is calculated. Ideally, B is less than the number of datapoints.
 
 
 \subsection*{The bias-variance trade-off analysis}
@@ -379,10 +385,18 @@ Lastly, it should be noted that the bias-variance tradeoff measuremnet is perfor
 %  \label{fig: Ridge_best_fit_2}
 %\end{figure}
 
-\begin{center}
-  \csvautobooktabular{data/report_data/redge_reg_lambda_-1.1.csv}
-  \label{data: Ridge_best_fit}
-\end{center}
+%\begin{center}
+%  \csvautobooktabular{data/report_data/redge_reg_lambda_-1.1.csv}
+%  \label{data: Ridge_best_fit}
+%\end{center}
+
+\subsection*{Bias-variance trade-off as function of model complexity}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.75]{figures/EX2_model_complexity_using_bootstrap_function.pdf}
+  \caption{\label{fig:?}bias and variance trade-off as function of model complexity}
+\end{figure}
 
 \section*{Exercise 3}
 In this project, an infinite number of data points could easily be created by simply adjusting the number of *n* decimals created in the span [0,1] for x and y. Setting a large *n* could then, in turn, yield a test set of substantial size, which ables the prediction of estimated average test error with statistical certainty. 
@@ -394,7 +408,7 @@ However, for real-life purposes, this is rarely the case. More often than not, t
 \section*{Exercise 4}
 Throughout Exercise 1 - 3, we have studied function fitting using the Ordinary Least Squares regression. When comparing models, we have plotted the test error as a function of the model complexity and chosen a model based on the bias-variance tradeoff. The bias-variance tradeoff has also been studied in light of resampling techniques such as the bootstrap and k-fold cross-validation. As we have seen when interpreting the result of the resampling, an increased degree of freedom for the model will make the model more prone to overfit.
 
-Instead of reducing the degree of freedom of a model by limiting it's order, we will in this section look at a different approach for model selection through the introduction of a regularization parameter $\lambda$. With the regularization parameter, individual predictors in the model can be restrained without resorting to reducing the overall order of the model.
+Instead of reducing the degree of freedom of a model by limiting it's order, we will in this section look at a different approach for model selection through the introduction of a regularization parameter $\lambda$. With the regularization parameter, individual predictors in the model can be restrained without resorting to reducing the overall order of the model. The regularization term will punish the predictors such that they stray from reaching large values, adding another method to control overfitting. \cite{Bishop2016}
 
 Ridge regression is a regression model where the weights are constrained. \cite{Geron2019} This is done by adding a regularization term to the cost function, such that the function we are to optimize becomes
 \[
@@ -412,10 +426,12 @@ As further motivation as to why we want to apply Ridge (and further on also Lass
 As there are no universally best learning algorithm for fitting the problem at hand, we expand our analysis of Fitting the Franke Function in light the No Free Lunch Theorem to also include an assessment of Ridge and Lasso Regression. Both models handles feature selection through the introduction of the regularization parameter lambda, thus potentially achieving a lower MSE than for Ordinary Least Squares. Introducing several models also follows the implications of the Free Lunch Theorem, notably that we have to fine tune and assess our models to perform well on the current problem. \cite{Goodfellow2016}
 
 \subsection*{Weight Decay}
-The Cost function for Ridge regression can be seen as th≈e Cost function for Ordinary Least Squares with an added weight decay term $\lambda\bm{\beta}^\text{T}\bm{\beta}$. The parameter $\lambda$ is known as a hyperparameter, i.e. the parameter can be controlled before fitting the model and changes how the model behaves during fitting and predicting. \cite{Goodfellow2016} Moreover, $\lambda \geq 0$, such that $\lambda$ close to $0$ implies Ordinary Least Squares and $\lambda$ large implies that the predictors are close to $0$. Hence weight decay, as the hyperparamter can be tuned to enforce some predictors (weights) to be excluded from the model fit.
+The Cost function for Ridge regression can be seen as the Cost function for Ordinary Least Squares with an added weight decay term $\lambda\bm{\beta}^\text{T}\bm{\beta}$. The parameter $\lambda$ is known as a hyperparameter, i.e. the parameter can be controlled before fitting the model and changes how the model behaves during fitting and predicting. \cite{Goodfellow2016} Moreover, $\lambda \geq 0$, such that $\lambda$ close to $0$ implies Ordinary Least Squares and $\lambda$ large implies that the predictors are close to $0$. Hence weight decay, as the hyperparamter can be tuned to enforce some predictors (weights) to be excluded from the model fit.
 
 For this Exercise, we will analyse the effect of the weight decay when fitting the Franke Function using Ridge regression. We will analyse the polynomial of optimal degree that we determined in the previous exercises through assessing the bias-variance tradeoff for an increased model complexity. Firstly with the bootstrap resampling technique, then compared the bootstrap MSE with what was obtained using the k-fold cross validation. With the model complexity  
 
+\subsection*{Implementing Ridge regression}
+Our implementation of Ridge regression follow closely that of Ordinary Least Squares, but with an input parameter $\lambda$ determining the strength of the regularization term. Furthermore, the implementation differs as the normal equation for computing the optimal predictors have changed to $\bm{\hat{\beta}} = \left(\bm{X}^\text{T}\bm{X} + \bm{\lambda}\bm{I}\right)^{-1}\bm{X}^\text{T}\bm{y}$. 
 
 \section*{Exercise 6}
 The main goal of exercise 6 is to analyze the performance of our models on real digital terrain data using the approach conducted in previous exercises 1-5. Before commencing model analysis in exercise 6, we had to understand the terrain data's nature and how it differs from the constructed franke function dataset. 
