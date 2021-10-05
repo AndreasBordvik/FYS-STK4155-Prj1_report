@@ -504,7 +504,7 @@ def plot_beta_errors(summaary_df: pd.DataFrame(), degree):
     for i in range(1, degree+1):
         for k in range(i+1):
             x_ticks.append(f"({i-k},{k})")
-
+    
 
     fig = plt.figure()
     ax = plt.axes()
