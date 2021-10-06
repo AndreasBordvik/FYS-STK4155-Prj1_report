@@ -411,18 +411,23 @@ This algorithm is implemented by dividing the dataset into K parts of roughly th
 
 where $\hat{f}^{-k}(x)$ denotes the fitted function, in this case the linear regression model, with the \emph{k}th part of the data removed.\cite{Hastie2009}
 
-The following figures 
+The following figures provide a visualizes the results of 5-10 fold cross-validation on a dataset consisting of a total of $22^2$ points\cite{notebook_exc3}. The MSE for polynomial degrees ranging from 3 to 14 is then calculated. Here we present the results from degrees 4 and 12, while the remaining is available in {.......}
+
+ 
+The MSE estimated by bootstrap for the corresponding polynomial degree is also plotted. As figure ? displays,  at degree 4, the size of K seems to be of little importance, as the mean MSE of every fold is moderately low at approximately 0.10, with a standard deviation ranging from 0.8 to .012.  
 
 \begin{figure}[h]
   \centering
   \includegraphics[scale=0.75]{figures/EX3_mse_cv_boot4.pdf}
-  \caption{\label{fig:?}bias and variance trade-off as function of model complexity}
+  \caption{\label{fig:?} Mean MSE from CV and bootstrap at ploynomial degree = 4.}
 \end{figure}
+
+
 
 \begin{figure}[h]
   \centering
   \includegraphics[scale=0.75]{figures/EX3_mse_cv_boot12.pdf}
-  \caption{\label{fig:?}bias and variance trade-off as function of model complexity}
+  \caption{\label{fig:?}ean MSE from CV and bootstrap at ploynomial degree = 12.}
 \end{figure}
 
 
@@ -437,6 +442,7 @@ However, when evaluating the results provided, it is of great importance to also
   \includegraphics[scale=0.75]{figures/EX3_sk_vs_implemented_CV.pdf}
   \caption{\label{fig:?}Comparison of results from sklearn vs implemented method for Cross-Validation}
 \end{figure}
+
 
 The scores from Scikit-learn needed to be multiplied with $-1$ before beeing compared to our own results. This is due to the feact that this method expects a "greater is better" function rather than a cost function, resulting in an output opposite of the MSE.\cite{Geron2019} As illustrated by figure 8, we can conclude that our own implmented function produce the same results as the one fra Scikit-lean. As shuffeling is set to False as default in Scikit-learn, the same is done for our implmented method. 
 
