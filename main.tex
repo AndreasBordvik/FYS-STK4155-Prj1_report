@@ -265,30 +265,35 @@ As described in the preceding task, we split our data into several subsets used 
 
 Therefore, we impose resampling methods on our data to produce a more realistic estimate of the error. The following algorithm will demonstrate how *bootstrap* is performed to achieve this\cite{ref_forelesning}:
 
-We have some data: 
+We have some data, which consists of training data: 
 
-$$D = [x_1,x_2,...,x_n]$$
+$$X = [x_1,x_2,...,x_n]$$
+ and their respective target labels:
+ $$\bm{y} = [y_1,y_2,...,y_n]$$
+
 
 (I) A new sample is then drawn. This dataset will have the same dimension as D, but as it is drawn with replacements, they will differ from eachother as the latter has a high probability of drawing the same sample mulitple times:
 
 $$X^* = x_{1}^{*}, x_{2}^{*}, ... ,x_{n}^{*}$$
+$$\bm{y}^*= y_{1}^{*}, y_{2}^{*}, ... ,y_{n}^{*}$$
 
 (II)This sample is then used to create new set of predictors: 
 \[
-  \bm{\hat{\beta}}^* = \left(\bm{X}^\text{*T}\bm{X}^*\right)^{-1}\bm{X}^\text{T*}\bm{y}
+  \bm{\hat{\beta}}^* = \left(\bm{X}^\text{*T}\bm{X}^*\right)^{-1}\bm{X}^\text{*T}\bm{y}^*
 \]
 
-(III)which in turn is used to predict new values:
+(III)which in turn is used to predict new values on our test data. It is of great importance to emphasize that that $X_{test}$ is completly seperated from the rest of data, and only used to predict the new values for each sample.
 
-$$\tilde{y}^* = \bm{X}\bm{\hat{\beta}}$$.
+
+$$\tilde{y}^* = \bm{X}_{test}\bm{\hat{\beta}^*}$$.
 
 (IV)We then compute the error in our predictions:
 \[
   \text{MSE}(\boldsymbol{y},\boldsymbol{\tilde{y}^*}) = \frac{1}{n}
   \sum_{i=0}^{n-1}(y_i-\tilde{y}^{*}_i)^2
 \]
-
-Step I-IV is then repeated $B$ times, while keeping track of each sample MSE.
+ 
+Step I-IV is then repeated $B$ times, while keeping track of each sample MSE. After the completion of B bootstraps, an average of all MSE´s is calculated. Ideally, B is less than the number of datapoints.
 
 
 \subsection*{The bias-variance trade-off analysis}
@@ -385,10 +390,57 @@ Lastly, it should be noted that the bias-variance tradeoff measuremnet is perfor
 %  \label{data: Ridge_best_fit}
 %\end{center}
 
-\section*{Exercise 3}
-In this project, an infinite number of data points could easily be created by simply adjusting the number of *n* decimals created in the span [0,1] for x and y. Setting a large *n* could then, in turn, yield a test set of substantial size, which ables the prediction of estimated average test error with statistical certainty. 
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.75]{figures/EX2_model_complexity_using_bootstrap_function.pdf}
+  \caption{\label{fig:?}bias and variance trade-off as function of model complexity}
+\end{figure}
 
-However, for real-life purposes, this is rarely the case. More often than not, the challenges related to the validation of models in question lies in the limitations of available data.  A widely used approach for combating these issues is implementing cross-validation, which will ensure a better approximation of the generalization error. 
+Figure 8 visualizes where this occurs. As the complexity increases beyond degree 8, one can see an apparent increase in the variance.  At this point, one can assume that the model has started overfitting its predictors to the training data and lost some of its ability to generalize on unseen data.
+
+
+\section*{Exercise 3}
+In this project, an infinite number of data points could easily be created by simply adjusting the number of *n* decimals created in the span [0,1] for x and y. Setting a large *n* could then, in turn, yield a test set of substantial size, which ables the prediction of estimated average test error with statistical certainty. However, for real-life purposes, this is rarely the case. More often than not, the challenges related to the validation of models in question lies in the limitations of available data.  A widely used approach for combating these issues is implementing the cross-validation method.
+
+This algorithm is implemented by dividing the dataset into K parts of roughly the same size. In this project, we try K values ranging from 5 to 10, which also coincides with best-practice values \cite{Hastie2009}.  We have implemented the split into K-folds by using the method K-fold from Scikit learn model-selection \cite{link_to_doc}. This method provides us with arrays of approximately equal size, consisting of indices for choosing test- and train data.  Each fold is then used once as a test set, while the remaining K-1 folds make up the training set. The overall purpose of this method is to produce an estimate of the prediction error, given by:
+
+\[
+  \text{CV}(\hat{f}) = \frac{1}{K}
+  \sum_{i=1}^{K}L(y_i,\hat{f}^{-k(i)}(x_i))
+\]
+
+where $\hat{f}^{-k}(x)$ denotes the fitted function, in this case the linear regression model, with the \emph{k}th part of the data removed.\cite{Hastie2009}
+
+The following figures 
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.75]{figures/EX3_mse_cv_boot4.pdf}
+  \caption{\label{fig:?}bias and variance trade-off as function of model complexity}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.75]{figures/EX3_mse_cv_boot12.pdf}
+  \caption{\label{fig:?}bias and variance trade-off as function of model complexity}
+\end{figure}
+
+
+However, when evaluating the results provided, it is of great importance to also assess the total size of the dataset as this could bias the estimate of error: 
+
+\subsection*{Comparing methods}
+
+
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.75]{figures/EX3_sk_vs_implemented_CV.pdf}
+  \caption{\label{fig:?}Comparison of results from sklearn vs implemented method for Cross-Validation}
+\end{figure}
+
+The scores from Scikit-learn needed to be multiplied with $-1$ before beeing compared to our own results. This is due to the feact that this method expects a "greater is better" function rather than a cost function, resulting in an output opposite of the MSE.\cite{Geron2019} As illustrated by figure 8, we can conclude that our own implmented function produce the same results as the one fra Scikit-lean. As shuffeling is set to False as default in Scikit-learn, the same is done for our implmented method. 
+
+
 
 
 
@@ -444,7 +496,12 @@ Moreover, we created 8 patches of image data from the resized images where each 
 Another difference separating the terrain data from the synthetically created franke function data is that noise is incorporated within the image itself. For the franke function, we had to add noise in order for us to analyze the robustness of the models and to which degree the models were generalized. 
 However, having control over the influence and magnitude of the noise is a luxury situation in real data situations, and for the real terrain image data, the noise stems from sensors and the assembly or construction of the image. 
 
-After investagating the different patches we concluded on mainy focusing on two different patches shown in figure \ref{fig:terrain_patches_focus} 
+After investagating the different patches we narrowed down to two patches, one from each terrain. Two different patches were considered for our main analysis, figure \ref{fig:terrain_patches_focus}.
+We concluded on mainy focusing on patch1 from terrain1 since it was easier for our model to fit. For the terrain data we scale both target and input data using standard scaler for reasons described above. 
+The franke function is relativly smooth comparing the real terrain. The frank function has three dominating structures in its landscape, 
+one small dip together with two Gaussian peaks. Looking at the terrain landscape, it is obviouse that its structures and shape are very complex.
+We also see that the terrain patch we chose has a higher normalized variance than what the frank function has using a noise factor of 0.05
+Due to the complexity in the terrain data, we expected models of relativly high complexity before running into overfitting. 
 
 \begin{figure}
   \centering
@@ -455,7 +512,7 @@ After investagating the different patches we concluded on mainy focusing on two 
 
 \begin{figure}
   \centering
-  \subfloat{{\includegraphics[width=7cm]{figures/EX6_Terrain1 patches.pdf} }}%
+  \subfloat{{\includegraphics[width=7cm]{figures/EX6_Terrain1s patches.pdf} }}%
   \subfloat{{\includegraphics[width=7cm]{figures/EX6_Terrain2 patches.pdf} }}%
   \caption{Terrain patches}%
   \label{fig:terrain_patches}%
@@ -464,6 +521,7 @@ After investagating the different patches we concluded on mainy focusing on two 
 \begin{figure}
   \centering
   \subfloat{{\includegraphics[width=14cm]{figures/EX6_terrain_patch_to_fit_2D.pdf} }}%
+  \\
   \subfloat{{\includegraphics[width=15cm]{figures/EX6_terrain_patch_to_fit_3D.pdf} }}%
   \caption{Chosen terrain patches}%
   \label{fig:terrain_patches_focus}%
@@ -471,7 +529,10 @@ After investagating the different patches we concluded on mainy focusing on two 
 
 
 \subsection*{Exercise 6.1 (Exercise 1 approach)}
-In this task we conducted a OLS fit on the the terrain1 patch using the same appraoch as done in exercise1.
+In this task we conducted a OLS fit on the the terrain1 patch using similar appraoch as done in exercise1. We fitted the OLS model between degree 1-24.
+Looking at figure \ref{fig:EX6_1_OLS_fit} we see that the model is overfitting to the training data at degree 19. We have a relativly large dataset of 
+32400 data points (180x180). We dicovered that the need for a slightly larger test sample fraction to more accuratly determain which complexity the model starts to overfit. 
+
 
 \begin{figure}
   \centering
