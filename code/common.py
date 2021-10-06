@@ -94,9 +94,9 @@ class Regression():
         coeffs_df = pd.DataFrame.from_dict({f"{self.param_name}": params,
                                             "coeff name": [rf"$\beta${i}" for i in range(0, self.betas.shape[0])],
                                             "coeff value": np.round(self.betas, decimals=4),
-                                            "std error": np.round(SE_betas, decimals=5),
-                                            "CI lower": np.round(CI_lower_all_betas, decimals=5),
-                                            "CI upper": np.round(CI_upper_all_betas, decimals=5)},
+                                            "std error": np.round(SE_betas, decimals=4),
+                                            "CI lower": np.round(CI_lower_all_betas, decimals=4),
+                                            "CI upper": np.round(CI_upper_all_betas, decimals=4)},
                                            orient='index').T
 
         return coeffs_df
@@ -139,21 +139,21 @@ class RidgeRegression(Regression):
         self.param = self.lam = lambda_val
         self.param_name = param_name
 
-    def fit(self, X: np.ndarray, t: np.ndarray, SVDfit=True, keep_intercept=True) -> np.ndarray:
-        self.SVDfit = SVDfit
-        self.keep_intercept = keep_intercept
-        if keep_intercept == False:
-            X = X[:, 1:]
+    def fit(self, X: np.ndarray, t: np.ndarray) -> np.ndarray:
+        #self.SVDfit = SVDfit
+        #self.keep_intercept = keep_intercept
+        #if keep_intercept == False:
+        #    X = X[:, 1:]
         self.X_train = X
         self.t_train = t
         Hessian = X.T @ X
         # beta punishing and preventing the singular matix
         Hessian += self.lam * np.eye(Hessian.shape[0])
 
-        if SVDfit:
-            self.betas = SVDinv(Hessian) @ X.T @ t
-        else:
-            self.betas = np.linalg.pinv(Hessian) @ X.T @ t
+        #if SVDfit:
+        #    self.betas = SVDinv(Hessian) @ X.T @ t
+        #else:
+        self.betas = np.linalg.pinv(Hessian) @ X.T @ t
         self.t_hat_train = X @ self.betas
         # print(f"Betas.shape in Ridge before:{self.betas.shape}")
         self.betas = np.squeeze(self.betas)
@@ -180,7 +180,7 @@ def design_matrix(x: np.ndarray, features: int) -> np.ndarray:
     return X
 
 
-def prepare_data(X: np.ndarray, t: np.ndarray, test_size=0.2, shuffle=True, scale_X=False, scale_t=False, zero_center=False, random_state=SEED_VALUE) -> np.ndarray:
+def prepare_data(X: np.ndarray, t: np.ndarray, test_size=0.2, shuffle=True, scale_X=False, scale_t=False, zero_center=False, skip_intercept=False, random_state=SEED_VALUE) -> np.ndarray:
     # split in training and test data
     if random_state is None:
         X_train, X_test, t_train, t_test = train_test_split(
@@ -196,9 +196,6 @@ def prepare_data(X: np.ndarray, t: np.ndarray, test_size=0.2, shuffle=True, scal
             X_test = manual_scaling(X_test)
         else:
             X_train, X_test = standard_scaling(X_train, X_test)
-            # Readd the intercept to avoid singularities
-            X_train[:, 0] = 1
-            X_test[:, 0] = 1
 
     if(scale_t):
         if zero_center:  # This should NEVER happen
@@ -206,6 +203,10 @@ def prepare_data(X: np.ndarray, t: np.ndarray, test_size=0.2, shuffle=True, scal
             t_test = manual_scaling(t_test)
         else:
             t_train, t_test = standard_scaling(t_train, t_test)
+
+    if (skip_intercept):
+        X_train = X_train[:,1:]
+        X_test = X_test[:,1:]
 
     return X_train, X_test, t_train, t_test
 
@@ -220,7 +221,7 @@ def manual_scaling(data):
 
 
 def standard_scaling(train, test):
-    scaler = StandardScaler(with_std=False)
+    scaler = StandardScaler()
     scaler.fit(train)
     train_scaled = scaler.transform(train)
     test_scaled = scaler.transform(test)
@@ -375,7 +376,7 @@ def SVDinv(A):
 
 
 @timer
-def bootstrap(x, y, t, maxdegree, n_bootstraps, model, scale_X=False, scale_t=False):
+def bootstrap(x, y, t, maxdegree, n_bootstraps, model, scale_X=False, scale_t=False, skip_intercept=False):
 
     MSE_test = np.zeros(maxdegree)
     MSE_train = np.zeros(maxdegree)
@@ -386,10 +387,10 @@ def bootstrap(x, y, t, maxdegree, n_bootstraps, model, scale_X=False, scale_t=Fa
     for degree in tqdm(range(1, maxdegree+1), desc=f"Looping trhough polynomials up to {maxdegree} with {n_bootstraps}: "):
         X = create_X(x, y, n=degree)
         X_train, X_test, t_train, t_test = prepare_data(
-            X, t_flat, test_size=0.2, shuffle=True, scale_X=scale_X, scale_t=scale_t, random_state=SEED_VALUE)
+            X, t_flat, test_size=0.2, shuffle=True, scale_X=scale_X, scale_t=scale_t, skip_intercept=skip_intercept, random_state=SEED_VALUE)
 
         t_hat_train, t_hat_test = bootstrapping(
-            X_train, t_train, X_test, t_test, n_bootstraps, model, keep_intercept=True)
+            X_train, t_train, X_test, t_test, n_bootstraps, model)
 
         MSE_test[degree-1] = np.mean(
             np.mean((t_test - t_hat_test)**2, axis=1, keepdims=True))
@@ -401,13 +402,13 @@ def bootstrap(x, y, t, maxdegree, n_bootstraps, model, scale_X=False, scale_t=Fa
     return MSE_test, MSE_train, bias, variance
 
 
-def bootstrapping(X_train, t_train, X_test, t_test, n_bootstraps, model, keep_intercept=False):
+def bootstrapping(X_train, t_train, X_test, t_test, n_bootstraps, model):
     t_hat_trains = np.empty((t_train.shape[0], n_bootstraps))
     t_hat_tests = np.empty((t_test.shape[0], n_bootstraps))
     for i in range(n_bootstraps):
         X, t = resample(X_train, t_train)
         t_hat_train = model.fit(
-            X, t, SVDfit=False, keep_intercept=keep_intercept)
+            X, t, SVDfit=False)
         t_hat_test = model.predict(X_test)
         # Storing predictions
         t_hat_trains[:, i] = t_hat_train.ravel()
@@ -432,7 +433,11 @@ def plot_beta_errors_for_lambdas(summaries_df: pd.DataFrame(), degree):
 
         # plot beta values
         # plt.plot(lambdas, beta_values, label=f"b{i}")
-        plt.plot(lambdas, beta_values, label=fr"$\beta_{i}$$\pm SE$")
+        
+        
+
+        
+        plt.plot(lambdas, beta_values, label=fr"$\beta_{i+1}$$\pm SE$")
         # plt.plot(lambdas, beta_values)
 
         # plot std error
@@ -472,7 +477,7 @@ def plot_beta_CI_for_lambdas(summaries_df: pd.DataFrame(), degree):
 
         # plot beta values
         # plt.plot(lambdas, beta_values, label=f"b{i}")
-        plt.plot(lambdas, beta_values, label=fr"$\beta_{i}$ with $CI$")
+        plt.plot(lambdas, beta_values, label=fr"$\beta_{i+1}$ with $CI$")
         # plt.plot(lambdas, beta_values)
 
         # plot std error
