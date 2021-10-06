@@ -446,7 +446,12 @@ Moreover, we created 8 patches of image data from the resized images where each 
 Another difference separating the terrain data from the synthetically created franke function data is that noise is incorporated within the image itself. For the franke function, we had to add noise in order for us to analyze the robustness of the models and to which degree the models were generalized. 
 However, having control over the influence and magnitude of the noise is a luxury situation in real data situations, and for the real terrain image data, the noise stems from sensors and the assembly or construction of the image. 
 
-After investagating the different patches we concluded on mainy focusing on two different patches shown in figure \ref{fig:terrain_patches_focus} 
+After investagating the different patches we narrowed down to two patches, one from each terrain. Two different patches were considered for our main analysis, figure \ref{fig:terrain_patches_focus}.
+We concluded on mainy focusing on patch1 from terrain1 since it was easier for our model to fit. For the terrain data we scale both target and input data using standard scaler for reasons described above. 
+The franke function is relativly smooth comparing the real terrain. The frank function has three dominating structures in its landscape, 
+one small dip together with two Gaussian peaks. Looking at the terrain landscape, it is obviouse that its structures and shape are very complex.
+We also see that the terrain patch we chose has a higher normalized variance than what the frank function has using a noise factor of 0.05
+Due to the complexity in the terrain data, we expected models of relativly high complexity before running into overfitting. 
 
 \begin{figure}
   \centering
@@ -474,8 +479,10 @@ After investagating the different patches we concluded on mainy focusing on two 
 
 
 \subsection*{Exercise 6.1 (Exercise 1 approach)}
-In this task we conducted a OLS fit on the the terrain1 patch using similar appraoch as done in exercise1.
-We scale both target and input data using standard scaler. Looking at figure \ref{fig:EX6_1_OLS_fit} 
+In this task we conducted a OLS fit on the the terrain1 patch using similar appraoch as done in exercise1. We fitted the OLS model between degree 1-24.
+Looking at figure \ref{fig:EX6_1_OLS_fit} we see that the model is overfitting to the training data at degree 19. We have a relativly large dataset of 
+32400 data points (180x180). We dicovered that the need for a slightly larger test sample fraction to more accuratly determain which complexity the model starts to overfit. 
+
 
 \begin{figure}
   \centering
