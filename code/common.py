@@ -94,9 +94,9 @@ class Regression():
         coeffs_df = pd.DataFrame.from_dict({f"{self.param_name}": params,
                                             "coeff name": [rf"$\beta${i}" for i in range(0, self.betas.shape[0])],
                                             "coeff value": np.round(self.betas, decimals=4),
-                                            "std error": np.round(SE_betas, decimals=4),
-                                            "CI lower": np.round(CI_lower_all_betas, decimals=4),
-                                            "CI upper": np.round(CI_upper_all_betas, decimals=4)},
+                                            "std error": np.round(SE_betas, decimals=5),
+                                            "CI lower": np.round(CI_lower_all_betas, decimals=5),
+                                            "CI upper": np.round(CI_upper_all_betas, decimals=5)},
                                            orient='index').T
 
         return coeffs_df
