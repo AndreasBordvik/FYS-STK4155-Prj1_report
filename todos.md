@@ -1,5 +1,6 @@
 # Project 1 todos
 
+Vi må fikse SEED_VALUE
 
 ## Exercise 1
 
@@ -33,6 +34,9 @@ Compare and plot with sk_learn!!!
 
 
 ## Exercise 4-5
+3D grid search,
+lambdaplot for optimal degree
+
 Section 5.2.2 in Goodfellow
 
 vår fit opp mot sklearn
@@ -41,8 +45,6 @@ CV for degree lambda
 
 plotte vertikal linje for optimal lambda i beta-plot
 
-Note that $\lambda$ is regularization parameter
-Discuss the importance of regularization, for feature selection. 
 Discuss bootstrap and cv with and without regularization.
 
 Note regularization both with and without noise.

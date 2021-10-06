@@ -476,7 +476,18 @@ The Cost function for Ridge regression can be seen as the Cost function for Ordi
 For this Exercise, we will analyse the effect of the weight decay when fitting the Franke Function using Ridge regression. We will analyse the polynomial of optimal degree that we determined in the previous exercises through assessing the bias-variance tradeoff for an increased model complexity. Firstly with the bootstrap resampling technique, then compared the bootstrap MSE with what was obtained using the k-fold cross validation. With the model complexity  
 
 \subsection*{Implementing Ridge regression}
-Our implementation of Ridge regression follow closely that of Ordinary Least Squares, but with an input parameter $\lambda$ determining the strength of the regularization term. Furthermore, the implementation differs as the normal equation for computing the optimal predictors have changed to $\bm{\hat{\beta}} = \left(\bm{X}^\text{T}\bm{X} + \bm{\lambda}\bm{I}\right)^{-1}\bm{X}^\text{T}\bm{y}$. 
+Our implementation of Ridge regression follow closely that of Ordinary Least Squares, but with an input parameter $\lambda$ determining the strength of the regularization term. Furthermore, the implementation differs as the normal equation for computing the optimal predictors have changed to $\bm{\hat{\beta}} = \left(\bm{X}^\text{T}\bm{X} + \bm{\lambda}\bm{I}\right)^{-1}\bm{X}^\text{T}\bm{y}$. When implementing Ridge regression, we follow the convention that the intercept is skipped when fitting the function, hence we start computing the regularization term starting at $\beta_1$. \cite{Geron2019} if the intercept were included, the regularizer would be dependant on the choice of origin for the target, which generally causes the mean squared error to increase as touched upon during the first Exercise.
+
+\section*{Exercise 5}
+The second regularized linear model which we will study is Least Absolute Shrinkage and Selection Operator (LASSO) Regression. Lasso adds a regularization term to the Cost function similarly to Ridge regression, though Lasso utilizes the L1 norm of the predictors instead of the L2 as in Ridge. \cite{Geron2019} Mathematically, adding the L1 regularizer gives us the following Cost function 
+\[
+  C\left(\bm{X},\bm{\beta}\right) = \left\{\left(\bm{y}-\bm{X}\bm{\beta}\right)^\text{T}\left(\bm{y}-\bm{X}\bm{\beta}\right)\right\}+\lambda\lVert \bm{\beta}\rVert_1
+\]
+We note that the L1-norm is the same as the sum of the absolute value for each $\beta_i$. Moreover, the derivative of the absolute value is the sign-function. The resulting normal equation for Lasso regression is thus not a nice analytical expression, and is omitted for this Exercise. As a result, only the Sci-Kit implementation of Lasso regression will be studied.
+
+\subsection*{Difference between L1 and L2-norm regularization}
+The difference between the L1 and L2-norm is how it can be related to our understanding of distance. The L1-norm, mathematically defined as $\lVert \bm{\beta} \rVert_1 = \sum_{i=0}^{n-1}|\beta_i|$ is the "Manhattan Distance" of $\bm{\beta}$, i.e. the distance from two points a to b using only straight and normal lines. On the other hand, the L2-norm is mathematically defined as $\lVert \bm{\beta} \rVert_2 = \sqrt{\sum_{i=0}^{n-1}\beta_i^2}$. The L2-norm is more commonly referred to as the Euclidean distance, or the distance of a straight line drawn between a and b.
+
 
 \section*{Exercise 6}
 The main goal of exercise 6 is to analyze the performance of our models on real digital terrain data using the approach conducted in previous exercises 1-5. Before commencing model analysis in exercise 6, we had to understand the terrain data's nature and how it differs from the constructed franke function dataset. 
