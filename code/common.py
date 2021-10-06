@@ -90,7 +90,7 @@ class Regression():
         # Summary dataframe
         params = np.zeros(self.betas.shape[0])
         params.fill(self.param)
-        
+
         coeffs_df = pd.DataFrame.from_dict({f"{self.param_name}": params,
                                             "coeff name": [rf"$\beta${i}" for i in range(0, self.betas.shape[0])],
                                             "coeff value": np.round(self.betas, decimals=4),
@@ -98,7 +98,7 @@ class Regression():
                                             "CI lower": np.round(CI_lower_all_betas, decimals=4),
                                             "CI upper": np.round(CI_upper_all_betas, decimals=4)},
                                            orient='index').T
-        
+
         return coeffs_df
 
 
@@ -197,8 +197,8 @@ def prepare_data(X: np.ndarray, t: np.ndarray, test_size=0.2, shuffle=True, scal
         else:
             X_train, X_test = standard_scaling(X_train, X_test)
             # Readd the intercept to avoid singularities
-            X_train[:,0] = 1
-            X_test[:,0] = 1
+            X_train[:, 0] = 1
+            X_test[:, 0] = 1
 
     if(scale_t):
         if zero_center:  # This should NEVER happen
@@ -226,11 +226,13 @@ def standard_scaling(train, test):
     test_scaled = scaler.transform(test)
     return train_scaled, test_scaled
 
+
 def standard_scaling_single(data):
     scaler = StandardScaler()
     scaler.fit(data)
     data_scaled = scaler.transform(data)
     return data_scaled, scaler
+
 
 def min_max_scaling(data):
     scaler = MinMaxScaler()
@@ -506,7 +508,6 @@ def plot_beta_errors(summaary_df: pd.DataFrame(), degree):
         for k in range(i+1):
             x_ticks.append(f"({i-k},{k})")
     """
-    
 
     fig = plt.figure()
     ax = plt.axes()
@@ -523,11 +524,11 @@ def plot_beta_errors(summaary_df: pd.DataFrame(), degree):
     m = 0.2  # inch margin
     s = maxsize/plt.gcf().dpi*summaary_df.shape[0]+2*m
     margin = m/plt.gcf().get_size_inches()[0]
- 
+
     plt.gcf().subplots_adjust(left=margin, right=1.-margin)
     plt.gcf().set_size_inches(s, plt.gcf().get_size_inches()[1])
     plt.errorbar(x_ticks_values, betas, yerr=1.96*SE, fmt='o', ms=4)
-    #for i, txt in enumerate(x_ticks):
+    # for i, txt in enumerate(x_ticks):
     #    plt.annotate(f"{txt}", (x_ticks_values[i], betas[i]))
     # plt.tight_layout()
     # plt.show()
@@ -558,9 +559,7 @@ def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffl
     else:
         "Provide a valid model as a string(Ridge/Lasso/OLS) "
 
-
-
-    kfold = KFold(n_splits=k, shuffle=shuffle, random_state=SEED_VALUE)
+    kfold = KFold(n_splits=k, shuffle=shuffle)
     scores_KFold = np.zeros(k)
     z = z.ravel()
     # scores_KFold idx counter
@@ -573,11 +572,12 @@ def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffl
         # get all cols and selected test_inds rows/elements:
         xtest = X[test_inds, :]
         ytest = z[test_inds]
-
+        # fit a scaler to train_data and transform train and test:
         scaler = StandardScaler()
         scaler.fit(xtrain)
         xtrain_scaled = scaler.transform(xtrain)
         xtest_scaled = scaler.transform(xtest)
+        # sett bias to  1:
         xtrain_scaled[:, 0] = 1
         xtest_scaled[:, 0] = 1
 
@@ -594,9 +594,10 @@ def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffl
 
 
 def noise_factor(n, factor=0.3):
-    return factor*np.random.randn(n, n) # Stochastic noise
+    return factor*np.random.randn(n, n)  # Stochastic noise
 
-def MSE(y_data,y_model):
+
+def MSE(y_data, y_model):
     """Simple Morten function to compute MSE
 
     Args:

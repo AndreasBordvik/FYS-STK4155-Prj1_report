@@ -399,9 +399,35 @@ Lastly, it should be noted that the bias-variance tradeoff measuremnet is perfor
 \end{figure}
 
 \section*{Exercise 3}
-In this project, an infinite number of data points could easily be created by simply adjusting the number of *n* decimals created in the span [0,1] for x and y. Setting a large *n* could then, in turn, yield a test set of substantial size, which ables the prediction of estimated average test error with statistical certainty. 
+In this project, an infinite number of data points could easily be created by simply adjusting the number of *n* decimals created in the span [0,1] for x and y. Setting a large *n* could then, in turn, yield a test set of substantial size, which ables the prediction of estimated average test error with statistical certainty. However, for real-life purposes, this is rarely the case. More often than not, the challenges related to the validation of models in question lies in the limitations of available data.  A widely used approach for combating these issues is implementing the cross-validation method.
 
-However, for real-life purposes, this is rarely the case. More often than not, the challenges related to the validation of models in question lies in the limitations of available data.  A widely used approach for combating these issues is implementing cross-validation, which will ensure a better approximation of the generalization error. 
+This algorithm is implemented by dividing the dataset into K parts of roughly the same size. In this project, we try K values ranging from 5 to 10, which also coincides with best-practice values \cite{Hastie2009}.  We have implemented the split into K-folds by using the method K-fold from Scikit learn model-selection \cite{link_to_doc}. This method provides us with arrays of approximately equal size, consisting of indices for choosing test- and train data.  Each fold is then used once as a test set, while the remaining K-1 folds make up the training set. The overall purpose of this method is to produce an estimate of the prediction error, given by:
+
+\[
+  \text{CV}(\hat{f}) = \frac{1}{K}
+  \sum_{i=1}^{K}L(y_i,\hat{f}^{-k(i)}(x_i))
+\]
+
+where $\hat{f}^{-k}(x)$ denotes the fitted function, in this case the linear regression model, with the \emph{k}th part of the data removed.\cite{Hastie2009}
+
+However, when evaluating the results provided, it is of great importance to also assess the total size of the dataset as this could bias the estimate of error: 
+
+
+
+
+
+\subsection*{Comparing methods}
+
+
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.75]{figures/EX3_sk_vs_implemented_CV.pdf}
+  \caption{\label{fig:?}Comparison of results from sklearn vs implemented method for Cross-Validation}
+\end{figure}
+
+The scores from Scikit-learn needed to be multiplied with $-1$ before beeing compared to our own results. This is due to the feact that this method expects a "greater is better" function rather than a cost function, resulting in an output opposite of the MSE.\cite{Geron2019} As illustrated by figure 8, we can conclude that our own implmented function produce the same results as the one fra Scikit-lean. 
+
 
 
 

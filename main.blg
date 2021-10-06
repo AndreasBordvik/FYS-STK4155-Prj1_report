@@ -4,9 +4,10 @@ The top-level auxiliary file: main.aux
 The style file: plain.bst
 Database file #1: bibliography.bib
 Warning--I didn't find a database entry for "ref_forelesning"
+Warning--I didn't find a database entry for "link_to_doc"
 You've used 7 entries,
             2118 wiz_defined-function locations,
-            545 strings with 5206 characters,
+            546 strings with 5217 characters,
 and the built_in function-call counts, 2383 in all, are:
 = -- 209
 > -- 153
@@ -45,4 +46,4 @@ warning$ -- 0
 while$ -- 18
 width$ -- 8
 write$ -- 76
-(There was 1 warning)
+(There were 2 warnings)
