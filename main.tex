@@ -390,13 +390,14 @@ Lastly, it should be noted that the bias-variance tradeoff measuremnet is perfor
 %  \label{data: Ridge_best_fit}
 %\end{center}
 
-\subsection*{Bias-variance trade-off as function of model complexity}
-
 \begin{figure}[h]
   \centering
   \includegraphics[scale=0.75]{figures/EX2_model_complexity_using_bootstrap_function.pdf}
   \caption{\label{fig:?}bias and variance trade-off as function of model complexity}
 \end{figure}
+
+Figure 8 visualizes where this occurs. As the complexity increases beyond degree 8, one can see an apparent increase in the variance.  At this point, one can assume that the model has started overfitting its predictors to the training data and lost some of its ability to generalize on unseen data.
+
 
 \section*{Exercise 3}
 In this project, an infinite number of data points could easily be created by simply adjusting the number of *n* decimals created in the span [0,1] for x and y. Setting a large *n* could then, in turn, yield a test set of substantial size, which ables the prediction of estimated average test error with statistical certainty. However, for real-life purposes, this is rarely the case. More often than not, the challenges related to the validation of models in question lies in the limitations of available data.  A widely used approach for combating these issues is implementing the cross-validation method.
@@ -410,11 +411,22 @@ This algorithm is implemented by dividing the dataset into K parts of roughly th
 
 where $\hat{f}^{-k}(x)$ denotes the fitted function, in this case the linear regression model, with the \emph{k}th part of the data removed.\cite{Hastie2009}
 
+The following figures 
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.75]{figures/EX3_mse_cv_boot4.pdf}
+  \caption{\label{fig:?}bias and variance trade-off as function of model complexity}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.75]{figures/EX3_mse_cv_boot12.pdf}
+  \caption{\label{fig:?}bias and variance trade-off as function of model complexity}
+\end{figure}
+
+
 However, when evaluating the results provided, it is of great importance to also assess the total size of the dataset as this could bias the estimate of error: 
-
-
-
-
 
 \subsection*{Comparing methods}
 
@@ -426,7 +438,8 @@ However, when evaluating the results provided, it is of great importance to also
   \caption{\label{fig:?}Comparison of results from sklearn vs implemented method for Cross-Validation}
 \end{figure}
 
-The scores from Scikit-learn needed to be multiplied with $-1$ before beeing compared to our own results. This is due to the feact that this method expects a "greater is better" function rather than a cost function, resulting in an output opposite of the MSE.\cite{Geron2019} As illustrated by figure 8, we can conclude that our own implmented function produce the same results as the one fra Scikit-lean. 
+The scores from Scikit-learn needed to be multiplied with $-1$ before beeing compared to our own results. This is due to the feact that this method expects a "greater is better" function rather than a cost function, resulting in an output opposite of the MSE.\cite{Geron2019} As illustrated by figure 8, we can conclude that our own implmented function produce the same results as the one fra Scikit-lean. As shuffeling is set to False as default in Scikit-learn, the same is done for our implmented method. 
+
 
 
 
