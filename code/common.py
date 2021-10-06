@@ -23,7 +23,7 @@ from sklearn import linear_model
 INPUT_DATA = "../data/input_data/"  # Path for input data
 REPORT_DATA = "../data/report_data/"  # Path for data ment for the report
 REPORT_FIGURES = "../figures/"  # Path for figures ment for the report
-SEED_VALUE = 4155
+#SEED_VALUE = 4155
 EX1 = "EX1_"
 EX2 = "EX2_"
 EX3 = "EX3_"
@@ -108,19 +108,19 @@ class OLS(Regression):
         self.param = degree
         self.param_name = param_name
 
-    def fit(self, X: np.ndarray, t: np.ndarray, SVDfit=True, keep_intercept=True) -> np.ndarray:
-        self.SVDfit = SVDfit
-        self.keep_intercept = keep_intercept
-        if keep_intercept == False:
-            X = X[:, 1:]
+    def fit(self, X: np.ndarray, t: np.ndarray) -> np.ndarray:
+        #self.SVDfit = SVDfit
+        #self.keep_intercept = keep_intercept
+        #if keep_intercept == False:
+        #    X = X[:, 1:]
 
         self.X_train = X
         self.t_train = t
 
-        if SVDfit:
-            self.betas = SVDinv(X.T @ X) @ X.T @ t
-        else:
-            self.betas = np.linalg.pinv(X.T @ X) @ X.T @ t
+        #if SVDfit:
+        #    self.betas = SVDinv(X.T @ X) @ X.T @ t
+        #else:
+        self.betas = np.linalg.pinv(X.T @ X) @ X.T @ t
         self.t_hat_train = X @ self.betas
         # print("betas.shape in train before squeeze:",self.betas.shape)
         self.betas = np.squeeze(self.betas)
@@ -180,29 +180,24 @@ def design_matrix(x: np.ndarray, features: int) -> np.ndarray:
     return X
 
 
-def prepare_data(X: np.ndarray, t: np.ndarray, test_size=0.2, shuffle=True, scale_X=False, scale_t=False, zero_center=False, skip_intercept=False, random_state=SEED_VALUE) -> np.ndarray:
+def prepare_data(X: np.ndarray, t: np.ndarray, random_state, test_size=0.2, shuffle=True, scale_X=False, scale_t=False, skip_intercept=False) -> np.ndarray:
     # split in training and test data
+    '''
     if random_state is None:
         X_train, X_test, t_train, t_test = train_test_split(
             X, t, test_size=test_size, shuffle=shuffle)
     else:
         X_train, X_test, t_train, t_test = train_test_split(
             X, t, test_size=test_size, shuffle=shuffle, random_state=random_state)
+    '''
+    X_train, X_test, t_train, t_test = train_test_split(X, t, test_size=test_size, shuffle=shuffle, random_state=random_state)
 
     # Scale data
     if(scale_X):
-        if zero_center:  # This should NEVER happen
-            X_train = manual_scaling(X_train)
-            X_test = manual_scaling(X_test)
-        else:
-            X_train, X_test = standard_scaling(X_train, X_test)
+        X_train, X_test = standard_scaling(X_train, X_test)
 
     if(scale_t):
-        if zero_center:  # This should NEVER happen
-            t_train = manual_scaling(t_train)
-            t_test = manual_scaling(t_test)
-        else:
-            t_train, t_test = standard_scaling(t_train, t_test)
+        t_train, t_test = standard_scaling(t_train, t_test)
 
     if (skip_intercept):
         X_train = X_train[:,1:]
