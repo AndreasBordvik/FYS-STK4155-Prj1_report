@@ -23,7 +23,7 @@ from sklearn import linear_model
 INPUT_DATA = "../data/input_data/"  # Path for input data
 REPORT_DATA = "../data/report_data/"  # Path for data ment for the report
 REPORT_FIGURES = "../figures/"  # Path for figures ment for the report
-SEED_VALUE = 4155
+#SEED_VALUE = 4155
 EX1 = "EX1_"
 EX2 = "EX2_"
 EX3 = "EX3_"
@@ -47,7 +47,6 @@ class Regression():
         self.param_name = None
         self.SVDfit = None
         self.SE_betas = None
-        self.keep_intercept = None
 
     def fit(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
         pass
@@ -58,9 +57,7 @@ class Regression():
 
     def predict(self, X: np.ndarray) -> np.ndarray:
         # print("from predict: self.keep_intercept:",self.keep_intercept)
-        if(self.keep_intercept == False):
-            # print(f"Predict: removing intercept")
-            X = X[:, 1:]
+
         # print("betas.shape in predict:",self.betas.shape)
         # print("X.shape in predict:",X.shape)
         prediction = X @ self.betas
@@ -108,19 +105,19 @@ class OLS(Regression):
         self.param = degree
         self.param_name = param_name
 
-    def fit(self, X: np.ndarray, t: np.ndarray, SVDfit=True, keep_intercept=True) -> np.ndarray:
-        self.SVDfit = SVDfit
-        self.keep_intercept = keep_intercept
-        if keep_intercept == False:
-            X = X[:, 1:]
+    def fit(self, X: np.ndarray, t: np.ndarray) -> np.ndarray:
+        #self.SVDfit = SVDfit
+        #self.keep_intercept = keep_intercept
+        #if keep_intercept == False:
+        #    X = X[:, 1:]
 
         self.X_train = X
         self.t_train = t
 
-        if SVDfit:
-            self.betas = SVDinv(X.T @ X) @ X.T @ t
-        else:
-            self.betas = np.linalg.pinv(X.T @ X) @ X.T @ t
+        #if SVDfit:
+        #    self.betas = SVDinv(X.T @ X) @ X.T @ t
+        #else:
+        self.betas = np.linalg.pinv(X.T @ X) @ X.T @ t
         self.t_hat_train = X @ self.betas
         # print("betas.shape in train before squeeze:",self.betas.shape)
         self.betas = np.squeeze(self.betas)
@@ -180,29 +177,24 @@ def design_matrix(x: np.ndarray, features: int) -> np.ndarray:
     return X
 
 
-def prepare_data(X: np.ndarray, t: np.ndarray, test_size=0.2, shuffle=True, scale_X=False, scale_t=False, zero_center=False, skip_intercept=False, random_state=SEED_VALUE) -> np.ndarray:
+def prepare_data(X: np.ndarray, t: np.ndarray, random_state, test_size=0.2, shuffle=True, scale_X=False, scale_t=False, skip_intercept=True) -> np.ndarray:
     # split in training and test data
+    '''
     if random_state is None:
         X_train, X_test, t_train, t_test = train_test_split(
             X, t, test_size=test_size, shuffle=shuffle)
     else:
         X_train, X_test, t_train, t_test = train_test_split(
             X, t, test_size=test_size, shuffle=shuffle, random_state=random_state)
+    '''
+    X_train, X_test, t_train, t_test = train_test_split(X, t, test_size=test_size, shuffle=shuffle, random_state=random_state)
 
     # Scale data
     if(scale_X):
-        if zero_center:  # This should NEVER happen
-            X_train = manual_scaling(X_train)
-            X_test = manual_scaling(X_test)
-        else:
-            X_train, X_test = standard_scaling(X_train, X_test)
+        X_train, X_test = standard_scaling(X_train, X_test)
 
     if(scale_t):
-        if zero_center:  # This should NEVER happen
-            t_train = manual_scaling(t_train)
-            t_test = manual_scaling(t_test)
-        else:
-            t_train, t_test = standard_scaling(t_train, t_test)
+        t_train, t_test = standard_scaling(t_train, t_test)
 
     if (skip_intercept):
         X_train = X_train[:,1:]
@@ -376,7 +368,7 @@ def SVDinv(A):
 
 
 @timer
-def bootstrap(x, y, t, maxdegree, n_bootstraps, model, scale_X=False, scale_t=False, skip_intercept=False):
+def bootstrap(x, y, t, maxdegree, n_bootstraps, model, seed, scale_X=True, scale_t=False, skip_intercept=True):
 
     MSE_test = np.zeros(maxdegree)
     MSE_train = np.zeros(maxdegree)
@@ -387,7 +379,7 @@ def bootstrap(x, y, t, maxdegree, n_bootstraps, model, scale_X=False, scale_t=Fa
     for degree in tqdm(range(1, maxdegree+1), desc=f"Looping trhough polynomials up to {maxdegree} with {n_bootstraps}: "):
         X = create_X(x, y, n=degree)
         X_train, X_test, t_train, t_test = prepare_data(
-            X, t_flat, test_size=0.2, shuffle=True, scale_X=scale_X, scale_t=scale_t, skip_intercept=skip_intercept, random_state=SEED_VALUE)
+            X, t_flat, seed, test_size=0.2, shuffle=True, scale_X=scale_X, scale_t=scale_t, skip_intercept=skip_intercept)
 
         t_hat_train, t_hat_test = bootstrapping(
             X_train, t_train, X_test, t_test, n_bootstraps, model)
@@ -408,7 +400,7 @@ def bootstrapping(X_train, t_train, X_test, t_test, n_bootstraps, model):
     for i in range(n_bootstraps):
         X, t = resample(X_train, t_train)
         t_hat_train = model.fit(
-            X, t, SVDfit=False)
+            X, t)
         t_hat_test = model.predict(X_test)
         # Storing predictions
         t_hat_trains[:, i] = t_hat_train.ravel()
@@ -521,21 +513,22 @@ def plot_beta_errors(summaary_df: pd.DataFrame(), degree):
     plt.ylabel("Beta values with std error")
     ax.set_xticks(np.arange(summaary_df.shape[0]))
     # ax.set_xticklabels(x_ticks)
-    ax.set_xticklabels(rf"$\beta${i}" for i in x_ticks_values)
-    plt.gca().margins(x=0)
-    plt.gcf().canvas.draw()
-    tl = plt.gca().get_xticklabels()
-    maxsize = max([t.get_window_extent().width for t in tl])
-    m = 0.2  # inch margin
-    s = maxsize/plt.gcf().dpi*summaary_df.shape[0]+2*m
-    margin = m/plt.gcf().get_size_inches()[0]
+    ax.set_xticklabels(rf"$\beta${i+1}" for i in x_ticks_values)
+    #plt.gca().margins(x=0)
+    #plt.gcf().canvas.draw()
+    #tl = plt.gca().get_xticklabels()
+    #maxsize = max([t.get_window_extent().width for t in tl])
+    #m = 0.2  # inch margin
+    #s = maxsize/plt.gcf().dpi*summaary_df.shape[0]+2*m
+    #margin = m/plt.gcf().get_size_inches()[0]
 
-    plt.gcf().subplots_adjust(left=margin, right=1.-margin)
-    plt.gcf().set_size_inches(s, plt.gcf().get_size_inches()[1])
+    #plt.gcf().subplots_adjust(left=margin, right=1.-margin)
+    #plt.gcf().set_size_inches(s, plt.gcf().get_size_inches()[1])
     plt.errorbar(x_ticks_values, betas, yerr=1.96*SE, fmt='o', ms=4)
     # for i, txt in enumerate(x_ticks):
     #    plt.annotate(f"{txt}", (x_ticks_values[i], betas[i]))
-    # plt.tight_layout()
+    # plt.tight_layout(pad=3.)
+    #plt.margins(0.5)
     # plt.show()
     return fig
 
@@ -598,7 +591,7 @@ def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffl
     return scores_KFold
 
 
-def noise_factor(n, factor=0.3):
+def noise_factor(n, factor=0.2):
     return factor*np.random.randn(n, n)  # Stochastic noise
 
 
