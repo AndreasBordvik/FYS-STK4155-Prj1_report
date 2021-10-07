@@ -3,6 +3,8 @@
 Vi må fikse SEED_VALUE
 
 ## Exercise 1
+Add R2 metrics 
+
 
 ## Exercise 2
 feil konvergerer som 1/sqrt(n) (kanskje). (MonteCarlo)
@@ -19,7 +21,7 @@ underfitting and overfitting
 relate the bias-variance discussion to figure 2.11 Hastie
 
 ## Exercise 3
-
+Kommenter overlapp i standardavvik i CV og bootstrap.. ref degree4
 Complexity degree 6, low variance between kfold splits
 
 Compare bootstrap MSE for one degree with all kfold mean MSE for one degree.
