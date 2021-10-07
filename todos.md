@@ -42,8 +42,10 @@ lambdaplot for optimal degree
 Section 5.2.2 in Goodfellow
 
 vår fit opp mot sklearn
-bootstrap for varierende degree lambda
-CV for degree lambda
+
+obs obs: 
+Felles for oppgave 4 og 5: BOOTSTRAP
+Kun for oppgavbe 4: CROSS-VAL
 
 plotte vertikal linje for optimal lambda i beta-plot
 
