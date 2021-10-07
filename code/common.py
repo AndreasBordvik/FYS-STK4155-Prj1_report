@@ -249,6 +249,11 @@ def create_X(x: np.ndarray, y: np.ndarray, n: int) -> np.ndarray:
             X[:, q+k] = (x**(i-k))*(y**k)
 
     return X
+    #return X[:, 1:]
+
+
+def remove_intercept(X):
+    return X[:, 1:]
 
 
 def FrankeFunction(x: float, y: float) -> float:
