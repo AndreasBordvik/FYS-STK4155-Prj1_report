@@ -5,8 +5,8 @@ import pandas as pd
 from tqdm import tqdm
 from numpy.core.defchararray import index
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error as MSE
-from sklearn.metrics import r2_score as R2
+#from sklearn.metrics import mean_squared_error as MSE
+#from sklearn.metrics import r2_score as R2
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 import sklearn.linear_model as lm
 from sklearn.utils import resample
