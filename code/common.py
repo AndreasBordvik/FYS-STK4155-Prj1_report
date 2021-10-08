@@ -5,8 +5,8 @@ import pandas as pd
 from tqdm import tqdm
 from numpy.core.defchararray import index
 from sklearn.model_selection import train_test_split
-#from sklearn.metrics import mean_squared_error as MSE
-#from sklearn.metrics import r2_score as R2
+from sklearn.metrics import mean_squared_error as MSE
+from sklearn.metrics import r2_score as R2
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 import sklearn.linear_model as lm
 from sklearn.utils import resample
@@ -598,33 +598,6 @@ def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffl
 
 def noise_factor(n, factor=0.2):
     return factor*np.random.randn(n, n)  # Stochastic noise
-
-
-def MSE(y_data, y_model):
-    """Simple Morten function to compute MSE
-
-    Args:
-        y_data ([type]): [description]
-        y_model ([type]): [description]
-
-    Returns:
-        [type]: [description]
-    """
-    n = np.size(y_model)
-    return np.sum((y_data-y_model)**2)/n
-
-
-def R2(y_data, y_model):
-    """Simple Morten function to compute R2
-
-    Args:
-        y_data ([type]): [description]
-        y_model ([type]): [description]
-
-    Returns:
-        [type]: [description]
-    """
-    return 1 - np.sum((y_data - y_model) ** 2) / np.sum((y_data - np.mean(y_data)) ** 2)
 
 
 if __name__ == '__main__':
