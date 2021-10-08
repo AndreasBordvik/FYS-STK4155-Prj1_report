@@ -390,10 +390,20 @@ def bootstrap(x, y, t, maxdegree, n_bootstraps, model, seed, scale_X=True, scale
         t_hat_train, t_hat_test = bootstrapping(
             X_train, t_train, X_test, t_test, n_bootstraps, model)
 
-        MSE_test[degree-1] = np.mean(
-            np.mean((t_test - t_hat_test)**2, axis=1, keepdims=True))
-        MSE_train[degree-1] = np.mean(
-            np.mean((t_train - t_hat_train)**2, axis=1, keepdims=True))
+        # print(f"t_test.sxhape: {t_test.shape}")
+        # print(f"t_hat_test.shape: {t_hat_test.shape}")
+        # print(f"t_train.shape: {t_train.shape}")
+        # print(f"t_hat_train.shape: {t_hat_train.shape}")
+        MSE_test[degree-1] = np.mean([MSE(t_test, t_hat_test[:, strap])
+                                     for strap in range(n_bootstraps)])
+        MSE_train[degree-1] = np.mean([MSE(t_train, t_hat_train[:, strap])
+                                      for strap in range(n_bootstraps)])
+
+        # np.mean(np.mean((t_test - t_hat_test)**2, axis=1, keepdims=True))
+
+        # MSE_train[degree-1] = np.mean(
+        #     np.mean((t_train - t_hat_train)**2, axis=1, keepdims=True))
+
         bias[degree-1] = np.mean(
             (t_test - np.mean(t_hat_test, axis=1, keepdims=True))**2)
         variance[degree-1] = np.mean(np.var(t_hat_test, axis=1, keepdims=True))
@@ -588,7 +598,7 @@ def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffl
             model.fit(xtrain_scaled, ytrain)
 
         ypred = model.predict(xtest_scaled)
-        scores_KFold[j] = np.sum((ypred - ytest)**2)/np.size(ypred)
+        scores_KFold[j] = MSE(ypred, ytest)
         j += 1
 
     return scores_KFold
@@ -649,7 +659,7 @@ def cross_val_ex6(k: int, model: str, X: np.ndarray, z: np.ndarray, degree: int,
 
         zpred = model.predict(xtest_scaled)
 
-        scores_KFold[j] = sk_MSE(zpred, ztest_scaled)
+        scores_KFold[j] = MSE(zpred, ztest_scaled)
         j += 1
 
     return scores_KFold
