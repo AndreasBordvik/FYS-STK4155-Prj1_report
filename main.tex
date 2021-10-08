@@ -181,7 +181,7 @@ However, other regression methods such as Ridge and Lasso, which will be discuss
 
 Furthermore, while on the topic of Ridge and Lasso regression, a scaling of the data should always be performed. This is due to the regularized linear models such as Ridge and Lasso being sensitive to the scale of the input features. \cite{Geron2019}
 
-To determine whether scaling is apropriate for the current problem, that being fitting the Franke Function using oridnary least squares, an inspection of the generated data is made in light of the just discussion. For Exercise 1, the datapoints $x,y \in \left[0,1\right]$. This would indicate that the data is already scaled to a unit reference system. Moreover, as we are training a model based on the ordinary least squares, there is no dependance on scale of the input features as for regularized linear models. However, for consistency with further models, the data will be scaled with respect to the training data. However, the target variables however will not be scaled.
+To determine whether scaling is apropriate for the current problem, that being fitting the Franke Function using oridnary least squares, an inspection of the generated data is made in light of the just discussion. For Exercise 1, the datapoints $x,y \in \left[0,1\right]$. This would indicate that the data is already scaled to a unit reference system. Moreover, as we are training a model based on the ordinary least squares, there is no dependance on scale of the input features as for regularized linear models. However, to keep the data-preprocessing consistent and to ensure that different models are comparable, we will scale the data in accordance to the StandardScaler and always remove the intercept from the design matrix. The latter to ensure that our models always have responses biased towards the origin.  
 
 \subsubsection*{Splitting the data}
 As we want our model to perform well in general cases, we split the data into a training and testing set to simulate model prediction using new data. This is achieved by the aforementioned split, since the training and test data are kept entirely separated. In practice, we fit the model using the training data, then perform a test of the model using the test data. The error rate for new cases predicted by the model using the test data, can be used to understand how the model will perform on new untrained data. \cite{Geron2019} Moreover, by assessing the deviation between training error and test error, it can be seen whether the model is overfitting or not. It would be a case of overfitting if the training error is low, whereas the test error is high.
@@ -210,17 +210,17 @@ For this initial run, we are interested in studying the least squares fit of the
   \caption{\label{fig:OLS_franke_1} Benchmark run of the Franke Function fit with added Gaussian noise (factor of 0.05) with degree up to the fifth order of our OLS implementation compared to the similar LinearRegression() from SciKit-learn}
 \end{figure}
 
-By inspecting Figure (\ref{fig:OLS_franke_1}), we can see that there are no visual differences between our implementation of OLS compared to the SciKit-learn implementation. Moreover, there is a reduction in MSE as model complexity increases. Thus it is clear that a higher order fit of the model results in a lower error when predicting new values using the test data.
+By inspecting Figure (\ref{fig:OLS_franke_1}), we can see that there are no visual differences between our implementation of OLS compared to the SciKit-learn implementation. Moreover, there is a reduction in MSE as model complexity increases. Thus it is clear that a higher order fit of the model results in a lower prediction error when predicting new values using the train and test data. Moreover, as higher order polynomials are not currently studied for this initial run, at which degree the model would start to overfit is not currently known.
 
 \begin{figure}
   \centering
   \includegraphics[scale=0.5]{figures/EX1_franke_function_OLS_evaluate_fit_dn.pdf}
-  \caption{\label{fig:OLS_franke_2} Benchmark run with doubled the amount of added Gaussian noise (factor 0f 0.1) of our OLS implementation to the similar LinearRegression() from SciKit-learn}
+  \caption{\label{fig:OLS_franke_2} Benchmark run with four times the amount of added Gaussian noise (factor of 0.2) of our OLS implementation to the similar LinearRegression() from SciKit-learn}
 \end{figure}
 
-Comparing Figure (\ref{fig:OLS_franke_1}) and (\ref{fig:OLS_franke_2}), where the first figure features half the amount of added noise compared to the second figure, there are two things of note. Firstly, Figure (\ref{fig:OLS_franke_1}) attains an overall lower MSE, even as the order of the fitted function increases. Secondly, the initial difference between the train and test MSE is greater for Figure (\ref{fig:OLS_franke_2}) than for Figure (\ref{fig:OLS_franke_1}), though the difference converges to zero for higher order fits in both figures. As such, we make a preliminary conclusion that fitting functions with a higher amount of added Gaussian noise is more difficult than for smooth "predictable" functions. 
+Comparing Figure (\ref{fig:OLS_franke_1}) and (\ref{fig:OLS_franke_2}), where the first figure features a quarter the amount of added noise compared to the second figure, there are two things of note. Firstly, Figure (\ref{fig:OLS_franke_1}) attains an overall lower MSE, even as the order of the fitted function increases. Secondly, the two figures (\ref{fig:OLS_franke_2}) and (\ref{fig:OLS_franke_1}), seem to somewhat attain the same shape for both the prediction and test error. As such, we make a preliminary conclusion that fitting functions with a higher amount of added Gaussian noise is more difficult than for smooth "predictable" functions. 
 
-The Confidence Interval for the predictors $\beta_j$ is constructed for the fit using up to fifth order polynomials. As the predictors are based not only of the x and y parameters in isolation, but also their interaction terms, a fifth order fitted model includes 21 different predictors. The result of computing the Confidence Interval for the 21 different predictors can be seen in Figure \ref{fig:OLS_beta_1}. Note that the predictors  From Figure \ref{fig:OLS_beta_1}, it can be seen that the lowermost and higher order terms have the smallest confidence intervals. Thus some of the predictors related to x and y of the third and fourth order pose the highest uncertainty. 
+The Confidence Interval for the predictors $\beta_j$ is constructed for both model fits with up to fifth order polynomials. As the predictors are based not only of the x and y parameters in isolation, but also their interaction terms, a fifth order fitted model includes 21 different predictors. The result of computing the Confidence Interval for the 21 different predictors can be seen in Figure (\ref{fig:OLS_beta_1}) and (\ref{fig:OLS_beta_2}). From Figure \ref{fig:OLS_beta_1}, it can be seen that the lowermost and higher order terms have the smallest confidence intervals. Thus some of the predictors related to x and y of the third and fourth order pose the highest uncertainty. Furthermore, comparing Figure (\ref{fig:OLS_beta_1}) to (\ref{fig:OLS_beta_2}) shows that as the added noise is increased in size, the uncertainty of the predictors is increased as seen in the slightly larger confidence intervals. The predictor values also attain slightly altered values, though their general position in relation to each other seems to be preserved.
 
 \begin{figure}
   \centering
@@ -230,12 +230,13 @@ The Confidence Interval for the predictors $\beta_j$ is constructed for the fit 
 
 \begin{figure}
   \centering
-  \includegraphics[scale=.85]{figures/EX1_OLS_beta_error_degree5_dn.pdf}
+  \includegraphics[scale=.85]{figures/EX1_OLS_beta_error_degree5_mn.pdf}
   \caption{\label{fig:OLS_beta_2} 95\% Confidence intervals for the predictors of an OLS model with polynomials up to the fifth order and added Gaussian noise multiplied with a factor of 0.1.}
 \end{figure}
 
 Following the comparison of Figure (\ref{fig:OLS_franke_1}) and (\ref{fig:OLS_franke_2}), comparing the two confidence intervals reveals that as the added Gaussian noise is increased in size, the confidence intervals for the predictors increase as well. This can be seen especially for the predictors with some variability for the $0.05$ noise factor case. Thus, as we increase the Gaussian noise added to the Franke Function, our predictors become less uncertain, which in turn could result in less precise model predictions. 
 
+For the rest of this assignment up to and including Exercise 5, we will add noise with a factor of $0.2$ to all our data, unless otherwise stated.
 
 %\begin{figure}
 %  \centering
@@ -259,7 +260,7 @@ Following the comparison of Figure (\ref{fig:OLS_franke_1}) and (\ref{fig:OLS_fr
 %\end{figure}
 
 
-\section*{Exercise 2}
+\section*{\label{ex:2}Exercise 2}
 \subsection*{Some words on bootstrapping}
 As described in the preceding task, we split our data into several subsets used for different purposes. The overall objective is to train a model on a given subset and then measure how well it performs on a new unseen data set. *Figure 3* illustrates the results of this method, where the average prediction error is plotted against the model complexity. However, a dilemma that may emerge from this approach is that our data only represents a sample from an unknown distribution. We run the risk of measuring a predicted error that deviates from the actual probability by iterating through our data points only once. 
 
@@ -399,7 +400,7 @@ Lastly, it should be noted that the bias-variance tradeoff measuremnet is perfor
 Figure 8 visualizes where this occurs. As the complexity increases beyond degree 8, one can see an apparent increase in the variance.  At this point, one can assume that the model has started overfitting its predictors to the training data and lost some of its ability to generalize on unseen data.
 
 
-\section*{Exercise 3}
+\section*{\label{ex:3}Exercise 3}
 In this project, an infinite number of data points could easily be created by simply adjusting the number of *n* decimals created in the span [0,1] for x and y. Setting a large *n* could then, in turn, yield a test set of substantial size, which ables the prediction of estimated average test error with statistical certainty. However, for real-life purposes, this is rarely the case. More often than not, the challenges related to the validation of models in question lies in the limitations of available data.  A widely used approach for combating these issues is implementing the cross-validation method.
 
 This algorithm is implemented by dividing the dataset into K parts of roughly the same size. In this project, we try K values ranging from 5 to 10, which also coincides with best-practice values \cite{Hastie2009}.  We have implemented the split into K-folds by using the method K-fold from Scikit learn model-selection \cite{link_to_doc}. This method provides us with arrays of approximately equal size, consisting of indices for choosing test- and train data.  Each fold is then used once as a test set, while the remaining K-1 folds make up the training set. The overall purpose of this method is to produce an estimate of the prediction error, given by:
@@ -471,12 +472,31 @@ As further motivation as to why we want to apply Ridge (and further on also Lass
 As there are no universally best learning algorithm for fitting the problem at hand, we expand our analysis of Fitting the Franke Function in light the No Free Lunch Theorem to also include an assessment of Ridge and Lasso Regression. Both models handles feature selection through the introduction of the regularization parameter lambda, thus potentially achieving a lower MSE than for Ordinary Least Squares. Introducing several models also follows the implications of the Free Lunch Theorem, notably that we have to fine tune and assess our models to perform well on the current problem. \cite{Goodfellow2016}
 
 \subsection*{Weight Decay}
-The Cost function for Ridge regression can be seen as the Cost function for Ordinary Least Squares with an added weight decay term $\lambda\bm{\beta}^\text{T}\bm{\beta}$. The parameter $\lambda$ is known as a hyperparameter, i.e. the parameter can be controlled before fitting the model and changes how the model behaves during fitting and predicting. \cite{Goodfellow2016} Moreover, $\lambda \geq 0$, such that $\lambda$ close to $0$ implies Ordinary Least Squares and $\lambda$ large implies that the predictors are close to $0$. Hence weight decay, as the hyperparamter can be tuned to enforce some predictors (weights) to be excluded from the model fit.
+The Cost function for Ridge regression can be seen as the Cost function for Ordinary Least Squares with an added weight decay term $\lambda\bm{\beta}^\text{T}\bm{\beta}$. The parameter $\lambda$ is known as a hyperparameter, i.e. the parameter can be controlled before fitting the model and changes how the model behaves during fitting and predicting. \cite{Goodfellow2016} Moreover, $\lambda \geq 0$, such that $\lambda$ close to $0$ implies Ordinary Least Squares and $\lambda$ large implies that the predictors are close to $0$. Hence the term weight decay, as the hyperparamter can be tuned to enforce some predictors (weights) to gradually be excluded from the model fit.
 
 For this Exercise, we will analyse the effect of the weight decay when fitting the Franke Function using Ridge regression. We will analyse the polynomial of optimal degree that we determined in the previous exercises through assessing the bias-variance tradeoff for an increased model complexity. Firstly with the bootstrap resampling technique, then compared the bootstrap MSE with what was obtained using the k-fold cross validation. With the model complexity  
 
 \subsection*{Implementing Ridge regression}
 Our implementation of Ridge regression follow closely that of Ordinary Least Squares, but with an input parameter $\lambda$ determining the strength of the regularization term. Furthermore, the implementation differs as the normal equation for computing the optimal predictors have changed to $\bm{\hat{\beta}} = \left(\bm{X}^\text{T}\bm{X} + \bm{\lambda}\bm{I}\right)^{-1}\bm{X}^\text{T}\bm{y}$. When implementing Ridge regression, we follow the convention that the intercept is skipped when fitting the function, hence we start computing the regularization term starting at $\beta_1$. \cite{Geron2019} if the intercept were included, the regularizer would be dependant on the choice of origin for the target, which generally causes the mean squared error to increase as touched upon during the first Exercise.
+
+\begin{figure}
+  \centering
+  \includegraphics[scale=0.75]{figures/EX4_beta_plot_ridge_2.pdf}
+  \caption{\label{fig:ridge_beta_1}Plot of the weight decay on the individual predictors for our Ridge regression with a second order polynomial}
+\end{figure}
+
+Figure (\ref{fig:ridge_beta_1}) shows the effect of the regularizer for a fitted model of order 2. The figure clearly shows the weight decay, as the individual predictors start off essentially unaffected, until they are gradually decayed to 0 at independent rates. additionally, following the weight decay plot, we can understand how the regularizer affects the final model fit as already mentioned in the previous section. The case of the regularization parameter $\lambda$ achieving larger values, which forces all predictors to become 0, would result in the fitted model being a flat plane centered around 0. Thus, to study where the regularization parameter would attain an optimal fit, we plot a Search Landscape over all degrees and lambda values. 
+
+\begin{figure}
+  \centering
+  \hspace*{-3.5cm}   
+  \includegraphics[scale=0.58]{figures/EX4_search_landscape_plt.pdf}
+  \caption{\label{fig:ridge_search_land}Plot of the Search Landscape for polynomials up to a cretain order initialized with different regularization parameter values. The red dot symbolizes surface minimum.}
+\end{figure}
+
+The search landscape in Figure (\ref{fig:ridge_search_land}) gives us predicted MSE values for a Ridge polynomial of order up to 15. With regularization parameters on a range $\lambda \in \left[10^{-9},10^{4}\right]$ As such, we can use the search landscape to make an initial guess at where the optimal degree and regularization parameter combination will be based on where the lowest MSE is located. For our Ridge regression model, that initial guess would be degree 6, with a $\lambda = 10^{-9}$.
+
+Though an initial guess at the optimal Ridge model has been made, we have to further study the model by applying the resampling techniques developed and explored in \nameref{ex:2} and \nameref{ex:3}.
 
 \section*{Exercise 5}
 The second regularized linear model which we will study is Least Absolute Shrinkage and Selection Operator (LASSO) Regression. Lasso adds a regularization term to the Cost function similarly to Ridge regression, though Lasso utilizes the L1 norm of the predictors instead of the L2 as in Ridge. \cite{Geron2019} Mathematically, adding the L1 regularizer gives us the following Cost function 
