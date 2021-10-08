@@ -108,15 +108,15 @@ class OLS(Regression):
     def fit(self, X: np.ndarray, t: np.ndarray) -> np.ndarray:
         #self.SVDfit = SVDfit
         #self.keep_intercept = keep_intercept
-        #if keep_intercept == False:
+        # if keep_intercept == False:
         #    X = X[:, 1:]
 
         self.X_train = X
         self.t_train = t
 
-        #if SVDfit:
+        # if SVDfit:
         #    self.betas = SVDinv(X.T @ X) @ X.T @ t
-        #else:
+        # else:
         self.betas = np.linalg.pinv(X.T @ X) @ X.T @ t
         self.t_hat_train = X @ self.betas
         # print("betas.shape in train before squeeze:",self.betas.shape)
@@ -139,7 +139,7 @@ class RidgeRegression(Regression):
     def fit(self, X: np.ndarray, t: np.ndarray) -> np.ndarray:
         #self.SVDfit = SVDfit
         #self.keep_intercept = keep_intercept
-        #if keep_intercept == False:
+        # if keep_intercept == False:
         #    X = X[:, 1:]
         self.X_train = X
         self.t_train = t
@@ -147,9 +147,9 @@ class RidgeRegression(Regression):
         # beta punishing and preventing the singular matix
         Hessian += self.lam * np.eye(Hessian.shape[0])
 
-        #if SVDfit:
+        # if SVDfit:
         #    self.betas = SVDinv(Hessian) @ X.T @ t
-        #else:
+        # else:
         self.betas = np.linalg.pinv(Hessian) @ X.T @ t
         self.t_hat_train = X @ self.betas
         # print(f"Betas.shape in Ridge before:{self.betas.shape}")
@@ -187,7 +187,8 @@ def prepare_data(X: np.ndarray, t: np.ndarray, random_state, test_size=0.2, shuf
         X_train, X_test, t_train, t_test = train_test_split(
             X, t, test_size=test_size, shuffle=shuffle, random_state=random_state)
     '''
-    X_train, X_test, t_train, t_test = train_test_split(X, t, test_size=test_size, shuffle=shuffle, random_state=random_state)
+    X_train, X_test, t_train, t_test = train_test_split(
+        X, t, test_size=test_size, shuffle=shuffle, random_state=random_state)
 
     # Scale data
     if(scale_X):
@@ -197,8 +198,8 @@ def prepare_data(X: np.ndarray, t: np.ndarray, random_state, test_size=0.2, shuf
         t_train, t_test = standard_scaling(t_train, t_test)
 
     if (skip_intercept):
-        X_train = X_train[:,1:]
-        X_test = X_test[:,1:]
+        X_train = X_train[:, 1:]
+        X_test = X_test[:, 1:]
 
     return X_train, X_test, t_train, t_test
 
@@ -249,7 +250,7 @@ def create_X(x: np.ndarray, y: np.ndarray, n: int) -> np.ndarray:
             X[:, q+k] = (x**(i-k))*(y**k)
 
     return X
-    #return X[:, 1:]
+    # return X[:, 1:]
 
 
 def remove_intercept(X):
@@ -430,10 +431,7 @@ def plot_beta_errors_for_lambdas(summaries_df: pd.DataFrame(), degree):
 
         # plot beta values
         # plt.plot(lambdas, beta_values, label=f"b{i}")
-        
-        
 
-        
         plt.plot(lambdas, beta_values, label=fr"$\beta_{i+1}$$\pm SE$")
         # plt.plot(lambdas, beta_values)
 
@@ -519,11 +517,11 @@ def plot_beta_errors(summaary_df: pd.DataFrame(), degree):
     ax.set_xticks(np.arange(summaary_df.shape[0]))
     # ax.set_xticklabels(x_ticks)
     ax.set_xticklabels(rf"$\beta${i+1}" for i in x_ticks_values)
-    #plt.gca().margins(x=0)
-    #plt.gcf().canvas.draw()
+    # plt.gca().margins(x=0)
+    # plt.gcf().canvas.draw()
     #tl = plt.gca().get_xticklabels()
     #maxsize = max([t.get_window_extent().width for t in tl])
-    #m = 0.2  # inch margin
+    # m = 0.2  # inch margin
     #s = maxsize/plt.gcf().dpi*summaary_df.shape[0]+2*m
     #margin = m/plt.gcf().get_size_inches()[0]
 
@@ -533,7 +531,7 @@ def plot_beta_errors(summaary_df: pd.DataFrame(), degree):
     # for i, txt in enumerate(x_ticks):
     #    plt.annotate(f"{txt}", (x_ticks_values[i], betas[i]))
     # plt.tight_layout(pad=3.)
-    #plt.margins(0.5)
+    # plt.margins(0.5)
     # plt.show()
     return fig
 
@@ -596,11 +594,72 @@ def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffl
     return scores_KFold
 
 
+def cross_val_ex6(k: int, model: str, X: np.ndarray, z: np.ndarray, degree: int, lmb=None, shuffle=False) -> np.ndarray:
+    """Function for cross validating on k folds. Scales data after split(standarscaler).
+
+    Args:
+        k (int): Number of folds
+        model (str): Linear regression model
+        X (np.ndarray): Design matrix
+        z (np.ndarray): target values
+        lmb (Optional): lambda value
+        shuffle (boolean): deafault False. 
+
+    Returns:
+        np.ndarray: Scores of MSE on all k folds
+    """
+    if model == "Ridge":
+        model = RidgeRegression(lambda_val=lmb)
+    elif model == "Lasso":
+        model = lm.Lasso(alpha=lmb)
+    elif model == "OLS":
+        model = OLS(degree=degree)
+
+    else:
+        "Provide a valid model as a string(Ridge/Lasso/OLS) "
+
+    kfold = KFold(n_splits=k, shuffle=shuffle)
+    scores_KFold = np.zeros(k)
+    # scores_KFold idx counter
+    j = 0
+    z = z.ravel().reshape(-1, 1)
+    for train_inds, test_inds in kfold.split(X, z):
+
+        # get all cols and selected train_inds rows/elements:
+        xtrain = X[train_inds, :]
+        ztrain = z[train_inds]
+        # get all cols and selected test_inds rows/elements:
+        xtest = X[test_inds, :]
+        ztest = z[test_inds]
+        # fit a scaler to train_data and transform train and test:
+        data_scaler = StandardScaler()
+        data_scaler.fit(xtrain)
+        xtrain_scaled = data_scaler.transform(xtrain)
+        xtest_scaled = data_scaler.transform(xtest)
+
+        target_scaler = StandardScaler()
+        target_scaler.fit(ztrain)
+        ztrain_scaled = target_scaler.transform(ztrain)
+        ztest_scaled = target_scaler.transform(ztest)
+
+        if model == "Ridge":
+            model.fit(xtrain_scaled, ztrain_scaled)
+        else:
+            model.fit(xtrain_scaled, ztrain_scaled)
+
+        zpred = model.predict(xtest_scaled)
+
+        scores_KFold[j] = sk_MSE(zpred, ztest_scaled)
+        j += 1
+
+    return scores_KFold
+
+
 def noise_factor(n, factor=0.2):
     return factor*np.random.randn(n, n)  # Stochastic noise
 
 
-def MSE(y_data, y_model):
+def MSE_implemented(y_data, y_model):
     """Simple Morten function to compute MSE
 
     Args:
@@ -614,7 +673,7 @@ def MSE(y_data, y_model):
     return np.sum((y_data-y_model)**2)/n
 
 
-def R2(y_data, y_model):
+def R2_implemented(y_data, y_model):
     """Simple Morten function to compute R2
 
     Args:
