@@ -604,7 +604,7 @@ def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffl
     return scores_KFold
 
 
-def cross_val_ex6(k: int, model: str, X: np.ndarray, z: np.ndarray, degree: int, lmb=None, shuffle=False) -> np.ndarray:
+def cross_val_ex6(k: int, model: str, X: np.ndarray, z: np.ndarray, degree: int, lmb=None, shuffle=False, random_state=None) -> np.ndarray:
     """Function for cross validating on k folds. Scales data after split(standarscaler).
 
     Args:
@@ -628,7 +628,7 @@ def cross_val_ex6(k: int, model: str, X: np.ndarray, z: np.ndarray, degree: int,
     else:
         "Provide a valid model as a string(Ridge/Lasso/OLS) "
 
-    kfold = KFold(n_splits=k, shuffle=shuffle)
+    kfold = KFold(n_splits=k, shuffle=shuffle, random_state=random_state)
     scores_KFold = np.zeros(k)
     # scores_KFold idx counter
     j = 0
