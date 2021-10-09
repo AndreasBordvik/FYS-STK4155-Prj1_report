@@ -618,15 +618,6 @@ def cross_val_ex6(k: int, model: str, X: np.ndarray, z: np.ndarray, degree: int,
     Returns:
         np.ndarray: Scores of MSE on all k folds
     """
-    if model == "Ridge":
-        model = RidgeRegression(lambda_val=lmb)
-    elif model == "Lasso":
-        model = lm.Lasso(alpha=lmb)
-    elif model == "OLS":
-        model = OLS(degree=degree)
-
-    else:
-        "Provide a valid model as a string(Ridge/Lasso/OLS) "
 
     kfold = KFold(n_splits=k, shuffle=shuffle, random_state=random_state)
     scores_KFold = np.zeros(k)
@@ -653,9 +644,16 @@ def cross_val_ex6(k: int, model: str, X: np.ndarray, z: np.ndarray, degree: int,
         ztest_scaled = target_scaler.transform(ztest)
 
         if model == "Ridge":
+            model = RidgeRegression(lmb)
+            model.fit(xtrain_scaled, ztrain_scaled)
+        elif model == "Lasso":
+            model = lm.Lasso(alpha=lmb)
+            model.fit(xtrain_scaled, ztrain_scaled)
+        elif model == "OLS":
+            model = OLS(degree=degree)
             model.fit(xtrain_scaled, ztrain_scaled)
         else:
-            model.fit(xtrain_scaled, ztrain_scaled)
+            "Provide a valid model as a string(Ridge/Lasso/OLS) "
 
         zpred = model.predict(xtest_scaled)
 
