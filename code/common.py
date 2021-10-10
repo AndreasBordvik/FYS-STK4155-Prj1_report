@@ -399,6 +399,9 @@ def bootstrap(x, y, t, maxdegree, n_bootstraps, model, seed, scale_X=True, scale
         MSE_train[degree-1] = np.mean([MSE(t_train, t_hat_train[:, strap])
                                       for strap in range(n_bootstraps)])
 
+        # Test max and min vals:
+        test_arr = [MSE(t_test, t_hat_test[:, strap])
+                    for strap in range(n_bootstraps)]
         # np.mean(np.mean((t_test - t_hat_test)**2, axis=1, keepdims=True))
 
         # MSE_train[degree-1] = np.mean(
@@ -421,6 +424,7 @@ def bootstrapping(X_train, t_train, X_test, t_test, n_bootstraps, model):
         # Storing predictions
         t_hat_trains[:, i] = t_hat_train.ravel()
         t_hat_tests[:, i] = t_hat_test.ravel()
+
     return t_hat_trains, t_hat_tests
 
 
@@ -519,7 +523,6 @@ def plot_beta_errors(summaary_df: pd.DataFrame(), degree, fig=plt.figure()):
             x_ticks.append(f"({i-k},{k})")
     """
 
-    
     ax = plt.axes()
     plt.title(f"Beta error OLS - degree{degree}")
     plt.xlabel(r"$\beta_i$")
