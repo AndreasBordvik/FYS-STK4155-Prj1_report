@@ -1,20 +1,19 @@
-
-======================================================================
-starting package maintenance...
-installation directory: C:\Users\andre\AppData\Local\Programs\MiKTeX
-package repository: https://ftp.acc.umu.se/mirror/CTAN/systems/win32/miktex/tm/packages/
-visiting repository https://ftp.acc.umu.se/mirror/CTAN/systems/win32/miktex/tm/packages/...
-repository type: remote package repository
-loading package repository manifest...
-downloading https://ftp.acc.umu.se/mirror/CTAN/systems/win32/miktex/tm/packages/miktex-zzdb1-2.9.tar.lzma...
-0.24 MB, 5.14 Mbit/s
-package repository digest: 7410fca1b4056d4b64b5764e6be578a9
-going to download 66986 bytes
-going to install 42 file(s) (1 package(s))
-downloading https://ftp.acc.umu.se/mirror/CTAN/systems/win32/miktex/tm/packages/latexindent.tar.lzma...
-0.07 MB, 10.31 Mbit/s
-extracting files from latexindent.tar.lzma...
-======================================================================
+% ======================================================================
+% starting package maintenance...
+% installation directory: C:\Users\andre\AppData\Local\Programs\MiKTeX
+% package repository: https://ftp.acc.umu.se/mirror/CTAN/systems/win32/miktex/tm/packages/
+% visiting repository https://ftp.acc.umu.se/mirror/CTAN/systems/win32/miktex/tm/packages/...
+% repository type: remote package repository
+% loading package repository manifest...
+% downloading https://ftp.acc.umu.se/mirror/CTAN/systems/win32/miktex/tm/packages/miktex-zzdb1-2.9.tar.lzma...
+% 0.24 MB, 5.14 Mbit/s
+% package repository digest: 7410fca1b4056d4b64b5764e6be578a9
+% going to download 66986 bytes
+% going to install 42 file(s) (1 package(s))
+% downloading https://ftp.acc.umu.se/mirror/CTAN/systems/win32/miktex/tm/packages/latexindent.tar.lzma...
+% 0.07 MB, 10.31 Mbit/s
+% extracting files from latexindent.tar.lzma...
+% ======================================================================
 \documentclass[11pt, a4paper]{article}
 
 % Basic packages
@@ -35,6 +34,7 @@ extracting files from latexindent.tar.lzma...
 \usepackage[margin=3cm]{geometry}
 \usepackage{subfig}
 
+\usepackage{todonotes}
 \usepackage{listings}
 \lstset{
     language=Python,
@@ -65,7 +65,7 @@ extracting files from latexindent.tar.lzma...
 %\usepackage{tikz}
 %\usetikzlibrary{math,calc,positioning}
 
-%\usepackage{todonotes}
+
 
 \usepackage{hyperref}
 \hypersetup{
@@ -613,7 +613,9 @@ determine overfitting since you basically test on many data points that are clos
 \end{figure}
 
 
-\subsection*{Exercise 6.1 (Exercise 1 approach)}
+\subsection*{Exercise 6 - Conclusion and critical model selelction}
+\subsubsection*{OLS fit}
+\todo[inline]{TODO: Include bias-variance trade-off, fix figure references, include beta plots and compare between degree 10,11 and 12 to determain overfitting}
 In this task we conducted a OLS fit on the the terrain1 patch using similar appraoch as done in exercise1. We fitted the OLS model between degree 1-24.
 When approximating polynomials, the simpler components are often incorporated within the first coefficients of a model. The simpler components of an approximation 
 often carry basic but significantly important information. When tackling the approximation of complex data, more coefficients must contribute in order to capture the 
@@ -641,6 +643,10 @@ of the predicted terrain image were correctly approximated at an early polynomia
 approximated image are incorporated within the lower degrees and lower term coefficients, while the image variance is more aligned with the level of data complexity. 
 This makes sense since image variance reflects the variance within the real terrain we try to approximate. The more the terrain varies, the more complex the polynomial approximation. 
 
+\subsubsection*{Ridge fit}
+\todo[inline]{TODO: Ridge conclusion and critical model selelction. Write similar story as done for OLS using surfaceplon}
+\subsubsection*{Lasso fit}
+\todo[inline]{TODO: Lasso conclusion and critical model selelction. Write similar as done for Ridge}
 
 
 \begin{figure}
