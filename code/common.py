@@ -519,10 +519,10 @@ def plot_beta_errors(summaary_df: pd.DataFrame(), degree, fig=plt.figure()):
             x_ticks.append(f"({i-k},{k})")
     """
 
-    fig = plt.figure()
+    
     ax = plt.axes()
     plt.title(f"Beta error OLS - degree{degree}")
-    plt.xlabel(r"$\beta_i$ as power of (x,y)")
+    plt.xlabel(r"$\beta_i$")
     plt.ylabel("Beta values with std error")
     ax.set_xticks(np.arange(summaary_df.shape[0]))
     # ax.set_xticklabels(x_ticks)
