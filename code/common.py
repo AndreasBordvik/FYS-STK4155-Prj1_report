@@ -506,7 +506,7 @@ def plot_beta_CI_for_lambdas(summaries_df: pd.DataFrame(), degree):
     return fig
 
 
-def plot_beta_errors(summaary_df: pd.DataFrame(), degree):
+def plot_beta_errors(summaary_df: pd.DataFrame(), degree, fig=plt.figure()):
     betas = summaary_df["coeff value"].to_numpy().astype(np.float64)
     SE = summaary_df["std error"].to_numpy().astype(np.float64)
 
@@ -538,6 +538,8 @@ def plot_beta_errors(summaary_df: pd.DataFrame(), degree):
     #plt.gcf().subplots_adjust(left=margin, right=1.-margin)
     #plt.gcf().set_size_inches(s, plt.gcf().get_size_inches()[1])
     plt.errorbar(x_ticks_values, betas, yerr=1.96*SE, fmt='o', ms=4)
+    plt.xticks(rotation=90)
+    plt.grid()
     # for i, txt in enumerate(x_ticks):
     #    plt.annotate(f"{txt}", (x_ticks_values[i], betas[i]))
     # plt.tight_layout(pad=3.)
