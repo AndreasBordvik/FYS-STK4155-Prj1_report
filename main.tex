@@ -544,7 +544,7 @@ height or depth similarly as for the franke function. However, the height or dep
 having an entirely different scale comparing the constructed range between 0-1 of the franke function. Considering terrain data assembly for the x and y variables, 
 it must be constructed as a meshgrid spanning the entire range of all x and y pixel positions within the terrain image. Since the range of x and y is determined by 
 the span of pixel positions corresponding to the image width and height, we must scale both the x and y variables from the terrain data. The terrain input data utilized
-is of dimension 3601x1801, inducing 6485401 data points for the entire dataset. Comparing the constructed franke function, the terrain image is not quadratic, meaning 
+has dimensions 3601x1801, inducing 6485401 data points for the entire dataset. Comparing the constructed franke function, the terrain image is not quadratic, meaning 
 the range of x and y is not equal. Therefore, both the shape and values of the terrain data motivates to data scaling (both inputs and targets) to prevent one feature,
 by its magnitude, from dominating over the other. 
 
@@ -562,39 +562,17 @@ image data from the resized images where each patch being quadratic of dimension
 different configurations of the grid size constituting all patches and the number of data points (pixels) within each patch regarding data complexity and terrain shape.
 After investigating the different patches, we narrowed down to two patches, one from each terrain, figure \ref{fig:terrain_patches_focus}. We eventually decided to focus 
 on patch2 from terrain1 since it yields both an interesting shape and is complex while not being infeasible to work with considering the models prone to the task. 
-This preprocessing serves the purpose of feeding tbhe model with only one patch, making a smaller subproblem that is more digestible for the model in the pursuit of a good 
+This preprocessing serves the purpose of feeding the model with only one patch, making a smaller subproblem that is more digestible for the model in the pursuit of a good 
 fit on exciting data.\\
 The motivation behind image resizing and resampling is not just to reduce the number of data points; it also relates to the closeness between data points. 
 Having many similar data points may lead to biased model performance and that the model is not generalized properly. By resizing and resampling pixels from an image 
-into a new smaller image with fewer pixels, the pixels in the smaller image have longer distances to each other. For simplicity, let’s consider the image of size 7x7 
-with 49 data points (pixels) drawn in figure \ref{fig:image_resizing}. Let's assume you performed a train test split on the 7x7 image resulting in $${x0,x1,x7, x8}$$ being contained in the 
-training set. Let's say each pixel position counts for the distance of 1, then the Euclidean distance between x0 and its nearest neighbors x1 and x7 is both 1. 
-So you basically have several pixels of very similar values in your training data. You can also end up having several pixels in the training set and the test set that are 
-very similar and basically represents the same data point value.   
-
-\subsection*{Example}
-Let’s say you resize the 7x7 image down to a 3x3 image by sampling 9 pixels from the original image of 7x7, as illustrated in figure \ref{fig:image_resizing}. Considering the resampled 3x3 image,
-the Euclidean distance between one pixel and its nearest neighbors is not 1 anymore. The distance between pixel (y=0,x=0) and its nearest neighbor (y=0,x=1) and (y=1,x=0) 
-in the 3x3 image is now the Euclidean distance between pixel x0 and x3, and x0 and x21 from the original image. Therefore, picking pixels from the 3x3 image for the training
-set and the test set now results in data points within the training set and the test set not being considerably similar anymore. It also reduces the share of similar data 
-points ending up in both the training and test sets, which is important. Having many data points in the test set that are similar to the training set makes it harder to 
-determine overfitting since you basically test on many data points that are close to what the model has been trained on.
-
-
-\begin{figure}
-  \centering
-  \includegraphics[scale=0.28]{figures/EX6_resizing.png}
-  \caption{Image resizing}
-  \label{fig:image_resizing}
-\end{figure}
-
+into a new smaller image with fewer pixels, the pixels in the smaller image have longer distances to each other.
 \begin{figure}
   \centering
   \includegraphics[scale=0.75]{figures/EX6_terrain_data_resized.pdf}
   \caption{Terrain data resized}
   \label{fig:terrain_resized}
 \end{figure}
-
 \begin{figure}
   \centering
   \subfloat{{\includegraphics[width=7cm]{figures/EX6_Terrain1 patches.pdf} }}%
@@ -602,7 +580,6 @@ determine overfitting since you basically test on many data points that are clos
   \caption{Terrain patches}%
   \label{fig:terrain_patches}%
 \end{figure}
-
 \begin{figure}
   \centering
   \subfloat{{\includegraphics[width=14cm]{figures/EX6_terrain_patch_to_fit_2D.pdf} }}%
@@ -612,7 +589,28 @@ determine overfitting since you basically test on many data points that are clos
   \label{fig:terrain_patches_focus}%
 \end{figure}
 
+\subsection*{Example}
+For simplicity, let’s consider the image of size 7x7 
+with 49 data points (pixels) drawn in figure\ref{fig:image_resizing}. Let's assume you performed a train test split on the 7x7 image resulting in $\{x_0,x_1,x_7,x_8\}$ being contained in the 
+training set. Let's assume each pixel value and its $(x,y)$ position counts as the distance of 1, then the Euclidean distance between $x_0$ and its nearest neighbors ($x_1$ and $x_7$) is both 1. 
+The distance between $x_0$ and $x_8$ would then be $\sqrt{2}=1.41$.
+\todo[inline]{ADD eclaedan dinstance formula with the values?}
+Three similar pixel values are not much, but this is just an example highlighting the concept, and in real situations you basically get several pixels of very similar values in your training data. 
+You can also end up having several pixels in the training set and the test set that are very similar and basically represents the same data point value. Let’s say you resize the 7x7 image down to a 
+3x3 image by sampling 9 pixels from the original image of 7x7, as illustrated in figure \ref{fig:image_resizing}. Considering the resampled 3x3 image,
+the Euclidean distance between one pixel and its nearest neighbors is not 1 anymore. The distance between pixel (y=0,x=0) and its nearest neighbor (y=0,x=1) and (y=1,x=0) 
+in the 3x3 image is now the Euclidean distance between pixel x0 and x3, and x0 and x21 from the original image. Therefore, picking pixels from the 3x3 image for the training
+set and the test set now results in data points within the training set and the test set not being considerably similar anymore. It also reduces the share of similar data 
+points ending up in both the training and test sets, which is important. Having many data points in the test set that are similar to the training set makes it harder to 
+determine overfitting since you basically test on many data points that are close to what the model has been trained on.
+\begin{figure}
+  \centering
+  \includegraphics[scale=0.28]{figures/EX6_resizing.png}
+  \caption{Distance between data points}
+  \label{fig:image_resizing}
+\end{figure}
 
+\newpage
 \subsection*{Exercise 6 - Conclusion and critical model selelction}
 \subsubsection*{OLS fit}
 \todo[inline]{TODO: Include bias-variance trade-off, fix figure references, include beta plots and compare between degree 10,11 and 12 to determain overfitting}
@@ -649,25 +647,69 @@ This makes sense since image variance reflects the variance within the real terr
 \todo[inline]{TODO: Lasso conclusion and critical model selelction. Write similar as done for Ridge}
 
 
+
+
 \begin{figure}
   \centering
-  \includegraphics[scale=0.62]{figures/EX6_EX1_OLS_evaluattion.pdf}
+  \hspace*{-2cm}
+  \includegraphics[scale=0.75]{figures/EX6_EX1_OLS_evaluattion.pdf}
   \caption{Model complexity vs prediction error using OLS}
   \label{fig:EX6_1_OLS_fit}
 \end{figure}
 
-\begin{table}
+\begin{figure}
   \centering
-  \csvautobooktabular{data/report_data/EX6_EX1_OLS_beta_error_degree5.csv}
-  \caption{Coefficient summary of OLS fit}
-  \label{data:EX6_1_OLS_betas}
-\end{table}
+  \includegraphics[scale=1.0]{figures/EX6_mse_cv_fold_compare_degrees.pdf}
+  \caption{Cross-validation comparison for degree 9,10,11,12}
+  \label{fig:EX6_1_CV}
+\end{figure}
+
+% \begin{table}
+%   \centering
+%   \csvautobooktabular{data/report_data/EX6_EX1_OLS_beta_error_degree5.csv}
+%   \caption{Coefficient summary of OLS fit}
+%   \label{data:EX6_1_OLS_betas}
+% \end{table}
 
 \begin{figure}
   \centering
-  \includegraphics[scale=0.9]{figures/EX6_EX1_OLS_beta_error_degree5.pdf}
-  \caption{Plot of OLS coefficients including standard error}
-  \label{fig:EX6_1_OLS_betas_plot}
+  \hspace*{-4.2cm}  
+  \includegraphics[scale=0.52]{figures/EX6_EX1_OLS_beta_error_degree10.pdf}
+  \caption{Coefficients plot for degree 10}
+  \label{fig:EX6_1_OLS_betas_plot_degree10}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \hspace*{-4.2cm}  
+  \includegraphics[scale=0.52]{figures/EX6_EX1_OLS_beta_error_degree11.pdf}
+  \caption{Coefficients plot for degree 11}
+  \label{fig:EX6_1_OLS_betas_plot_degree11}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \hspace*{-4.2cm}  
+  \includegraphics[scale=0.52]{figures/EX6_EX1_OLS_beta_error_degree12.pdf}
+  \caption{Coefficients plot for degree 12}
+  \label{fig:EX6_1_OLS_betas_plot_degree12}
+\end{figure}
+
+
+\begin{figure}
+  \centering
+  \caption{2D plot showing the produced product from models at degree9-12}
+  \hspace*{-1.2cm}  
+  \includegraphics[scale=0.95]{figures/EX6_EX1_target_terrain_and_OLS_prediction_2D.pdf}
+  \label{fig:EX6_1_OLS_2D}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \caption{3D plot showing the produced product from models at degree9-12}
+  \hspace*{-1.2cm}  
+  \includegraphics[scale=0.95]{figures/EX6_EX1_target_terrain_and_OLS_prediction_3D.pdf}
+  \label{fig:EX6_1_OLS_3D}
 \end{figure}
 
 
