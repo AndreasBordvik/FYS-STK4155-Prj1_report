@@ -679,25 +679,28 @@ Looking at the CV plots in figure \ref{fig:EX6_1_CV}, degree 9 has a overall hig
 in generall comparing the other degrees. The lower part of the standard deviation for degree 9 does not look to overlap into the other degrees for the majority of all K-folds. While it may not be so common 
 to consider several K-folds when analyzing MSE and how well the model generalise to the data we took the liberty of of just doing that. We considered compariong models using all folds a reasonable task 
 computational wise for all different degrees on the data size that we ended up using. We also though that given the relativly similar performance of degree 10, 11, and 12, it was an interesting task to 
-look deeper to determain how consistent the model robustness is.
+look deeper to determain how consistent the model robustness is. Rounding up the analysis for degree 9, we also see that degree 9 is not as sharp as degree 10 looking at the predicted 2D terrain in figure \ref{fig:EX6_1_OLS_2D}. 
+This excludes degree 9 as a candidate in the contest of being the moste optimal degree. 
 
-Concluding on the model with degree 9 
-We also see that degree 9 is not as sharp as degree 10, looking at the predicted 2D terrain in figure \ref{fig:EX6_1_OLS_2D}. This excludes degree 9 as a candidate
-in the contest of being the optimal degree. Looking at the CV plots, degree 10,11, and 12 are relatively equal considering MSE for different K-folds. Looking at the standard deviation,
-the robustness and generalization using these degrees seem to be reasonably equal given the slight differences between the degrees. It is not easy to distinguish between degree 10,11 and 12 in the 
-plots of the $\beta$ coefficients in the figures \ref{fig:EX6_1_OLS_betas_plot_degree10},
-\ref{fig:EX6_1_OLS_betas_plot_degree11}, and \ref{fig:EX6_1_OLS_betas_plot_degree12} either. Many coeffeicente with high standard errors can be signs of 
-overfitting, but the all appear relatively equal. 
+Looking further in the CV plots in figure \ref{fig:EX6_1_CV}, degree 10,11, and 12 are relatively equal considering MSE for different K-folds. Looking at the standard deviation,
+the robustness and generalization using these degrees seem to be reasonably equal given the slight differences between the degrees. To be fair, it looks that degree 11, the green color in the figure,
+is haveing a smaller standard deviation and MSE for the majority of K-folds, and based on this; degree 11 takes the lead over degree 10 and 12. However, the standard deviation is overlapping for all 
+degrees; 10, 11 and 12, meaning degree 11 may not better by statistically meassures. It is not easy to distinguish between degree 10,11 and 12 in the 
+plots of the $\beta$ coefficients in the figures \ref{fig:EX6_1_OLS_betas_plot_degree10}, \ref{fig:EX6_1_OLS_betas_plot_degree11}, and \ref{fig:EX6_1_OLS_betas_plot_degree12} either. 
+Many coefficentes with high standard errors can be a sign of overfit, but the all degrees appear relatively equal and does not show signs of a clear overfit. 
 
-First when we study the predicted product in the 3D plot and especially the 2D plots in figure \ref{fig:EX6_1_OLS_3D} and \ref{fig:EX6_1_OLS_2D}, we see an essential difference between the degrees. 
-Degree 10 seems to have a smooth surface, while some unnatural artifacts are present at degrees 11 and 12.
-We discovered that the predicted image gets artifacts and becomes more distorted at even higher degrees. This concludes that the artifacts and the distortions in predicted 
-terrain images are indications of overfitting, leaving us with degree 10 as the most optimal degree. Another interesting observation we discovered is that the mean statistics 
-of the predicted terrain image were correctly approximated at an early polynomial degree while the pixel variance differed more between degrees. The mean statistics of the 
-approximated image are incorporated within the lower degrees and lower term coefficients, while the image variance is more aligned with the level of data complexity. 
-This makes sense since image variance reflects the variance within the real terrain we try to approximate. The more the terrain varies, the more complex the polynomial approximation. 
-A lesson learned from this is to be critical to draw conclusions just by evaluating the MSE values. It may be that you in the end have to 
+First when we study the predicted product in the 3D plot and especially the 2D plots in figure \ref{fig:EX6_1_OLS_3D} and \ref{fig:EX6_1_OLS_2D}, we see important differences between the degrees. 
+Degree 10 seems to have a smooth surface, while some unnatural artifacts are present at degrees 11 and 12. We discovered that the predicted image gets artifacts and becomes more distorted at even higher degrees. 
+This concludes that the artifacts and the distortions in predicted terrain images are indications of overfitting, leaving us with degree 10 as the most optimal degree. 
+Another interesting observation we discovered is that the mean statistics of the predicted terrain image were correctly approximated at an early polynomial degree while the pixel variance differed more between degrees. 
+The mean statistics of the approximated image are incorporated within the lower degrees and lower term coefficients, while the image variance is more aligned with the level of data and model complexity. 
+This makes sense since image variance reflects the topographical variance within the real terrain we try to approximate. The more the terrain varies, the more complex the polynomial approximation. 
+A lesson learned from this is to be critical to draw conclusions just by evaluating the MSE values, standard deviations and beta coefficients. It may be that you in the end have to 
 evaluate to produced end product to be certain of which complexity that yields the best fit. 
+\\\\
+Based on the analyzis we conclude that degree 10 yeilds the best fit for the OLS model having a test MSE value of xx and a standard deviation of yy.
+\\\\
+Another intersting observation we though of mentioning is that our models are actualy performing as a type of image or data compression, where the model coefficients contain the information of considerably large terrain data. 
 
 \subsubsection*{Ridge fit}
 \todo[inline]{TODO: Ridge conclusion and critical model selelction. Write similar story as done for OLS using surfaceplon}
