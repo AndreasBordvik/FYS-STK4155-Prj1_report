@@ -674,9 +674,15 @@ looking at the test MSE values. Looking at the R2 values, the R2 score on train 
 the variation in the training data is increasingly described while the variation within the test data is decreasingly described. This is also a sign of overfitting since
 the more variation described of the training data, the more you are fitted to the training data. However, just looking at test MSE and R2 scores is not always sufficient
 to determine overfitting and to validate the robustness of the model and to which degree it is generalized. Just by looking at figure \ref{fig:EX6_1_OLS_fit}, we can have a range of degrees 
-between degrees 9-14 which are candidates to be the most optimal degree. We consider the most optimal degree resulting in a model not being underfitted or overfitted. 
-Looking at the CV plots in figure \ref{fig:EX6_1_CV}, degree 9 has a higher MSE score for the test data for all tested K-folds. The lower part the standard deviation for degree 9 is not significantly overlapping
-the lower values for degree 10 for the tested K-folds. We also see that degree 9 is not as sharp as degree 10, looking at the predicted 2D terrain in figure \ref{fig:EX6_1_OLS_2D}. This excludes degree 9 as a candidate
+between degrees 9-14 which are candidates to be the most optimal degree. We consider the most optimal degree being a model that has consistent good performance and not being underfitted or overfitted. 
+Looking at the CV plots in figure \ref{fig:EX6_1_CV}, degree 9 has a overall higher MSE score for the test data for all tested K-folds comparing the other degrees. Degree 9 also has a larger standard deviation 
+in generall comparing the other degrees. The lower part of the standard deviation for degree 9 does not look to overlap into the other degrees for the majority of all K-folds. While it may not be so common 
+to consider several K-folds when analyzing MSE and how well the model generalise to the data we took the liberty of of just doing that. We considered compariong models using all folds a reasonable task 
+computational wise for all different degrees on the data size that we ended up using. We also though that given the relativly similar performance of degree 10, 11, and 12, it was an interesting task to 
+look deeper to determain how consistent the model robustness is.
+
+Concluding on the model with degree 9 
+We also see that degree 9 is not as sharp as degree 10, looking at the predicted 2D terrain in figure \ref{fig:EX6_1_OLS_2D}. This excludes degree 9 as a candidate
 in the contest of being the optimal degree. Looking at the CV plots, degree 10,11, and 12 are relatively equal considering MSE for different K-folds. Looking at the standard deviation,
 the robustness and generalization using these degrees seem to be reasonably equal given the slight differences between the degrees. It is not easy to distinguish between degree 10,11 and 12 in the 
 plots of the $\beta$ coefficients in the figures \ref{fig:EX6_1_OLS_betas_plot_degree10},
