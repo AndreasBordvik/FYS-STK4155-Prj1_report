@@ -690,16 +690,17 @@ degrees; 10, 11 and 12, meaning degree 11 may not better by statistically meassu
 plots of the $\beta$ coefficients in the figures \ref{fig:EX6_1_OLS_betas_plot_degree10}, \ref{fig:EX6_1_OLS_betas_plot_degree11}, and \ref{fig:EX6_1_OLS_betas_plot_degree12} either. 
 Many coefficentes with high standard errors can be a sign of overfit, but the all degrees appear relatively equal and does not show signs of a clear overfit. 
 
-First when we study the predicted product in the 3D plot and especially the 2D plots in figure \ref{fig:EX6_1_OLS_3D} and \ref{fig:EX6_1_OLS_2D}, we see important differences between the degrees. 
-Degree 10 seems to have a smooth surface, while some unnatural artifacts are present at degrees 11 and 12. We discovered that the predicted image gets artifacts and becomes more distorted at even higher degrees. 
-This concludes that the artifacts and the distortions in predicted terrain images are indications of overfitting, leaving us with degree 10 as the most optimal degree. 
+First when we study in detail the predicted product in the 3D plot and especially the 2D plots in figure \ref{fig:EX6_1_OLS_3D} and \ref{fig:EX6_1_OLS_2D}, we see important differences between the degrees. 
+Degree 10 seems to have a smooth surface, while some unnatural artifacts are present at degrees 11 and 12 in the lower and right parts of the terrain images. We discovered that the predicted image gets artifacts and becomes more distorted at even higher degrees. 
+This concludes that the artifacts and the distortions in predicted terrain images are indications of overfitting, leaving us with degree 10 as the most optimal degree. In general, you also want to have 
+the simples possible model complexity which also favors degree 10 over degree 11 and 12. 
 Another interesting observation we discovered is that the mean statistics of the predicted terrain image were correctly approximated at an early polynomial degree while the pixel variance differed more between degrees. 
 The mean statistics of the approximated image are incorporated within the lower degrees and lower term coefficients, while the image variance is more aligned with the level of data and model complexity. 
 This makes sense since image variance reflects the topographical variance within the real terrain we try to approximate. The more the terrain varies, the more complex the polynomial approximation. 
 A lesson learned from this is to be critical to draw conclusions just by evaluating the MSE values, standard deviations and beta coefficients. It may be that you in the end have to 
 evaluate to produced end product to be certain of which complexity that yields the best fit. 
 \\\\
-Based on the analyzis we conclude that degree 10 yeilds the best fit for the OLS model having a test MSE value of xx and a standard deviation of yy.
+Based on the analyzis we conclude that degree 10 yeilds the best fit for the OLS model having a mean test MSE value of 0.169 and a standard deviation of 0.0075.
 \\\\
 Another intersting observation we though of mentioning is that our models are actualy performing as a type of image or data compression, where the model coefficients contain the information of considerably large terrain data. 
 
