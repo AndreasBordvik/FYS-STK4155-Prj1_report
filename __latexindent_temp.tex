@@ -400,9 +400,9 @@ Figure 7(a) visualizes a polynomial degree where this point lies within the give
 On the other hand, increasing the dataset to contain 1600 data points produces completely different results. The percentage of data used in training is kept constant between these two examples, resulting in the increase from 320 data points to 1280. This gives the model a significantly better foundation for generalizing on the data, hence resulting in a much lower MSE at the degrees in the higher range of the interval in question. At this number of data points, there is still no clear evidence of overfitting.  
 
 \subsection*{Some words on bootstrapping}
-As described in the preceding task, we split our data into several subsets used for different purposes. The overall objective is to train a model on a given subset and then measure how well it performs on a new unseen data set. \emph{Figure 3}  illustrates the results of this method, where the average prediction error is plotted against the model complexity. However, a dilemma that may emerge from this approach is that our data only represents a sample from an unknown distribution. We run the risk of measuring a predicted error that deviates from the actual probability by iterating through our data points only once.
+As described in the preceding task, we split our data into several subsets used for different purposes. The overall objective is to train a model on a given subset and then measure how well it performs on a new unseen data set. However, a dilemma that may emerge from this approach is that our data only represents a sample from an unknown distribution. We run the risk of measuring a predicted error that deviates from the actual probability by iterating through our data points only once.
 
-Therefore, we impose resampling methods on our data to produce a more realistic estimate of the error. The following algorithm will demonstrate how *bootstrap* is performed to achieve this\cite{ref_forelesning}:
+Therefore, we impose resampling methods on our data to produce a more realistic estimate of the error.This will help us in the the process of assesing the model. The following algorithm will demonstrate how the bootstrap is performed to achieve this:
 
 We have some data, which consists of training data:
 
@@ -432,7 +432,7 @@ $$\tilde{y}^* = \bm{X}_{test}\bm{\hat{\beta}^*}$$.
   \sum_{i=0}^{n-1}(y_i-\tilde{y}^{*}_i)^2
 \]
 
-Step I-IV is then repeated $B$ times, while keeping track of each sample MSE. After the completion of B bootstraps, an average of all MSE´s is calculated. Ideally, B is less than the number of datapoints. This is implemented in our algorith by simply setting B to half the size of the datapoints. 
+Step I-IV is then repeated $B$ times, while keeping track of each sample MSE. After the completion of B bootstraps, an average of all MSE´s is calculated. Ideally, B is less than the number of datapoints. This is implemented in our algorith by simply setting B to some fraction of the size of the data set. 
 
 
 
@@ -589,7 +589,7 @@ height or depth similarly as for the franke function. However, the height or dep
 having an entirely different scale comparing the constructed range between 0-1 of the franke function. Considering terrain data assembly for the x and y variables, 
 it must be constructed as a meshgrid spanning the entire range of all x and y pixel positions within the terrain image. Since the range of x and y is determined by 
 the span of pixel positions corresponding to the image width and height, we must scale both the x and y variables from the terrain data. The terrain input data utilized
-is of dimension 3601x1801, inducing 6485401 data points for the entire dataset. Comparing the constructed franke function, the terrain image is not quadratic, meaning 
+has dimensions 3601x1801, inducing 6485401 data points for the entire dataset. Comparing the constructed franke function, the terrain image is not quadratic, meaning 
 the range of x and y is not equal. Therefore, both the shape and values of the terrain data motivates to data scaling (both inputs and targets) to prevent one feature,
 by its magnitude, from dominating over the other. 
 
@@ -607,39 +607,17 @@ image data from the resized images where each patch being quadratic of dimension
 different configurations of the grid size constituting all patches and the number of data points (pixels) within each patch regarding data complexity and terrain shape.
 After investigating the different patches, we narrowed down to two patches, one from each terrain, figure \ref{fig:terrain_patches_focus}. We eventually decided to focus 
 on patch2 from terrain1 since it yields both an interesting shape and is complex while not being infeasible to work with considering the models prone to the task. 
-This preprocessing serves the purpose of feeding tbhe model with only one patch, making a smaller subproblem that is more digestible for the model in the pursuit of a good 
+This preprocessing serves the purpose of feeding the model with only one patch, making a smaller subproblem that is more digestible for the model in the pursuit of a good 
 fit on exciting data.\\
 The motivation behind image resizing and resampling is not just to reduce the number of data points; it also relates to the closeness between data points. 
 Having many similar data points may lead to biased model performance and that the model is not generalized properly. By resizing and resampling pixels from an image 
-into a new smaller image with fewer pixels, the pixels in the smaller image have longer distances to each other. For simplicity, let’s consider the image of size 7x7 
-with 49 data points (pixels) drawn in figure \ref{fig:image_resizing}. Let's assume you performed a train test split on the 7x7 image resulting in $${x0,x1,x7, x8}$$ being contained in the 
-training set. Let's say each pixel position counts for the distance of 1, then the Euclidean distance between x0 and its nearest neighbors x1 and x7 is both 1. 
-So you basically have several pixels of very similar values in your training data. You can also end up having several pixels in the training set and the test set that are 
-very similar and basically represents the same data point value.   
-
-\subsection*{Example}
-Let’s say you resize the 7x7 image down to a 3x3 image by sampling 9 pixels from the original image of 7x7, as illustrated in figure \ref{fig:image_resizing}. Considering the resampled 3x3 image,
-the Euclidean distance between one pixel and its nearest neighbors is not 1 anymore. The distance between pixel (y=0,x=0) and its nearest neighbor (y=0,x=1) and (y=1,x=0) 
-in the 3x3 image is now the Euclidean distance between pixel x0 and x3, and x0 and x21 from the original image. Therefore, picking pixels from the 3x3 image for the training
-set and the test set now results in data points within the training set and the test set not being considerably similar anymore. It also reduces the share of similar data 
-points ending up in both the training and test sets, which is important. Having many data points in the test set that are similar to the training set makes it harder to 
-determine overfitting since you basically test on many data points that are close to what the model has been trained on.
-
-
-\begin{figure}
-  \centering
-  \includegraphics[scale=0.28]{figures/EX6_resizing.png}
-  \caption{Image resizing}
-  \label{fig:image_resizing}
-\end{figure}
-
+into a new smaller image with fewer pixels, the pixels in the smaller image have longer distances to each other.
 \begin{figure}
   \centering
   \includegraphics[scale=0.75]{figures/EX6_terrain_data_resized.pdf}
   \caption{Terrain data resized}
   \label{fig:terrain_resized}
 \end{figure}
-
 \begin{figure}
   \centering
   \subfloat{{\includegraphics[width=7cm]{figures/EX6_Terrain1 patches.pdf} }}%
@@ -647,7 +625,6 @@ determine overfitting since you basically test on many data points that are clos
   \caption{Terrain patches}%
   \label{fig:terrain_patches}%
 \end{figure}
-
 \begin{figure}
   \centering
   \subfloat{{\includegraphics[width=14cm]{figures/EX6_terrain_patch_to_fit_2D.pdf} }}%
@@ -657,11 +634,32 @@ determine overfitting since you basically test on many data points that are clos
   \label{fig:terrain_patches_focus}%
 \end{figure}
 
+\subsection*{Example}
+For simplicity, let’s consider the image of size 7x7 
+with 49 data points (pixels) drawn in figure\ref{fig:image_resizing}. Let's assume you performed a train test split on the 7x7 image resulting in $\{x_0,x_1,x_7,x_8\}$ being contained in the 
+training set. Let's assume each pixel value and its $(x,y)$ position counts as the distance of 1, then the Euclidean distance between $x_0$ and its nearest neighbors ($x_1$ and $x_7$) is both 1. 
+The distance between $x_0$ and $x_8$ would then be $\sqrt{2}=1.41$.
+\todo[inline]{ADD eclaedan dinstance formula with the values?}
+Three similar pixel values are not much, but this is just an example highlighting the concept, and in real situations you basically get several pixels of very similar values in your training data. 
+You can also end up having several pixels in the training set and the test set that are basically equal. It is not ideal to have datapoint in the trainin set and test set that represents the same data point value. 
+Let’s say you resize the 7x7 image down to a 3x3 image by sampling 9 pixels from the original image of 7x7, as illustrated in figure \ref{fig:image_resizing}. Considering the resampled 3x3 image,
+the Euclidean distance between one pixel and its nearest neighbors is not 1 anymore. The distance between pixel (y=0,x=0) and its nearest neighbor (y=0,x=1) and (y=1,x=0) 
+in the 3x3 image is now the Euclidean distance between pixel $x_0$ and $x_3$, and $x_0$ and $x_{21}$ from the original image. Therefore, picking pixels from the 3x3 image for the training
+set and the test set now results in data points within the training set and the test set not being considerably similar anymore. It also reduces the share of similar data 
+points ending up in both the training and test sets, which is important. Having many data points in the test set that are similar to the training set makes it harder to 
+determine overfitting since you basically test on many data points that are close to what the model has been trained on.
+\begin{figure}
+  \centering
+  \includegraphics[scale=0.28]{figures/EX6_resizing.png}
+  \caption{Distance between data points}
+  \label{fig:image_resizing}
+\end{figure}
 
+\newpage
 \subsection*{Exercise 6 - Conclusion and critical model selelction}
 \subsubsection*{OLS fit}
 \todo[inline]{TODO: Include bias-variance trade-off, fix figure references, include beta plots and compare between degree 10,11 and 12 to determain overfitting}
-In this task we conducted a OLS fit on the the terrain1 patch using similar appraoch as done in exercise1. We fitted the OLS model between degree 1-24.
+In this task we conducted a OLS fit on the the terrain1 patch using similar appraoch as done in exercise1. We fitted the OLS model between degree 1-44.
 When approximating polynomials, the simpler components are often incorporated within the first coefficients of a model. The simpler components of an approximation 
 often carry basic but significantly important information. When tackling the approximation of complex data, more coefficients must contribute in order to capture the 
 real data's details, shape, and statistics. However, in approximation, the differences between degrees of complexity are not necessarily linear as it depends on the 
@@ -671,22 +669,29 @@ certain plateau before major overfitting occurred for a reasonably complex terra
 We first experimented using terrain patches of 180x180 and observed that our models eventually reached a plateau for several degrees before slowly moving into overfitting.
 A plateau of the test MSE most likely means that the difference from one degree to the next is not significant when capturing fine-grained details in the approximation.
 Moreover, we changed the patch data size to 60x60 for easier analyses of model performance while still having exciting results and plots to investigate. 
-In Figure xx the OLS model reaches the lower test MSE area at degree 10. The figure \ref{fig:EX6_1_OLS_fit} shows a plateau between degrees 10-14 before a clear sign of overfitting occurs, 
+In Figure \ref{fig:EX6_1_OLS_fit} the OLS model reaches the lower test MSE area at degree 10. The figure \ref{fig:EX6_1_OLS_fit} shows a plateau between degrees 10-14 before a clear sign of overfitting occurs, 
 looking at the test MSE values. Looking at the R2 values, the R2 score on train and test are clearly taking different paths after degree 14, and from here on, 
 the variation in the training data is increasingly described while the variation within the test data is decreasingly described. This is also a sign of overfitting since
 the more variation described of the training data, the more you are fitted to the training data. However, just looking at test MSE and R2 scores is not always sufficient
 to determine overfitting and to validate the robustness of the model and to which degree it is generalized. Just by looking at figure \ref{fig:EX6_1_OLS_fit}, we can have a range of degrees 
 between degrees 9-14 which are candidates to be the most optimal degree. We consider the most optimal degree resulting in a model not being underfitted or overfitted. 
-Looking at the CV plots in figure xx, degree 9 has a higher MSE score for the test data for all tested K-folds. The lover part of the standard deviation is not even touching
-the lower values for degree 10. We also see that degree 9 is not as sharp as degree 10, looking at the predicted 2D terrain in figure xx. This excludes degree 9 as a candidate
+Looking at the CV plots in figure \ref{fig:EX6_1_CV}, degree 9 has a higher MSE score for the test data for all tested K-folds. The lower part the standard deviation for degree 9 is not significantly overlapping
+the lower values for degree 10 for the tested K-folds. We also see that degree 9 is not as sharp as degree 10, looking at the predicted 2D terrain in figure \ref{fig:EX6_1_OLS_2D}. This excludes degree 9 as a candidate
 in the contest of being the optimal degree. Looking at the CV plots, degree 10,11, and 12 are relatively equal considering MSE for different K-folds. Looking at the standard deviation,
-the robustness and generalization using these degrees seem to be reasonably equal given the slight differences between the degrees. When we study the predicted 3D plot and especially
-the 2D plots in figure xx and yy, we see an essential difference between the degrees. Degree 10 seems to have a smooth surface, while some unnatural artifacts are present at degrees 11 and 12.
+the robustness and generalization using these degrees seem to be reasonably equal given the slight differences between the degrees. It is not easy to distinguish between degree 10,11 and 12 in the 
+plots of the $\beta$ coefficients in the figures \ref{fig:EX6_1_OLS_betas_plot_degree10},
+\ref{fig:EX6_1_OLS_betas_plot_degree11}, and \ref{fig:EX6_1_OLS_betas_plot_degree12} either. Many coeffeicente with high standard errors can be signs of 
+overfitting, but the all appear relatively equal. 
+
+First when we study the predicted product in the 3D plot and especially the 2D plots in figure \ref{fig:EX6_1_OLS_3D} and \ref{fig:EX6_1_OLS_2D}, we see an essential difference between the degrees. 
+Degree 10 seems to have a smooth surface, while some unnatural artifacts are present at degrees 11 and 12.
 We discovered that the predicted image gets artifacts and becomes more distorted at even higher degrees. This concludes that the artifacts and the distortions in predicted 
 terrain images are indications of overfitting, leaving us with degree 10 as the most optimal degree. Another interesting observation we discovered is that the mean statistics 
 of the predicted terrain image were correctly approximated at an early polynomial degree while the pixel variance differed more between degrees. The mean statistics of the 
 approximated image are incorporated within the lower degrees and lower term coefficients, while the image variance is more aligned with the level of data complexity. 
 This makes sense since image variance reflects the variance within the real terrain we try to approximate. The more the terrain varies, the more complex the polynomial approximation. 
+A lesson learned from this is to be critical to draw conclusions just by evaluating the MSE values. It may be that you in the end have to 
+evaluate to produced end product to be certain of which complexity that yields the best fit. 
 
 \subsubsection*{Ridge fit}
 \todo[inline]{TODO: Ridge conclusion and critical model selelction. Write similar story as done for OLS using surfaceplon}
@@ -694,25 +699,69 @@ This makes sense since image variance reflects the variance within the real terr
 \todo[inline]{TODO: Lasso conclusion and critical model selelction. Write similar as done for Ridge}
 
 
+
+
 \begin{figure}
   \centering
-  \includegraphics[scale=0.62]{figures/EX6_EX1_OLS_evaluattion.pdf}
+  \hspace*{-2cm}
+  \includegraphics[scale=0.75]{figures/EX6_EX1_OLS_evaluattion.pdf}
   \caption{Model complexity vs prediction error using OLS}
   \label{fig:EX6_1_OLS_fit}
 \end{figure}
 
-\begin{table}
+\begin{figure}
   \centering
-  \csvautobooktabular{data/report_data/EX6_EX1_OLS_beta_error_degree5.csv}
-  \caption{Coefficient summary of OLS fit}
-  \label{data:EX6_1_OLS_betas}
-\end{table}
+  \includegraphics[scale=1.0]{figures/EX6_mse_cv_fold_compare_degrees.pdf}
+  \caption{Cross-validation comparison for degree 9,10,11,12}
+  \label{fig:EX6_1_CV}
+\end{figure}
+
+% \begin{table}
+%   \centering
+%   \csvautobooktabular{data/report_data/EX6_EX1_OLS_beta_error_degree5.csv}
+%   \caption{Coefficient summary of OLS fit}
+%   \label{data:EX6_1_OLS_betas}
+% \end{table}
 
 \begin{figure}
   \centering
-  \includegraphics[scale=0.9]{figures/EX6_EX1_OLS_beta_error_degree5.pdf}
-  \caption{Plot of OLS coefficients including standard error}
-  \label{fig:EX6_1_OLS_betas_plot}
+  \hspace*{-4.2cm}  
+  \includegraphics[scale=0.52]{figures/EX6_EX1_OLS_beta_error_degree10.pdf}
+  \caption{Coefficients plot for degree 10}
+  \label{fig:EX6_1_OLS_betas_plot_degree10}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \hspace*{-4.2cm}  
+  \includegraphics[scale=0.52]{figures/EX6_EX1_OLS_beta_error_degree11.pdf}
+  \caption{Coefficients plot for degree 11}
+  \label{fig:EX6_1_OLS_betas_plot_degree11}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \hspace*{-4.2cm}  
+  \includegraphics[scale=0.52]{figures/EX6_EX1_OLS_beta_error_degree12.pdf}
+  \caption{Coefficients plot for degree 12}
+  \label{fig:EX6_1_OLS_betas_plot_degree12}
+\end{figure}
+
+
+\begin{figure}
+  \centering
+  \caption{2D plot showing the produced product from models at degree9-12}
+  \hspace*{-1.2cm}  
+  \includegraphics[scale=0.95]{figures/EX6_EX1_target_terrain_and_OLS_prediction_2D.pdf}
+  \label{fig:EX6_1_OLS_2D}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \caption{3D plot showing the produced product from models at degree9-12}
+  \hspace*{-1.2cm}  
+  \includegraphics[scale=0.95]{figures/EX6_EX1_target_terrain_and_OLS_prediction_3D.pdf}
+  \label{fig:EX6_1_OLS_3D}
 \end{figure}
 
 

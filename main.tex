@@ -402,9 +402,9 @@ Figure 7(a) visualizes a polynomial degree where this point lies within the give
 On the other hand, increasing the dataset to contain 1600 data points produces completely different results. The percentage of data used in training is kept constant between these two examples, resulting in the increase from 320 data points to 1280. This gives the model a significantly better foundation for generalizing on the data, hence resulting in a much lower MSE at the degrees in the higher range of the interval in question. At this number of data points, there is still no clear evidence of overfitting.  
 
 \subsection*{Some words on bootstrapping}
-As described in the preceding task, we split our data into several subsets used for different purposes. The overall objective is to train a model on a given subset and then measure how well it performs on a new unseen data set. \emph{Figure 3}  illustrates the results of this method, where the average prediction error is plotted against the model complexity. However, a dilemma that may emerge from this approach is that our data only represents a sample from an unknown distribution. We run the risk of measuring a predicted error that deviates from the actual probability by iterating through our data points only once.
+As described in the preceding task, we split our data into several subsets used for different purposes. The overall objective is to train a model on a given subset and then measure how well it performs on a new unseen data set. However, a dilemma that may emerge from this approach is that our data only represents a sample from an unknown distribution. We run the risk of measuring a predicted error that deviates from the actual probability by iterating through our data points only once.
 
-Therefore, we impose resampling methods on our data to produce a more realistic estimate of the error. The following algorithm will demonstrate how *bootstrap* is performed to achieve this\cite{ref_forelesning}:
+Therefore, we impose resampling methods on our data to produce a more realistic estimate of the error.This will help us in the the process of assesing the model. The following algorithm will demonstrate how the bootstrap is performed to achieve this:
 
 We have some data, which consists of training data:
 
@@ -434,7 +434,7 @@ $$\tilde{y}^* = \bm{X}_{test}\bm{\hat{\beta}^*}$$.
   \sum_{i=0}^{n-1}(y_i-\tilde{y}^{*}_i)^2
 \]
 
-Step I-IV is then repeated $B$ times, while keeping track of each sample MSE. After the completion of B bootstraps, an average of all MSE´s is calculated. Ideally, B is less than the number of datapoints. This is implemented in our algorith by simply setting B to half the size of the datapoints. 
+Step I-IV is then repeated $B$ times, while keeping track of each sample MSE. After the completion of B bootstraps, an average of all MSE´s is calculated. Ideally, B is less than the number of datapoints. This is implemented in our algorith by simply setting B to some fraction of the size of the data set. 
 
 
 
