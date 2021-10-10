@@ -596,10 +596,10 @@ training set. Let's assume each pixel value and its $(x,y)$ position counts as t
 The distance between $x_0$ and $x_8$ would then be $\sqrt{2}=1.41$.
 \todo[inline]{ADD eclaedan dinstance formula with the values?}
 Three similar pixel values are not much, but this is just an example highlighting the concept, and in real situations you basically get several pixels of very similar values in your training data. 
-You can also end up having several pixels in the training set and the test set that are very similar and basically represents the same data point value. Let’s say you resize the 7x7 image down to a 
-3x3 image by sampling 9 pixels from the original image of 7x7, as illustrated in figure \ref{fig:image_resizing}. Considering the resampled 3x3 image,
+You can also end up having several pixels in the training set and the test set that are basically equal. It is not ideal to have datapoint in the trainin set and test set that represents the same data point value. 
+Let’s say you resize the 7x7 image down to a 3x3 image by sampling 9 pixels from the original image of 7x7, as illustrated in figure \ref{fig:image_resizing}. Considering the resampled 3x3 image,
 the Euclidean distance between one pixel and its nearest neighbors is not 1 anymore. The distance between pixel (y=0,x=0) and its nearest neighbor (y=0,x=1) and (y=1,x=0) 
-in the 3x3 image is now the Euclidean distance between pixel x0 and x3, and x0 and x21 from the original image. Therefore, picking pixels from the 3x3 image for the training
+in the 3x3 image is now the Euclidean distance between pixel $x_0$ and $x_3$, and $x_0$ and $x_{21}$ from the original image. Therefore, picking pixels from the 3x3 image for the training
 set and the test set now results in data points within the training set and the test set not being considerably similar anymore. It also reduces the share of similar data 
 points ending up in both the training and test sets, which is important. Having many data points in the test set that are similar to the training set makes it harder to 
 determine overfitting since you basically test on many data points that are close to what the model has been trained on.
@@ -614,7 +614,7 @@ determine overfitting since you basically test on many data points that are clos
 \subsection*{Exercise 6 - Conclusion and critical model selelction}
 \subsubsection*{OLS fit}
 \todo[inline]{TODO: Include bias-variance trade-off, fix figure references, include beta plots and compare between degree 10,11 and 12 to determain overfitting}
-In this task we conducted a OLS fit on the the terrain1 patch using similar appraoch as done in exercise1. We fitted the OLS model between degree 1-24.
+In this task we conducted a OLS fit on the the terrain1 patch using similar appraoch as done in exercise1. We fitted the OLS model between degree 1-44.
 When approximating polynomials, the simpler components are often incorporated within the first coefficients of a model. The simpler components of an approximation 
 often carry basic but significantly important information. When tackling the approximation of complex data, more coefficients must contribute in order to capture the 
 real data's details, shape, and statistics. However, in approximation, the differences between degrees of complexity are not necessarily linear as it depends on the 
@@ -624,22 +624,29 @@ certain plateau before major overfitting occurred for a reasonably complex terra
 We first experimented using terrain patches of 180x180 and observed that our models eventually reached a plateau for several degrees before slowly moving into overfitting.
 A plateau of the test MSE most likely means that the difference from one degree to the next is not significant when capturing fine-grained details in the approximation.
 Moreover, we changed the patch data size to 60x60 for easier analyses of model performance while still having exciting results and plots to investigate. 
-In Figure xx the OLS model reaches the lower test MSE area at degree 10. The figure \ref{fig:EX6_1_OLS_fit} shows a plateau between degrees 10-14 before a clear sign of overfitting occurs, 
+In Figure \ref{fig:EX6_1_OLS_fit} the OLS model reaches the lower test MSE area at degree 10. The figure \ref{fig:EX6_1_OLS_fit} shows a plateau between degrees 10-14 before a clear sign of overfitting occurs, 
 looking at the test MSE values. Looking at the R2 values, the R2 score on train and test are clearly taking different paths after degree 14, and from here on, 
 the variation in the training data is increasingly described while the variation within the test data is decreasingly described. This is also a sign of overfitting since
 the more variation described of the training data, the more you are fitted to the training data. However, just looking at test MSE and R2 scores is not always sufficient
 to determine overfitting and to validate the robustness of the model and to which degree it is generalized. Just by looking at figure \ref{fig:EX6_1_OLS_fit}, we can have a range of degrees 
 between degrees 9-14 which are candidates to be the most optimal degree. We consider the most optimal degree resulting in a model not being underfitted or overfitted. 
-Looking at the CV plots in figure xx, degree 9 has a higher MSE score for the test data for all tested K-folds. The lover part of the standard deviation is not even touching
-the lower values for degree 10. We also see that degree 9 is not as sharp as degree 10, looking at the predicted 2D terrain in figure xx. This excludes degree 9 as a candidate
+Looking at the CV plots in figure \ref{fig:EX6_1_CV}, degree 9 has a higher MSE score for the test data for all tested K-folds. The lower part the standard deviation for degree 9 is not significantly overlapping
+the lower values for degree 10 for the tested K-folds. We also see that degree 9 is not as sharp as degree 10, looking at the predicted 2D terrain in figure \ref{fig:EX6_1_OLS_2D}. This excludes degree 9 as a candidate
 in the contest of being the optimal degree. Looking at the CV plots, degree 10,11, and 12 are relatively equal considering MSE for different K-folds. Looking at the standard deviation,
-the robustness and generalization using these degrees seem to be reasonably equal given the slight differences between the degrees. When we study the predicted 3D plot and especially
-the 2D plots in figure xx and yy, we see an essential difference between the degrees. Degree 10 seems to have a smooth surface, while some unnatural artifacts are present at degrees 11 and 12.
+the robustness and generalization using these degrees seem to be reasonably equal given the slight differences between the degrees. It is not easy to distinguish between degree 10,11 and 12 in the 
+plots of the $\beta$ coefficients in the figures \ref{fig:EX6_1_OLS_betas_plot_degree10},
+\ref{fig:EX6_1_OLS_betas_plot_degree11}, and \ref{fig:EX6_1_OLS_betas_plot_degree12} either. Many coeffeicente with high standard errors can be signs of 
+overfitting, but the all appear relatively equal. 
+
+First when we study the predicted product in the 3D plot and especially the 2D plots in figure \ref{fig:EX6_1_OLS_3D} and \ref{fig:EX6_1_OLS_2D}, we see an essential difference between the degrees. 
+Degree 10 seems to have a smooth surface, while some unnatural artifacts are present at degrees 11 and 12.
 We discovered that the predicted image gets artifacts and becomes more distorted at even higher degrees. This concludes that the artifacts and the distortions in predicted 
 terrain images are indications of overfitting, leaving us with degree 10 as the most optimal degree. Another interesting observation we discovered is that the mean statistics 
 of the predicted terrain image were correctly approximated at an early polynomial degree while the pixel variance differed more between degrees. The mean statistics of the 
 approximated image are incorporated within the lower degrees and lower term coefficients, while the image variance is more aligned with the level of data complexity. 
 This makes sense since image variance reflects the variance within the real terrain we try to approximate. The more the terrain varies, the more complex the polynomial approximation. 
+A lesson learned from this is to be critical to draw conclusions just by evaluating the MSE values. It may be that you in the end have to 
+evaluate to produced end product to be certain of which complexity that yields the best fit. 
 
 \subsubsection*{Ridge fit}
 \todo[inline]{TODO: Ridge conclusion and critical model selelction. Write similar story as done for OLS using surfaceplon}
