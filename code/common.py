@@ -374,7 +374,7 @@ def SVDinv(A):
 
 
 @timer
-def bootstrap(x, y, t, maxdegree, n_bootstraps, model, seed, scale_X=True, scale_t=False, skip_intercept=True):
+def bootstrap(x, y, t, maxdegree, n_bootstraps, model, seed, test_size=0.2, scale_X=True, scale_t=False, skip_intercept=True):
 
     MSE_test = np.zeros(maxdegree)
     MSE_train = np.zeros(maxdegree)
@@ -385,7 +385,7 @@ def bootstrap(x, y, t, maxdegree, n_bootstraps, model, seed, scale_X=True, scale
     for degree in tqdm(range(1, maxdegree+1), desc=f"Looping trhough polynomials up to {maxdegree} with {n_bootstraps}: "):
         X = create_X(x, y, n=degree)
         X_train, X_test, t_train, t_test = prepare_data(
-            X, t_flat, seed, test_size=0.2, shuffle=True, scale_X=scale_X, scale_t=scale_t, skip_intercept=skip_intercept)
+            X, t_flat, seed, test_size=test_size, shuffle=True, scale_X=scale_X, scale_t=scale_t, skip_intercept=skip_intercept)
 
         t_hat_train, t_hat_test = bootstrapping(
             X_train, t_train, X_test, t_test, n_bootstraps, model)
@@ -551,7 +551,7 @@ def plot_beta_errors(summaary_df: pd.DataFrame(), degree, fig=plt.figure()):
     return fig
 
 
-def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffle=False, random_state=None) -> np.ndarray:
+def cross_val_OLS(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffle=False, random_state=None) -> np.ndarray:
     """Function for cross validating on k folds. Scales data after split(standarscaler).
 
     Args:
@@ -593,7 +593,6 @@ def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffl
         scaler.fit(xtrain)
         xtrain_scaled = scaler.transform(xtrain)
         xtest_scaled = scaler.transform(xtest)
-        # sett bias to  1:
         xtrain_scaled[:, 0] = 1
         xtest_scaled[:, 0] = 1
 
@@ -609,7 +608,7 @@ def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffl
     return scores_KFold
 
 
-def cross_val_ex6(k: int, model: str, X: np.ndarray, z: np.ndarray, degree: int, lmb=None, shuffle=False, random_state=None) -> np.ndarray:
+def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, degree: int, lmb=None, shuffle=False, random_state=None, scale_t=True) -> np.ndarray:
     """Function for cross validating on k folds. Scales data after split(standarscaler).
 
     Args:
@@ -643,26 +642,27 @@ def cross_val_ex6(k: int, model: str, X: np.ndarray, z: np.ndarray, degree: int,
         xtrain_scaled = data_scaler.transform(xtrain)
         xtest_scaled = data_scaler.transform(xtest)
 
-        target_scaler = StandardScaler()
-        target_scaler.fit(ztrain)
-        ztrain_scaled = target_scaler.transform(ztrain)
-        ztest_scaled = target_scaler.transform(ztest)
+        if scale_t == True:
+            target_scaler = StandardScaler()
+            target_scaler.fit(ztrain)
+            ztrain = target_scaler.transform(ztrain)
+            ztest = target_scaler.transform(ztest)
 
         if model == "Ridge":
             model = RidgeRegression(lmb)
-            model.fit(xtrain_scaled, ztrain_scaled)
+            model.fit(xtrain_scaled, ztrain)
         elif model == "Lasso":
             model = lm.Lasso(alpha=lmb)
-            model.fit(xtrain_scaled, ztrain_scaled)
+            model.fit(xtrain_scaled, ztrain)
         elif model == "OLS":
             model = OLS(degree=degree)
-            model.fit(xtrain_scaled, ztrain_scaled)
+            model.fit(xtrain_scaled, ztrain)
         else:
             "Provide a valid model as a string(Ridge/Lasso/OLS) "
 
         zpred = model.predict(xtest_scaled)
 
-        scores_KFold[j] = MSE(zpred, ztest_scaled)
+        scores_KFold[j] = MSE(zpred, ztest)
         j += 1
 
     return scores_KFold
