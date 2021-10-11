@@ -1,4 +1,4 @@
-# FYS-STK4155-Prj1_report
+# FYS-STK4155 Project 1
 
 ## Installation:
 
