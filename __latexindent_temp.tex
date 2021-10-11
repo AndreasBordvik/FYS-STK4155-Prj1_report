@@ -497,7 +497,7 @@ In the first part of this project, an infinite number of data points could easil
 
 In the previous task, bootstrap was used to provide better estimates of a model's performance.  In this task, we will implement the cross-validation method to better measure the model's ability to generalize. 
 
-This algorithm is implemented by dividing the dataset into K parts of roughly the same size. In this project, we try K values ranging from 5 to 10, which also coincides with best-practice values \cite{Hastie2009}.  We have implemented the split into K-folds by using the method K-fold from Scikit learn model-selection \cite{link_to_doc}. This method provides us with arrays of approximately equal size, consisting of indices for choosing test- and train data.  Each fold is then used once as a test set, while the remaining K-1 folds make up the training set. The overall purpose of this method is to produce an estimate of the prediction error, given by:
+This algorithm is implemented by dividing the dataset into K parts of roughly the same size. In this project, we try K values ranging from 5 to 10, which also coincides with best-practice values. \cite{Hastie2009}  We have implemented the split into K-folds by using the method K-fold from Scikit learn model-selection. \cite{scikit-learn} This method provides us with arrays of approximately equal size, consisting of indices for choosing test- and train data.  Each fold is then used once as a test set, while the remaining K-1 folds make up the training set. The overall purpose of this method is to produce an estimate of the prediction error, given by:
 
 \[
   \text{CV}(\hat{f}) = \frac{1}{K}
@@ -506,7 +506,15 @@ This algorithm is implemented by dividing the dataset into K parts of roughly th
 
 where $\hat{f}^{-k}(x)$ denotes the fitted function, in this case the linear regression model, with the \emph{k}th part of the data removed.\cite{Hastie2009}  
 
-The following figures provide a visualizes the results of 5-10 fold cross-validation on a dataset consisting of a total of $484$ points. The MSE for polynomial degrees ranging from 3 to 14 is then calculated. Here we present the results from degrees 3 and 10, while the remaining is available in the github figures folder. 
+The following figures provides visualizations of the results for 5-10 fold cross-validation on a dataset consisting of a total of $484$ points. The MSE for polynomial degrees ranging from 3 to 14 is then calculated. Here we present the results from degrees 3 and 10, while the remaining is available in the github figures folder. 
+
+In Figures (\ref{fig:mse_cv_boot1}) and (\ref{fig:mse_cv_boot2}), these results are visualized. From the plots, we can see the difference in the estimated error between the two resampling methods. The first thing to notice is that the mean bootstrap error is not contained in the standard deviation for any of the five different selected folds. The estimated MSE between the two methods are consistently different, with bootstrap resulting in a higher value of a varying degree.  Both methods are dependent on hyperparameters. For the bootstrap method, the number of performed resamples can have a significant impact on the estimated error. For exmple given a small dataset, the number of times a given datapoint is re-used in the sample process might shift the predictors to be biased towards a certain pattern. This in turn, can lead to tendencies of overfitting.
+
+This problem is somewhat circumvented in Cross-validation, as there is no possbility for overlap between datapoints in the training data caused by a resample with replacement. However problems may although arise if limited datasets are cross-validated using a large k-value. This particular case could lead to a test sample containing significantly, and as a result unrelated, data which might lead to prediction errors unrepresentative of the model.
+
+Given our results, for the ordinary least squares regression case, cross validation might be a more favorable resampling technique as the standard error regardless of the fold used is somewhat contained. Though it is important to state that bootstrap and cross-validation are resampling techniques which do complement each other nicely as they give us separate interpretations of the estimated error. 
+
+Moreover, due to the nature of each resampling algorithm, the scaling of their respective training data is not performed equally. Whereas the bootstrap produces a mean over the entire resampled training-data, cross validation produces a separate mean for each of the K partitions of the dataset. Hence, though this would not drastically change the final estimated error as we have seen, the methods are not directly comparable as a result. 
 
 -error i bootstrap ikke inneholdt i CV
 -bootstrap konsekvent forskjellig 
@@ -516,19 +524,20 @@ The following figures provide a visualizes the results of 5-10 fold cross-valida
 - syns k-fold er mer robust selv med variasjoner . 
 -fordelen med CV er at man uansett vil trene og teste på all data. 
 -vanskelig å sammenligne direkte etttersom de er skalert på forskjellig grunnlag som er gitt av algoens natur. 
+over/underestimerer MSE? 
 
-\begin{figure}[h]
+\begin{figure}
   \centering
-  \includegraphics[scale=0.75]{figures/EX3_mse_cv_boot3.pdf}
-  \caption{\label{fig:?} Mean MSE from CV and bootstrap at ploynomial degree = 3.}
+  \includegraphics[scale=0.70]{figures/EX3_mse_cv_boot3.pdf}
+  \caption{\label{fig:mse_cv_boot1} Mean MSE from CV and bootstrap at ploynomial degree = 3.}
 \end{figure}
 
 
 
-\begin{figure}[h]
+\begin{figure}
   \centering
-  \includegraphics[scale=0.75]{figures/EX3_mse_cv_boot10.pdf}
-  \caption{\label{fig:?}Mean MSE from CV and bootstrap at ploynomial degree = 10.}
+  \includegraphics[scale=0.70]{figures/EX3_mse_cv_boot10.pdf}
+  \caption{\label{fig:mse_cv_boot2}Mean MSE from CV and bootstrap at ploynomial degree = 10.}
 \end{figure}
 
 
