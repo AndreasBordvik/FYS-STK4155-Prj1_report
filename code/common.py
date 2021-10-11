@@ -610,7 +610,7 @@ def bootstrapping_lasso(X_train: np.ndarray, t_train: np.ndarray, X_test: np.nda
     return t_hat_trains, t_hat_tests
 
 
-def plot_beta_errors_for_lambdas(summaries_df: pd.DataFrame(), degree: int) -> plt:
+def plot_beta_errors_for_lambdas(summaries_df: pd.DataFrame(), degree: int):
     """Plotting function 
 
     Args:
@@ -662,7 +662,7 @@ def plot_beta_errors_for_lambdas(summaries_df: pd.DataFrame(), degree: int) -> p
     return fig
 
 
-def plot_beta_CI_for_lambdas(summaries_df: pd.DataFrame(), degree: int) -> plt:
+def plot_beta_CI_for_lambdas(summaries_df: pd.DataFrame(), degree: int):
     """PLotting function for plotting confidence interval for lambda
 
      Args:
@@ -710,7 +710,7 @@ def plot_beta_CI_for_lambdas(summaries_df: pd.DataFrame(), degree: int) -> plt:
     return fig
 
 
-def plot_beta_errors(summaary_df: pd.DataFrame(), degree: int, fig=plt.figure()) -> plt:
+def plot_beta_errors(summaary_df: pd.DataFrame(), degree: int, fig=plt.figure()):
     """Plotting function to plot beta errors. 
 
     Args:
