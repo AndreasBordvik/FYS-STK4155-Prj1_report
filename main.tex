@@ -516,16 +516,6 @@ Given our results, for the ordinary least squares regression case, cross validat
 
 Moreover, due to the nature of each resampling algorithm, the scaling of their respective training data is not performed equally. Whereas the bootstrap produces a mean over the entire resampled training-data, cross validation produces a separate mean for each of the K partitions of the dataset. Hence, though this would not drastically change the final estimated error as we have seen, the methods are not directly comparable as a result. 
 
--error i bootstrap ikke inneholdt i CV
--bootstrap konsekvent forskjellig 
--boot significant høyere
--bootst avhengig av hyperparameter(antall straps), sensitiv til størr på dataset
-- CV også sensitiv, spesielt ved små dataset. 
-- syns k-fold er mer robust selv med variasjoner . 
--fordelen med CV er at man uansett vil trene og teste på all data. 
--vanskelig å sammenligne direkte etttersom de er skalert på forskjellig grunnlag som er gitt av algoens natur. 
-over/underestimerer MSE? 
-
 \begin{figure}
   \centering
   \includegraphics[scale=0.70]{figures/EX3_mse_cv_boot3.pdf}
@@ -561,9 +551,9 @@ The scores from Scikit-learn needed to be multiplied with $-1$ before beeing com
 
 
 \section*{Exercise 4}
-Throughout Exercise 1 - 3, we have studied function fitting using the Ordinary Least Squares regression. When comparing models, we have plotted the test error as a function of the model complexity and chosen a model based on the bias-variance tradeoff. The bias-variance tradeoff has also been studied in light of resampling techniques such as the bootstrap and k-fold cross-validation. As we have seen when interpreting the result of the resampling, an increased degree of freedom for the model will make the model more prone to overfit.
+Throughout Exercise 1 - 3, we have studied function fitting using the Ordinary Least Squares regression. When comparing models, we have plotted the test error as a function of the model complexity and chosen a model based on an optimal degree which was found analyzing the bias-variance tradeoff and minimum MSE from resampling the data. The minimum MSE has been studied in light of resampling techniques such as the bootstrap and k-fold cross-validation. As we have seen when interpreting the result of the resampling, an increased degree of freedom for the model will make the model more prone to overfit.
 
-Instead of reducing the degree of freedom of a model by limiting it's order, we will in this section look at a different approach for model selection through the introduction of a regularization parameter $\lambda$. With the regularization parameter, individual predictors in the model can be restrained without resorting to reducing the overall order of the model. The regularization term will punish the predictors such that they stray from reaching large values, adding another method to control overfitting. \cite{Bishop2016}
+Instead of reducing the degree of freedom of a model by limiting it's higest order, we will in the coming sections look at a different approach for model selection through the introduction of a regularization parameter $\lambda$. With the regularization parameter, individual predictors in the model can be restrained without resorting to reducing the overall order of the model. The regularization term will punish the predictors such that they stray from reaching large values, adding another method to control overfitting. \cite{Bishop2016}
 
 Ridge regression is a regression model where the weights are constrained. \cite{Geron2019} This is done by adding a regularization term to the cost function, such that the function we are to optimize becomes
 \[
@@ -583,18 +573,18 @@ As there are no universally best learning algorithm for fitting the problem at h
 \subsection*{Weight Decay}
 The Cost function for Ridge regression can be seen as the Cost function for Ordinary Least Squares with an added weight decay term $\lambda\bm{\beta}^\text{T}\bm{\beta}$. The parameter $\lambda$ is known as a hyperparameter, i.e. the parameter can be controlled before fitting the model and changes how the model behaves during fitting and predicting. \cite{Goodfellow2016} Moreover, $\lambda \geq 0$, such that $\lambda$ close to $0$ implies Ordinary Least Squares and $\lambda$ large implies that the predictors are close to $0$. Hence the term weight decay, as the hyperparamter can be tuned to enforce some predictors (weights) to gradually be excluded from the model fit.
 
-For this Exercise, we will analyse the effect of the weight decay when fitting the Franke Function using Ridge regression. We will analyse the polynomial of optimal degree that we determined in the previous exercises through assessing the bias-variance tradeoff for an increased model complexity. Firstly with the bootstrap resampling technique, then compared the bootstrap MSE with what was obtained using the k-fold cross validation. With the model complexity
+For this Exercise, we will analyse the effect of the weight decay when fitting the Franke Function using Ridge regression. Firstly with the bootstrap resampling technique, then compared the bootstrap MSE with what was obtained using the k-fold cross validation. With the model complexity
 
 \subsection*{Implementing Ridge regression}
-Our implementation of Ridge regression follow closely that of Ordinary Least Squares, but with an input parameter $\lambda$ determining the strength of the regularization term. Furthermore, the implementation differs as the normal equation for computing the optimal predictors have changed to $\bm{\hat{\beta}} = \left(\bm{X}^\text{T}\bm{X} + \bm{\lambda}\bm{I}\right)^{-1}\bm{X}^\text{T}\bm{y}$. When implementing Ridge regression, we follow the convention that the intercept is skipped when fitting the function, hence we start computing the regularization term starting at $\beta_1$. \cite{Geron2019} if the intercept were included, the regularizer would be dependant on the choice of origin for the target, which generally causes the mean squared error to increase as touched upon during the first Exercise.
+Our implementation of Ridge regression follow closely that of Ordinary Least Squares, but with an input parameter $\lambda$ determining the strength of the regularization term. Furthermore, the implementation differs as the normal equation for computing the optimal predictors have changed to $\bm{\hat{\beta}} = \left(\bm{X}^\text{T}\bm{X} + \bm{\lambda}\bm{I}\right)^{-1}\bm{X}^\text{T}\bm{y}$. When implementing Ridge regression, we follow the convention that the intercept is skipped when fitting the function, hence we start computing the regularization term starting at $\beta_1$. \cite{Geron2019} If the intercept were included, the regularizer would be dependant on the choice of origin for the target, which generally causes the mean squared error to increase as touched upon during the first Exercise.
 
 \begin{figure}
   \centering
   \includegraphics[scale=0.75]{figures/EX4_beta_plot_ridge_2.pdf}
-  \caption{\label{fig:ridge_beta_1}Plot of the weight decay on the individual predictors for our Ridge regression with a second order polynomial}
+  \caption{\label{fig:ridge_decay_beta}Plot of the weight decay on the individual predictors for our Ridge regression with a second order polynomial}
 \end{figure}
 
-Figure (\ref{fig:ridge_beta_1}) shows the effect of the regularizer for a fitted model of order 2. The figure clearly shows the weight decay, as the individual predictors start off essentially unaffected, until they are gradually decayed to 0 at independent rates. additionally, following the weight decay plot, we can understand how the regularizer affects the final model fit as already mentioned in the previous section. The case of the regularization parameter $\lambda$ achieving larger values, which forces all predictors to become 0, would result in the fitted model being a flat plane centered around the bias 0. Thus, to study where the regularization parameter would attain an optimal fit, we plot a Search Landscape over all degrees and lambda values.
+Figure (\ref{fig:ridge_decay_beta}) shows the effect of the regularizer for a fitted model of order 2. The figure clearly shows the weight decay, as the individual predictors start off essentially unaffected, until they are gradually decayed to 0 at independent rates. Additionally, following the weight decay plot, we can understand how the regularizer affects the final model fit as already mentioned in the previous section. The case of the regularization parameter $\lambda$ achieving larger values, which forces all predictors to become 0, would result in the fitted model being a flat plane centered around the bias 0. Thus, to study where the regularization parameter would attain an optimal fit, we plot a Search Landscape over all degrees and lambda values.
 
 \begin{figure}
   \centering
@@ -626,7 +616,10 @@ We use the bootstrap method developed in \nameref{ex:2} to study the bias-varian
   \caption{\label{sfig:ridge_beta_1}Bias-Variance tradeoff for different values of $\lambda$ with 400 datapoints}
 \end{figure}
 
-By inspecting Figure (\ref{fig:ridge_beta_1}), it can be seen that the plot is visually identical to Figure (\ref{fig:bias-variance}). This is probably a result of the regularization term being so small that its effect on the predictors is negligible. Following Figure (\ref{fig:ridge_beta_1}), it can be seen that Ridge regression reverts to Ordinary Least Squares as the regularization parameter goes towards zero.
+
+Following Figure (\ref{fig:ridge_beta_1}), it can be seen that Ridge regression reverts to Ordinary Least Squares as the regularization parameter goes towards zero. This is probably a result of the regularization term being so small that its effect on the predictors is negligible. As the complexity of the model is increased, there is an significant increase in the variance when reaching polynomial degree 7. 
+
+Since bias variance 
 
 Figure (\ref{fig:ridge_beta_2}) shows the opposite case where the regularization parameter is maxed out to $\lambda = 10^4$. Where the previous figure showed that as regularization goes to 0, Ridge reverts back to OLS, Figure (\ref{fig:ridge_beta_2}) shows the result of too much regularization as discussed in the previous subsection. Namely that the result of Ridge regression with too much regularization increases the model bias while also decreasing the model variance. Furthermore, this indicates that model predictions made with a too regularized Ridge model goes towards the model bias.
 
