@@ -183,6 +183,7 @@ The R2 score (coefficient of determination) is another metric that can be relate
 
 \todo[inline]{TODO: Possibly more one implementation} 
 \todo[inline]{TODO: Add the plot showing all predicitons up to degree} 
+\todo[inline]{TODO: R2 score must be plottet and briefly discussed} 
 
 \subsection*{Scaling the data}
 Our motivation for scaling the data arise in the context of fitting a design matrix of predictors with different units. To avoid having to disregard some predictors in favor of others based on their unit, not necessarily their contribution to the function fit, a scaling of the data is performed. By scaling the data using one of several scaling techniques, we ensure that all predictors lie in the same reference domain, resulting in a more accurate representation of the predictors. Furthermore, scaled data generally increases model skill. SciKit-learn includes several different Scalers, such as the StandardScaler and MinMaxScaler. \cite{scikit-learn} For this discussion, the StandardScaler will be inspected.
@@ -397,25 +398,25 @@ Lastly, it should be noted that the bias-variance tradeoff measuremnet is perfor
 \end{figure}
 
 
-Figure 7(a) visualizes a polynomial degree where this point lies within the given model.  With a dataset consisting of 400 data points, one can see a rapid increase in variance at degree 11. Here the model is starting to produce results that deviate from the expected estimator values. At degree 17, there is a drastic increase in the variance, while the bias is moving towards zero. This is clear evidence of the model being overfitted to the training data. 
+Figure 7(a) visualizes a polynomial fit where we can observe indications of overfitting.  With a dataset consisting of 400 data points, one can see a rapid increase in variance at degree 11. At the same time, the bias is decreasing.  Here the model is starting to produce results that deviate from the expected estimator values. At degree 17, there is a drastic increase in the variance, while the bias is moving towards zero. This is an indication of evidence of the model being overfitted to the training data. 
 
-On the other hand, increasing the dataset to contain 1600 data points produces completely different results. The percentage of data used in training is kept constant between these two examples, resulting in the increase from 320 data points to 1280. This gives the model a significantly better foundation for generalizing on the data, hence resulting in a much lower MSE at the degrees in the higher range of the interval in question. At this number of data points, there is still no clear evidence of overfitting.  
+On the other hand, increasing the dataset to contain 1600 data points produces completely different results. The percentage of data used in training is kept constant between these two examples, resulting in the increase from 320 training data points to 1280. This gives the model a significantly better foundation for generalizing the predictors, hence resulting in a much lower MSE at the degrees in the higher range of the interval in question. At this number of data points, there is still no clear evidence of overfitting in chosen range of polynomial degrees. 
 
 \subsection*{Some words on bootstrapping}
 As described in the preceding task, we split our data into several subsets used for different purposes. The overall objective is to train a model on a given subset and then measure how well it performs on a new unseen data set. However, a dilemma that may emerge from this approach is that our data only represents a sample from an unknown distribution. We run the risk of measuring a predicted error that deviates from the actual probability by iterating through our data points only once.
 
-Therefore, we impose resampling methods on our data to produce a more realistic estimate of the error.This will help us in the the process of assesing the model. The following algorithm will demonstrate how the bootstrap is performed to achieve this:
+Therefore, we impose resampling methods on our data to produce a more realistic estimate of the error. This will help us in the the process of assesing the model. The following algorithm will demonstrate how the bootstrap is performed to achieve this:
 
-We have some data, which consists of training data:
+We have some data, which consists of \emph{training} data:
 
-$$X = [x_1,x_2,...,x_n]$$
+$$\bm{X} = [x_1,x_2,...,x_n]$$
 and their respective target labels:
 $$\bm{y} = [y_1,y_2,...,y_n]$$
 
 
-(I) A new sample is then drawn. This dataset will have the same dimension as D, but as it is drawn with replacements, they will differ from eachother as the latter has a probability of drawing the same sample mulitple times:
+(I) A new sample is then drawn. This dataset will have the same dimension as D, but as it is drawn with replacements, they will differ from eachother as the latter has a probability of drawing the same data points mulitple times:
 
-$$X^* = x_{1}^{*}, x_{2}^{*}, ... ,x_{n}^{*}$$
+$$\bm{X^*} = x_{1}^{*}, x_{2}^{*}, ... ,x_{n}^{*}$$
 $$\bm{y}^*= y_{1}^{*}, y_{2}^{*}, ... ,y_{n}^{*}$$
 
 (II)This sample is then used to create new set of predictors:
@@ -442,14 +443,14 @@ Step I-IV is then repeated $B$ times, while keeping track of each sample MSE. Af
   \begin{subfigure}{0.49\textwidth}
       \centering
       \includegraphics[width=\textwidth]{figures/EX2_model_complexity_using_bootstrap_function_n_22_testsize_0.2.pdf}
-      \caption{400 datapoints, 200 bootstraps}
+      \caption{400 datapoints, 200 bootstraps, with test size = 0.2}
       \label{fig:bootstrap_bias_var_n_20}
   \end{subfigure}
   \hfill
   \begin{subfigure}{0.49\textwidth}
       \centering
       \includegraphics[width=\textwidth]{figures/EX2_model_complexity_using_bootstrap_function_n_40_testsize_0.2.pdf}
-      \caption{1600 datapoints, 800 bootstraps}
+      \caption{1600 datapoints, 800 bootstraps, with test size = 0.2}
       \label{fig:bootstrap_bias_var_n_30}
   \end{subfigure}
 
@@ -464,14 +465,14 @@ Step I-IV is then repeated $B$ times, while keeping track of each sample MSE. Af
   \begin{subfigure}{0.49\textwidth}
       \centering
       \includegraphics[width=\textwidth]{figures/EX2_model_complexity_using_bootstrap_function_n_22_testsize_0.3.pdf}
-      \caption{400 datapoints, 200 bootstraps}
+      \caption{400 datapoints, 200 bootstraps, with test size = 0.3}
       \label{fig:bootstrap_bias_var_n_20}
   \end{subfigure}
   \hfill
   \begin{subfigure}{0.49\textwidth}
       \centering
       \includegraphics[width=\textwidth]{figures/EX2_model_complexity_using_bootstrap_function_n_40_testsize_0.3.pdf}
-      \caption{1600 datapoints, 800 bootstraps}
+      \caption{1600 datapoints, 800 bootstraps, with test size = 0.3}
       \label{fig:bootstrap_bias_var_n_30}
   \end{subfigure}
 
@@ -479,7 +480,13 @@ Step I-IV is then repeated $B$ times, while keeping track of each sample MSE. Af
      \label{fig:bootstrap_bias_var}
 \end{figure}
 
+Figure 8 visualizes a model being fit to a model with a complexity ranging from polynomial degree 1 to 15. However, in this figure, bootstrapping was implemented to resample the data. This creates different results from the plots in figure 7. In figure that 7a, the rapid increase in variance can be seen already at polynomial degree 7. At this point, the mean squared error for the test data is already greater than 1.  This can suggest that the model has started overfitting and lost its ability to generalize. 
 
+When comparing figure 8b to 7b, one can see the same trends as described above. At around degree 12 in figure 8b, the variance is starting to increase and varies greatly between the preceding degrees. This variation in values could be an indication of overfitting. 
+
+In figure 9, the same parameters for the size of data and number of bootstraps remain constant, but here the test size is increased from 0.2 to 0.3, which also creates differences in the results when comparing to figure 8. When comparing figure 8a to 9a, the pattern in 8a is of a different nature than the one present in 9a. The increase in variance can be seen at roughly the same polynomial degree, 6, but 8a shows a distinct zigzag pattern, while 9a has a smoother curve. The MSE in 9a is also magnitudes higher than in 8a. This might be due to the fact that the model in 9a has been trained on a smaller part of the data compared to 8a. This could have lead to the model in 9a being biased to certain data points, hence lost some of its abilities to generalize. 
+
+However, in figure 9b, we see the effect of a larger data set. Here the test size is also increased from figure 8b, but the variance does not suffer under the same increase we observed in figure 9a. This might be due to the fact that the model has had enough data points in the training phase to still be able to generalize well on new, unseen data. 
 
 
 \section*{\label{ex:3}Exercise 3}
@@ -496,23 +503,29 @@ This algorithm is implemented by dividing the dataset into K parts of roughly th
 
 where $\hat{f}^{-k}(x)$ denotes the fitted function, in this case the linear regression model, with the \emph{k}th part of the data removed.\cite{Hastie2009}  
 
-The following figures provide a visualizes the results of 5-10 fold cross-validation on a dataset consisting of a total of $22^2$ points\cite{notebook_exc3}. The MSE for polynomial degrees ranging from 3 to 14 is then calculated. Here we present the results from degrees 4 and 12, while the remaining is available in {.......}
+The following figures provide a visualizes the results of 5-10 fold cross-validation on a dataset consisting of a total of $484$ points. The MSE for polynomial degrees ranging from 3 to 14 is then calculated. Here we present the results from degrees 3 and 10, while the remaining is available in the github figures folder. 
 
-
-The MSE estimated by bootstrap for the corresponding polynomial degree is also plotted. As figure ? displays,  at degree 4, the size of K seems to be of little importance, as the mean MSE of every fold is moderately low at approximately 0.10, with a standard deviation ranging from 0.8 to .012.
+-error i bootstrap ikke inneholdt i CV
+-bootstrap konsekvent forskjellig 
+-boot significant høyere
+-bootst avhengig av hyperparameter(antall straps), sensitiv til størr på dataset
+- CV også sensitiv, spesielt ved små dataset. 
+- syns k-fold er mer robust selv med variasjoner . 
+-fordelen med CV er at man uansett vil trene og teste på all data. 
+-vanskelig å sammenligne direkte etttersom de er skalert på forskjellig grunnlag som er gitt av algoens natur. 
 
 \begin{figure}[h]
   \centering
-  \includegraphics[scale=0.75]{figures/EX3_mse_cv_boot4.pdf}
-  \caption{\label{fig:?} Mean MSE from CV and bootstrap at ploynomial degree = 4.}
+  \includegraphics[scale=0.75]{figures/EX3_mse_cv_boot3.pdf}
+  \caption{\label{fig:?} Mean MSE from CV and bootstrap at ploynomial degree = 3.}
 \end{figure}
 
 
 
 \begin{figure}[h]
   \centering
-  \includegraphics[scale=0.75]{figures/EX3_mse_cv_boot12.pdf}
-  \caption{\label{fig:?}ean MSE from CV and bootstrap at ploynomial degree = 12.}
+  \includegraphics[scale=0.75]{figures/EX3_mse_cv_boot10.pdf}
+  \caption{\label{fig:?}Mean MSE from CV and bootstrap at ploynomial degree = 10.}
 \end{figure}
 
 
