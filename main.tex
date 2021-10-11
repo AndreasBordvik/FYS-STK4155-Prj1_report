@@ -183,6 +183,7 @@ The R2 score (coefficient of determination) is another metric that can be relate
 
 \todo[inline]{TODO: Possibly more one implementation} 
 \todo[inline]{TODO: Add the plot showing all predicitons up to degree} 
+\todo[inline]{TODO: R2 score must be plottet and briefly discussed} 
 
 \subsection*{Scaling the data}
 Our motivation for scaling the data arise in the context of fitting a design matrix of predictors with different units. To avoid having to disregard some predictors in favor of others based on their unit, not necessarily their contribution to the function fit, a scaling of the data is performed. By scaling the data using one of several scaling techniques, we ensure that all predictors lie in the same reference domain, resulting in a more accurate representation of the predictors. Furthermore, scaled data generally increases model skill. SciKit-learn includes several different Scalers, such as the StandardScaler and MinMaxScaler. \cite{scikit-learn} For this discussion, the StandardScaler will be inspected.
@@ -285,7 +286,7 @@ For the rest of this assignment up to and including Exercise 5, we will add nois
 \subsection*{The bias-variance trade-off analysis}
 
 Moving on to the bias-variance trade-off analysis, we start off by showing that
-
+\todo[inline]{TODO: add new figure9 with different test size. Comment on results and compare}
 \[
   C(\bm{X},\bm{\beta}) =\frac{1}{n}\sum_{i=0}^{n-1}(y_i-\tilde{y}_i)^2=\mathbb{E}\left[(\bm{y}-\bm{\tilde{y}})^2\right]
 \]
@@ -500,7 +501,7 @@ However, when evaluating the results provided, it is of great importance to also
 \subsection*{Comparing methods}
 
 
-
+\todo[inline]{TODO: skriv mer om SKlearn comparison mot vår}
 \begin{figure}[h]
   \centering
   \includegraphics[scale=0.75]{figures/EX3_sk_vs_implemented_CV.pdf}
