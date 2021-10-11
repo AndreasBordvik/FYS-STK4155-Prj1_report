@@ -17,6 +17,7 @@ from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from random import random, seed
 from sklearn.model_selection import KFold
 from sklearn import linear_model
+from typing import Callable, Tuple
 
 
 # Setting global variables
@@ -38,6 +39,9 @@ EX6_5 = f"{EX6}{EX5}"
 
 
 class Regression():
+    """ Super class containing methods for fitting, predicting and producing stats for regression models.   
+    """
+
     def __init__(self):
         self.betas = None
         self.X_train = None
@@ -49,22 +53,40 @@ class Regression():
         self.SE_betas = None
 
     def fit(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
+        """Polymorph 
+
+        """
         pass
 
     @property
-    def get_all_betas(self):
+    def get_all_betas(self) -> np.ndarray:
+        """Returns predictor values
+
+        Returns:
+            [np.ndarray]: betas
+        """
         return self.betas
 
     def predict(self, X: np.ndarray) -> np.ndarray:
-        # print("from predict: self.keep_intercept:",self.keep_intercept)
+        """Performs a prediction:       
 
-        # print("betas.shape in predict:",self.betas.shape)
-        # print("X.shape in predict:",X.shape)
+        Args:
+            X (np.ndarray): input data
+
+        Returns:
+            np.ndarray: Predicted values
+        """
+
         prediction = X @ self.betas
         return prediction
 
     @property
     def SE(self):
+        """Returns the standard error
+
+        Returns:
+            [type]: [description]
+        """
         var_hat = (1./self.X_train.shape[0]) * \
             np.sum((self.t_train - self.t_hat_train)**2)
 
@@ -75,7 +97,12 @@ class Regression():
                 self.X_train.T @ self.X_train))
         return np.sqrt(var_hat * invXTX_diag)
 
-    def summary(self):
+    def summary(self) -> pd.DataFrame:
+        """Produces a summary with coeffs,  STD, confidence intervals
+
+        Returns:
+            [pd.DataFrame]: dataframe with values. 
+        """
         # Estimated standard error for the beta coefficients
         N, P = self.X_train.shape
         SE_betas = self.SE
@@ -100,12 +127,33 @@ class Regression():
 
 
 class OLS(Regression):
+    """Class for ordinary least squares regression. 
+
+    Args:
+        Regression ([Class]): Class to inherit. 
+    """
+
     def __init__(self, degree=1, param_name="degree"):
+        """init.
+
+        Args:
+            degree (int, optional): [description]. Defaults to 1.
+            param_name (str, optional): [description]. Defaults to "degree".
+        """
         super().__init__()
         self.param = degree
         self.param_name = param_name
 
     def fit(self, X: np.ndarray, t: np.ndarray) -> np.ndarray:
+        """Function to fit model
+
+        Args:
+            X (np.ndarray): Input data
+            t (np.ndarray): target data
+
+        Returns:
+            np.ndarray: Predicted values. 
+        """
         #self.SVDfit = SVDfit
         #self.keep_intercept = keep_intercept
         # if keep_intercept == False:
@@ -126,17 +174,44 @@ class OLS(Regression):
 
 
 class LinearRegression(OLS):
+    """Linear regression model
+
+    Args:
+        OLS (Class): Class to inherit. 
+    """
+
     def __init__(self):
         super().__init__()
 
 
 class RidgeRegression(Regression):
+    """Class for Ridge Regression
+
+    Args:
+        Regression (Class): Class to inherit
+    """
+
     def __init__(self, lambda_val=1, param_name="lambda"):
+        """init.
+
+        Args:
+            lambda_val (int, optional): [description]. Defaults to 1.
+            param_name (str, optional): [description]. Defaults to "lambda".
+        """
         super().__init__()
         self.param = self.lam = lambda_val
         self.param_name = param_name
 
     def fit(self, X: np.ndarray, t: np.ndarray) -> np.ndarray:
+        """Function to fit model and predict on same values. 
+
+        Args:
+            X (np.ndarray): Input data
+            t (np.ndarray): Target data
+
+        Returns:
+            np.ndarray: Predicted values. 
+        """
         #self.SVDfit = SVDfit
         #self.keep_intercept = keep_intercept
         # if keep_intercept == False:
@@ -158,18 +233,16 @@ class RidgeRegression(Regression):
         return self.t_hat_train
 
 
-class LassoRegression(Regression):
-    def __init__(self):
-        super().__init__()
-
-    def fit(self, X: np.ndarray, y: np.ndarray, lambda_val: float) -> np.ndarray:
-        X_T_X = X.T @ X
-        # beta punishing and preventing the singular matix
-        X_T_X += lambda_val * np.eye(X_T_X.shape[0])
-        self.betas = np.linalg.inv(X_T_X) @ X.T @ y
-
-
 def design_matrix(x: np.ndarray, features: int) -> np.ndarray:
+    """Produces a design matrix for testing purposes. 
+
+    Args:
+        x (np.ndarray): input data
+        features (int): number of feats.
+
+    Returns:
+        np.ndarray: Design matrix
+    """
     X = np.zeros((x.shape[0], features))
     x = x.flatten()
     for i in range(1, X.shape[1]+1):
@@ -177,16 +250,22 @@ def design_matrix(x: np.ndarray, features: int) -> np.ndarray:
     return X
 
 
-def prepare_data(X: np.ndarray, t: np.ndarray, random_state, test_size=0.2, shuffle=True, scale_X=False, scale_t=False, skip_intercept=True) -> np.ndarray:
-    # split in training and test data
-    '''
-    if random_state is None:
-        X_train, X_test, t_train, t_test = train_test_split(
-            X, t, test_size=test_size, shuffle=shuffle)
-    else:
-        X_train, X_test, t_train, t_test = train_test_split(
-            X, t, test_size=test_size, shuffle=shuffle, random_state=random_state)
-    '''
+def prepare_data(X: np.ndarray, t: np.ndarray, random_state, test_size=0.2, shuffle=True, scale_X=False, scale_t=False, skip_intercept=True) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Function to prepare data. Has the ability to set test size, shuffle, scale both X and t, and skip intercept. 
+
+    Args:
+        X (np.ndarray): Input data
+        t (np.ndarray): Target Data
+        random_state ([type]): Seed value
+        test_size (float, optional): Size of test data. Defaults to 0.2.
+        shuffle (bool, optional): Shuffles the data before split. Defaults to True.
+        scale_X (bool, optional): Scales x. Defaults to False.
+        scale_t (bool, optional): Scales target data. Defaults to False.
+        skip_intercept (bool, optional): Skips intercept. Defaults to True.
+
+    Returns:
+        Tuple: Arrays containing X_train, X_test, t_train, t_test
+    """
     X_train, X_test, t_train, t_test = train_test_split(
         X, t, test_size=test_size, shuffle=shuffle, random_state=random_state)
 
@@ -204,16 +283,30 @@ def prepare_data(X: np.ndarray, t: np.ndarray, random_state, test_size=0.2, shuf
     return X_train, X_test, t_train, t_test
 
 
-def manual_scaling(data):
-    """
-    Avoids the use of sklearn StandardScaler(), which also
+def manual_scaling(data: np.ndarray) -> np.ndarray:
+    """    Avoids the use of sklearn StandardScaler(), which also
     divides the scaled value by the standard deviation.
     This scaling is essentially just a zero centering
+
+    Args:
+        data (np.ndarray): Input data
+
+    Returns:
+        np.ndarray: Scaled data
     """
     return data - np.mean(data, axis=0)
 
 
-def standard_scaling(train, test):
+def standard_scaling(train: np.ndarray, test: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    """Scales data using the StandarScaler from sklearn.preprocessing
+
+    Args:
+        train (np.ndarray): Training data
+        test (np.ndarray): test data
+
+    Returns:
+        Tuple[np.ndarray, np.ndarray]: Scaled data
+    """
     scaler = StandardScaler()
     scaler.fit(train)
     train_scaled = scaler.transform(train)
@@ -222,6 +315,14 @@ def standard_scaling(train, test):
 
 
 def standard_scaling_single(data):
+    """Scales data using the StandarScaler from sklearn.preprocessing. For scaling a single dataset.    
+
+    Args:
+        data ([type]): Input data set       
+
+    Returns:
+        [type]: Scaled data
+    """
     scaler = StandardScaler()
     scaler.fit(data)
     data_scaled = scaler.transform(data)
@@ -229,6 +330,14 @@ def standard_scaling_single(data):
 
 
 def min_max_scaling(data):
+    """Scales data using the MinMaxScaler from sklearn.preprocessing
+
+    Args:
+        data ([type]): input data
+
+    Returns:
+        [type]: Scaled data
+    """
     scaler = MinMaxScaler()
     scaler.fit(data)
     data_scaled = scaler.transform(data)
@@ -236,6 +345,16 @@ def min_max_scaling(data):
 
 
 def create_X(x: np.ndarray, y: np.ndarray, n: int) -> np.ndarray:
+    """Function based on code from course website. Creates design matrix. 
+
+    Args:
+        x (np.ndarray): input data
+        y (np.ndarray): input data
+        n (int): Number of degrees
+
+    Returns:
+        np.ndarray: Design Matrix
+    """
     if (len(x.shape)) > 1:
         x = np.ravel(x)
         y = np.ravel(y)
@@ -254,10 +373,27 @@ def create_X(x: np.ndarray, y: np.ndarray, n: int) -> np.ndarray:
 
 
 def remove_intercept(X):
+    """Removes the intercept from design matrix
+
+    Args:
+        X ([type]): Design matrix
+
+    Returns:
+        [type]: Design matrix with intercept removed. 
+    """
     return X[:, 1:]
 
 
 def FrankeFunction(x: float, y: float) -> float:
+    """Function from course website. 
+
+    Args:
+        x (float): Input data
+        y (float): input data
+
+    Returns:
+        float: [description]
+    """
     term1 = 0.75*np.exp(-(0.25*(9*x-2)**2) - 0.25*((9*y-2)**2))
     term2 = 0.75*np.exp(-((9*x+1)**2)/49.0 - 0.1*(9*y+1))
     term3 = 0.5*np.exp(-(9*x-7)**2/4.0 - 0.25*((9*y-3)**2))
@@ -280,27 +416,12 @@ def timer(func) -> float:
     return timer_inner
 
 
-"""
-def create_X(x:np.ndarray, y:np.ndarray, n:int)->np.ndarray:
-	if len(x.shape) > 1:
-		x = np.ravel(x)
-		y = np.ravel(y)
-
-	N = len(x)
-	l = int((n+1)*(n+2)/2)  # Number of elements in beta
-	X = np.ones((N,l))
-
-	for i in range(1,n+1):
-		q = int((i)*(i+1)/2)
-		for k in range(i+1):
-			X[:,q+k] = (x**(i-k))*(y**k)
-
-    return X
-"""
-
-
 def FrankeFunctionMeshgrid() -> np.ndarray:
-    # Making meshgrid of datapoints and compute Franke's function
+    """Making meshgrid of datapoints and compute Franke's function
+
+    Returns:
+        np.ndarray: [description]
+    """
     n = 5
     N = 1000
     x = np.sort(np.random.uniform(0, 1, N))
@@ -310,14 +431,28 @@ def FrankeFunctionMeshgrid() -> np.ndarray:
     return X
 
 
-def bias_error_var(t_true, t_pred):
+def bias_error_var(t_true: np.ndarray, t_pred: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Returns bias, variance and MSE 
+
+    Args:
+        t_true ([np.ndarray]): predicted data
+        t_pred ([np.ndarray]): ground truth
+
+    Returns:
+        [Tuple]: bias, variance and MSE
+    """
     error = np.mean(np.mean((t_true - t_pred)**2, axis=1, keepdims=True))
     bias = np.mean((t_true - np.mean(t_pred, axis=1, keepdims=True))**2)
     variance = np.mean(np.var(t_pred, axis=1, keepdims=True))
     return error, bias, variance
 
 
-def plot_franke_function():
+def plot_franke_function() -> plt:
+    """Plots the franke function for some set values.  
+
+    Returns:
+        plt: plot. 
+    """
     fig = plt.figure()
     ax = fig.gca(projection='3d')
 
@@ -341,27 +476,19 @@ def plot_franke_function():
 
     plt.show()
 
-    """
-    def evaluate(targets, predictions):
-        targets = targets.flatten()
-        predictions = predictions.flatten()
-        # Can we use sklearn or de we have to write it from scratch?
-        MSE_score = MSE(targets, predictions)
-        # Can we use sklearn or de we have to write it from scratch?
-        R2_score = R2(targets, predictions)
-        bias = None
-        variance = None
-        return MSE_score, R2_score, bias, variance
-    """
 
-
-# TODO: The methods below are temporary
-
-def SVDinv(A):
-    ''' Takes as input a numpy matrix A and returns inv(A) based on singular value decomposition (SVD).
+def SVDinv(A: np.ndarray) -> np.ndarray:
+    """Takes as input a numpy matrix A and returns inv(A) based on singular value decomposition (SVD).
     SVD is numerically more stable than the inversion algorithms provided by
     numpy and scipy.linalg at the cost of being slower.
-    '''
+
+    Args:
+        A ([type]): Matrix
+
+    Returns:
+        [type]: inverse of A
+    """
+
     U, s, VT = np.linalg.svd(A)
 
     D = np.zeros((len(U), len(VT)))
@@ -374,15 +501,34 @@ def SVDinv(A):
 
 
 @timer
-def bootstrap(x, y, t, maxdegree, n_bootstraps, model, seed, test_size=0.2, scale_X=True, scale_t=False, skip_intercept=True, is_scikit=False):
+def bootstrap(x: np.ndarray, y: np.ndarray, t: np.ndarray, maxdegree: int, n_bootstraps: int, model, seed: int, test_size=0.2, scale_X=True, scale_t=False, skip_intercept=True, is_scikit=False) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Method to resample data using the bootstrap algorithm. This method is used to to prepare date to later used in the 
+        method bootstrapping() which performs  the actual bootstrapping. 
 
+    Args:
+        x ([np.ndarray]): input data in x-direction
+        y ([np.ndarray]): input data in y-direction
+        t ([np.ndarray]): target data
+        maxdegree ([int]): Max degree to create data and fit model on. 
+        n_bootstraps ([int]): Number of bootstraps to be performed.
+        model ([Callable]): Type of regression model
+        seed ([int]): random seed. 
+        test_size (float, optional): Size of test. Defaults to 0.2.
+        scale_X (bool, optional): scales x. Defaults to True.
+        scale_t (bool, optional): scales t. Defaults to False.
+        skip_intercept (bool, optional): skips intercept. Defaults to True.
+        is_scikit (bool, optional): For use with Lasso and scikit models. Defaults to False.
+
+    Returns:
+        Tuple[np.ndarray,np.ndarray,np.ndarray,np.ndarray]: MSE_test, MSE_train, bias, variance
+    """
     MSE_test = np.zeros(maxdegree)
     MSE_train = np.zeros(maxdegree)
     bias = np.zeros(maxdegree)
     variance = np.zeros(maxdegree)
     t_flat = t.ravel().reshape(-1, 1)
 
-    for degree in tqdm(range(1, maxdegree+1), desc=f"Looping trhough polynomials up to {maxdegree} with {n_bootstraps}: "):
+    for degree in tqdm(range(1, maxdegree+1), desc=f"Looping through polynomials up to {maxdegree} with {n_bootstraps}: "):
         X = create_X(x, y, n=degree)
         X_train, X_test, t_train, t_test = prepare_data(
             X, t_flat, seed, test_size=test_size, shuffle=True, scale_X=scale_X, scale_t=scale_t, skip_intercept=skip_intercept)
@@ -393,22 +539,13 @@ def bootstrap(x, y, t, maxdegree, n_bootstraps, model, seed, test_size=0.2, scal
             t_hat_train, t_hat_test = bootstrapping_lasso(
                 X_train, t_train, X_test, t_test, n_bootstraps, model)
 
-        # print(f"t_test.sxhape: {t_test.shape}")
-        # print(f"t_hat_test.shape: {t_hat_test.shape}")
-        # print(f"t_train.shape: {t_train.shape}")
-        # print(f"t_hat_train.shape: {t_hat_train.shape}")
         MSE_test[degree-1] = np.mean([MSE(t_test, t_hat_test[:, strap])
                                      for strap in range(n_bootstraps)])
         MSE_train[degree-1] = np.mean([MSE(t_train, t_hat_train[:, strap])
                                       for strap in range(n_bootstraps)])
 
-        # Test max and min vals:
         test_arr = [MSE(t_test, t_hat_test[:, strap])
                     for strap in range(n_bootstraps)]
-        # np.mean(np.mean((t_test - t_hat_test)**2, axis=1, keepdims=True))
-
-        # MSE_train[degree-1] = np.mean(
-        #     np.mean((t_train - t_hat_train)**2, axis=1, keepdims=True))
 
         bias[degree-1] = np.mean(
             (t_test - np.mean(t_hat_test, axis=1, keepdims=True))**2)
@@ -416,7 +553,21 @@ def bootstrap(x, y, t, maxdegree, n_bootstraps, model, seed, test_size=0.2, scal
     return MSE_test, MSE_train, bias, variance
 
 
-def bootstrapping(X_train, t_train, X_test, t_test, n_bootstraps, model):
+def bootstrapping(X_train: np.ndarray, t_train: np.ndarray, X_test: np.ndarray, t_test: np.ndarray, n_bootstraps: int, model) -> Tuple[np.ndarray, np.ndarray]:
+    """Function to perform the actual bootstrap. Draws n_bootstrap number of resamples. 
+
+    Args:
+        X_train (np.ndarray): Input data
+        t_train (np.ndarray): train targets
+        X_test (np.ndarray): Input data
+        t_test (np.ndarray): test targets
+        n_bootstraps (int): Number of bootstrap to perform.
+        model ([Callable]): Regression model 
+
+    Returns:
+        Tuple[np.ndarray,np.ndarray]: Predicted values on train and test.
+    """
+
     t_hat_trains = np.empty((t_train.shape[0], n_bootstraps))
     t_hat_tests = np.empty((t_test.shape[0], n_bootstraps))
     for i in range(n_bootstraps):
@@ -430,12 +581,27 @@ def bootstrapping(X_train, t_train, X_test, t_test, n_bootstraps, model):
 
     return t_hat_trains, t_hat_tests
 
-def bootstrapping_lasso(X_train, t_train, X_test, t_test, n_bootstraps, model):
+
+def bootstrapping_lasso(X_train: np.ndarray, t_train: np.ndarray, X_test: np.ndarray, t_test: np.ndarray, n_bootstraps: int, model) -> Tuple[np.ndarray, np.ndarray]:
+    """Function to perform the actual bootstrap, adapted to work with scikit models. Draws n_bootstrap number of resamples. 
+
+    Args:
+        X_train (np.ndarray): Input data
+        t_train (np.ndarray): train targets
+        X_test (np.ndarray): Input data
+        t_test (np.ndarray): test targets
+        n_bootstraps (int): Number of bootstrap to perform.
+        model ([Callable]): Regression model 
+
+    Returns:
+        Tuple[np.ndarray,np.ndarray]: Predicted values on train and test.
+    """
+
     t_hat_trains = np.empty((t_train.shape[0], n_bootstraps))
     t_hat_tests = np.empty((t_test.shape[0], n_bootstraps))
     for i in range(n_bootstraps):
         X, t = resample(X_train, t_train)
-        model.fit(X,t)
+        model.fit(X, t)
         t_hat_train = model.predict(X_train)
         t_hat_test = model.predict(X_test)
         # Storing predictions
@@ -443,7 +609,17 @@ def bootstrapping_lasso(X_train, t_train, X_test, t_test, n_bootstraps, model):
         t_hat_tests[:, i] = t_hat_test.ravel()
     return t_hat_trains, t_hat_tests
 
-def plot_beta_errors_for_lambdas(summaries_df: pd.DataFrame(), degree):
+
+def plot_beta_errors_for_lambdas(summaries_df: pd.DataFrame(), degree: int) -> plt:
+    """Plotting function 
+
+    Args:
+        summaries_df (pd.DataFrame): Dataframe containing model summary
+        degree ([int]): Model complexity
+
+    Returns:
+        plt: Plot. 
+    """
     grp_by_coeff_df = summaries_df.groupby(["coeff name"])
 
     # plt.rcParams["figure.figsize"] = [7.00, 3.50]
@@ -486,7 +662,16 @@ def plot_beta_errors_for_lambdas(summaries_df: pd.DataFrame(), degree):
     return fig
 
 
-def plot_beta_CI_for_lambdas(summaries_df: pd.DataFrame(), degree):
+def plot_beta_CI_for_lambdas(summaries_df: pd.DataFrame(), degree: int) -> plt:
+    """PLotting function for plotting confidence interval for lambda
+
+     Args:
+        summaries_df (pd.DataFrame): Dataframe containing model summary
+        degree ([int]): Model complexity
+
+    Returns:
+        plt: Plot. 
+    """
     grp_by_coeff_df = summaries_df.groupby(["coeff name"])
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
@@ -525,18 +710,23 @@ def plot_beta_CI_for_lambdas(summaries_df: pd.DataFrame(), degree):
     return fig
 
 
-def plot_beta_errors(summaary_df: pd.DataFrame(), degree, fig=plt.figure()):
+def plot_beta_errors(summaary_df: pd.DataFrame(), degree: int, fig=plt.figure()) -> plt:
+    """Plotting function to plot beta errors. 
+
+    Args:
+        summaary_df (pd.DataFrame):  Dataframe containing model summary
+        degree ([int]): model complexity
+        fig ([type], optional): [description]. Defaults to plt.figure().
+
+    Returns:
+        plt: Plot
+    """
+
     betas = summaary_df["coeff value"].to_numpy().astype(np.float64)
     SE = summaary_df["std error"].to_numpy().astype(np.float64)
 
     # Computing x-ticks
     x_ticks_values = np.arange(summaary_df.shape[0])
-    """
-    x_ticks = ["1"]
-    for i in range(1, degree+1):
-        for k in range(i+1):
-            x_ticks.append(f"({i-k},{k})")
-    """
 
     ax = plt.axes()
     plt.title(f"Beta error OLS - degree{degree}")
@@ -567,15 +757,14 @@ def plot_beta_errors(summaary_df: pd.DataFrame(), degree, fig=plt.figure()):
 
 
 def cross_val_OLS(k: int, X: np.ndarray, z: np.ndarray, shuffle=False, random_state=None) -> np.ndarray:
-    """Function for cross validating on k folds. Scales data after split(standarscaler).
+    """Function for cross validating on k folds. To be used with OLS. Scales data after split(standarscaler).
 
     Args:
         k (int): Number of folds
-
         X (np.ndarray): Design matrix
         z (np.ndarray): target values
-        lmb (Optional): lambda value
         shuffle (boolean): deafault False. 
+        random_state(Optional) : Seed value. Defaults to None. 
 
     Returns:
         np.ndarray: Scores of MSE on all k folds
@@ -614,15 +803,19 @@ def cross_val_OLS(k: int, X: np.ndarray, z: np.ndarray, shuffle=False, random_st
 
 
 def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, degree: int, lmb=None, shuffle=False, random_state=None, scale_t=True) -> np.ndarray:
-    """Function for cross validating on k folds. Scales data after split(standarscaler).
+    """Function for cross validating on k folds. Modified and extended from cross_val_OLS.
+        Scales data after split(standarscaler).
 
     Args:
         k (int): Number of folds
-        model (str): Linear regression model
+        model (str): Chosen regression model
         X (np.ndarray): Design matrix
         z (np.ndarray): target values
         lmb (Optional): lambda value
-        shuffle (boolean): deafault False. 
+        shuffle (boolean): deafault False.
+        random_state(Optional) : Seed value. Defaults to None.
+        scale_t (boolean) : Wether to scale target values. Default True 
+
 
     Returns:
         np.ndarray: Scores of MSE on all k folds
@@ -633,6 +826,7 @@ def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, degree: int, lmb
     # scores_KFold idx counter
     j = 0
     z = z.ravel().reshape(-1, 1)
+
     for train_inds, test_inds in kfold.split(X, z):
 
         # get all cols and selected train_inds rows/elements:
@@ -657,7 +851,8 @@ def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, degree: int, lmb
             model = RidgeRegression(lmb)
             model.fit(xtrain_scaled, ztrain)
         elif model == "Lasso":
-            model = lm.Lasso(alpha=lmb, fit_intercept=False, random_state=random_state)
+            model = lm.Lasso(alpha=lmb, fit_intercept=False,
+                             random_state=random_state)
             model.fit(xtrain_scaled, ztrain)
         elif model == "OLS":
             model = OLS(degree=degree)
@@ -668,41 +863,51 @@ def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, degree: int, lmb
         zpred = model.predict(xtest_scaled)
 
         scores_KFold[j] = MSE(zpred, ztest)
+
         j += 1
 
     return scores_KFold
 
 
-def noise_factor(n, factor=0.2):
+def noise_factor(n: int, factor=0.2) -> np.ndarray:
+    """Adding noise to whole meshgrid. 
+
+    Args:
+        n ([type]): length of meshgrid
+        factor (float, optional): The factor of how much noise to be added. Defaults to 0.2.
+
+    Returns:
+        np.ndarray: Noise!
+    """
     return factor*np.random.randn(n, n)  # Stochastic noise
 
 
-def MSE_implemented(y_data, y_model):
+def MSE_implemented(y_data: np.ndarray, y_model: np.ndarray) -> float:
     """Simple Morten function to compute MSE
 
     Args:
-        y_data ([type]): [description]
-        y_model ([type]): [description]
+        y_data ([type]): Truth
+        y_model ([type]): predicted values
 
     Returns:
-        [type]: [description]
+        [type]: MSE
     """
     n = np.size(y_model)
     return np.sum((y_data-y_model)**2)/n
 
 
-def R2_implemented(y_data, y_model):
+def R2_implemented(y_data: np.ndarray, y_model: np.ndarray) -> float:
     """Simple Morten function to compute R2
 
-    Args:
-        y_data ([type]): [description]
-        y_model ([type]): [description]
+       Args:
+        y_data ([type]): Truth
+        y_model ([type]): predicted values
 
     Returns:
-        [type]: [description]
+        [type]: R2 score
     """
     return 1 - np.sum((y_data - y_model) ** 2) / np.sum((y_data - np.mean(y_data)) ** 2)
 
 
 if __name__ == '__main__':
-    print("Import this file as a package")
+    print("Import this file as a package please!")
