@@ -19,6 +19,8 @@ When done, deactive enviroment with:
 $ conda deactivate
 ```
 
+## Usage
+
 The main report is found as a pdf, named as main.pdf, which is generated from the latex file main.tex. 
 
 With enviroment activateded, running examples for each task can be found as jupyter notebooks in the code folder. This will reproduce the plots used in the report.
