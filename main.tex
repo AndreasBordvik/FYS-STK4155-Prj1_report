@@ -695,23 +695,100 @@ The second regularized linear model which we will study is Least Absolute Shrink
 \[
   C\left(\bm{X},\bm{\beta}\right) = \left\{\left(\bm{y}-\bm{X}\bm{\beta}\right)^\text{T}\left(\bm{y}-\bm{X}\bm{\beta}\right)\right\}+\lambda\lVert \bm{\beta}\rVert_1
 \]
-We note that the L1-norm is the same as the sum of the absolute value for each $\beta_i$. Moreover, the derivative of the absolute value is the sign-function. The resulting normal equation for Lasso regression is thus not a nice analytical expression, and is omitted for this Exercise. As a result, only the Sci-Kit implementation of Lasso regression will be studied.
+We note that the L1-norm is the same as the sum of the absolute value for each $\beta_i$. Moreover, the derivative of the absolute value is the sign-function. The resulting normal equation for Lasso regression will be omitted from this exercise as there is no closed form solution for the expression. \cite{Hastie2009} As a result, only the Sci-Kit implementation of Lasso regression will be studied. We note that the implementation of Lasso in SciKit-learn implements the fit using a gradient descent algorithm, and as a result introduces stochastic behavior to the regression. \cite{scikit-learn} Thus, to guarantee result reproducibility, the lasso is seeded.
 
 \subsection*{Difference between L1 and L2-norm regularization}
 The difference between the L1 and L2-norm is how it can be related to our understanding of distance. The L1-norm, mathematically defined as $\lVert \bm{\beta} \rVert_1 = \sum_{i=0}^{n-1}|\beta_i|$ is the "Manhattan Distance" of $\bm{\beta}$, i.e. the distance from two points a to b using only straight and normal lines. On the other hand, the L2-norm is mathematically defined as $\lVert \bm{\beta} \rVert_2 = \sqrt{\sum_{i=0}^{n-1}\beta_i^2}$. The L2-norm is more commonly referred to as the Euclidean distance, or the distance of a straight line drawn between a and b. In practice, this results in Lasso is able to suppress some predictors based on the choice of $\lambda$. Furthermore, the predictor suppression tends to eliminate the least important predictors first, such that Lasso regression can be looked at as a form of feature selection. \cite{Geron2019}
 
-When analyzing Lasso, we will not implement our own model, rather we will use the Lasso regression provided by SciKit-learn.
-
-\subsection*{Search Landscape}
-As with Ridge regression, we start off by plotting the search landscape for Lasso regression as an initial guess to where the optimal parameters might be located.
+\subsection*{Search Landscape for Lasso}
+As with Ridge regression, we start off by plotting the search landscape for Lasso regression as an initial guess to where the optimal degree and regularization parameter pair might be located. 
 
 \begin{figure}
   \centering
-  \hspace*{-3.8cm}
-  \includegraphics[scale=1.5]{figures/EX5_search_landscape_lasso.pdf}
-  \caption{\label{fig:lasso_search_land}Plot of the LASSO Search Landscape for polynomials up to a cretain order initialized with different regularization parameter values. The red dot symbolizes surface minimum.}
+  \hspace*{-3.5cm}
+  \includegraphics[scale=0.58]{figures/EX5_search_land_lasso_plt.pdf}
+  \caption{\label{fig:lasso_search_land}Plot of the LASSO Search Landscape for polynomials up to a cretain order initialized with different regularization parameter values on a range $\lambda \in \left[\log{(-7)}, \log{(2)} \right]$. The red dot symbolizes surface minimum.}
 \end{figure}
 
+By inspecting Figure (\ref{fig:lasso_search_land}), the effect of the L1 regularizer can be seen. The undulating search landscape show how penalizing the predictors lead to different predicted errors. Furthermore, it can be seen that the red dot signifying the surface minimum is located at degree 4 with a regularization parameter $\lambda = 0.000351119$. However, the initial MSE as reported from the search landscape is approximately 0.22, which is greater than the MSE reported from the Ridge search landscape in (\ref{fig:ridge_search_land}) at approximately 0.15. Both of which are still greater than the MSE values studied for OLS at the same degree. On the other hand, it can be seen that the lasso minimizes it MSE with some regularization, in comparison to Ridge which obtained its model minimum as it approached OLS through minimal regularization.
+
+\subsection*{Lasso with resampling}
+
+\begin{figure}
+  \centering
+  \begin{subfigure}{0.49\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{figures/EX5_lasso_complexity_using_bootstrap_function_lmb200.pdf}
+      \caption{\label{fig:boot_lasse_1}Cross Validation for 5 to 10 folds for a single model degree, with bootstrap for comparison.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.49\textwidth}  
+    \centering
+    \includegraphics[width=\textwidth]{figures/EX5_lasso_complexity_using_bootstrap_function_lmb400.pdf}
+    \caption{\label{fig:boot_lasso_2}Cross Validation for 5 to 10 folds for a single model degree, with bootstrap for comparison.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.49\textwidth}  
+    \centering
+    \includegraphics[width=\textwidth]{figures/EX5_lasso_complexity_using_bootstrap_function_lmb2039.pdf}
+    \caption{\label{fig:boot_lasso_3}Cross Validation for 5 to 10 folds for a single model degree, with bootstrap for comparison.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.49\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{figures/EX5_lasso_complexity_using_bootstrap_function_lmb4039.pdf}
+      \caption{\label{fig:boot_lasso_4}Cross Validation for 5 to 10 folds for a single model degree, with bootstrap for comparison.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.49\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{figures/EX5_lasso_complexity_using_bootstrap_function_lmb2099.pdf}
+      \caption{\label{fig:boot_lasso_5}Cross Validation for 5 to 10 folds for a single model degree, with bootstrap for comparison.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.49\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{figures/EX5_lasso_complexity_using_bootstrap_function_lmb4099.pdf}
+      \caption{\label{fig:boot_lasso_6}Cross Validation for 5 to 10 folds for a single model degree, with bootstrap for comparison.}
+  \end{subfigure}
+  \caption{\label{sfig:boot_lasso_1}Bias-variance tradeoff for Ridge Regression with different values of regularization and number of datapoints.}
+\end{figure}
+
+To further study Lasso regression, we apply the same resampling algorithms used when studying Ridge regression in the previous exercise. Figure (\ref{sfig:boot_lasso_1}) show how Lasso behaves with resampling using the bootstrap technique for varying degrees of lambda and number of datapoints. Note that the number of bootstraps are a magnitude lower than for Ridge and OLS, as Lasso is computationally more heavy than the aforementioned methods. Furthermore, Figure (\ref{fig:boot_lasso_3}) and (\ref{fig:boot_lasso_4}) show the bias-variance tradeoff for the assumed optimal parameter pair. Moreover, Figure (\ref{sfig:boot_lasso_1}) show the same tendency as in the previous exercise when Ridge was studied. Namely how the estimated mse tend to be completely computed by the bias as the regularization reach high values. As with Ridge, this is to be expected as L1 regularization also force the predictors to 0, the difference compared to Ridge's L2 regularization is how the penalization is performed as explored previously. This effect is also represented in the search landscape in Figure (\ref{fig:lasso_search_land}) by the flat plane located at the highest regularization parameters. 
+
+Moreover, by inspecting the bias-variance tradeoff plots, a slightly higher prediction error is reported then what was found in the search landscape. This might be result of the small sample sizes compared to the pool of available datapoints, as the small bootstrap samples might not fully represent the data. Though as previously stated, the bootstrap is computationally heavy, thus number of bootstraps had to be compromised. Thus, to further study the prediction error without the drawbacks of a small sample size, cross validation around the assumed optimal degree is performed.
+
+\begin{figure}
+  \centering
+  \begin{subfigure}{0.49\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{figures/EX5_lasso_mse_cv_boot06.pdf}
+      \caption{\label{fig:mse_cv_lasso_1}Cross Validation for 5 to 10 folds for a single model degree, with bootstrap for comparison.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.49\textwidth}  
+    \centering
+    \includegraphics[width=\textwidth]{figures/EX5_lasso_mse_cv_boot16.pdf}
+    \caption{\label{fig:mse_cv_lasso_2}Cross Validation for 5 to 10 folds for a single model degree, with bootstrap for comparison.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.49\textwidth}  
+    \centering
+    \includegraphics[width=\textwidth]{figures/EX5_lasso_mse_cv_boot26.pdf}
+    \caption{\label{fig:mse_cv_lasso_3}Cross Validation for 5 to 10 folds for a single model degree, with bootstrap for comparison.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.49\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{figures/EX5_lasso_mse_cv_boot36.pdf}
+      \caption{\label{fig:mse_cv_lasso_4}Cross Validation for 5 to 10 folds for a single model degree, with bootstrap for comparison.}
+  \end{subfigure}
+  \caption{\label{sfig:lasso_cv_1}Cross validation of Lasso Regression with different values of regularization.}
+\end{figure}
+
+Inspecting the cross-validation results in Figure (\ref{sfig:lasso_cv_1}) shows an estimated error akin to what the initial search landscape reported. For Figure (\ref{fig:mse_cv_lasso_1}) - (\ref{fig:mse_cv_lasso_2}), the MSE is slightly lower than 0.23. With the largest amount of regularization in Figure (\ref{fig:mse_cv_lasso_4}) resulting in an MSE of approximately 0.29. Comparing the lasso results to those for Ridge in Figure (\ref{sfig:ridge_cv_1}), it can be seen that the standard error makes the MSE less certain for lower amounts of regularization. Moreover, the MSE in Figure (\ref{fig:mse_cv_lasso_3}) and (\ref{fig:mse_cv_lasso_4}) attains higher values than that of the bootstrap. However the bootstrap is contained in the MSE interval, thus it is not guaranteed to attain lower values than the cross-validated MSE.
+
+Based on Figure (\ref{sfig:ridge_cv_1}), the MSE for the optimal degree and approximate optimal regularization parameter $\lambda$ could potentially reach a minimum MSE slightly larger than 0.2, which is still greater than Ridge and OLS which were closer to 0.1. As such, with the search landscape, bootstrap and cross-validation analysis in mind, we conclude that Lasso regression may pose as the least optimal regression method when fitting the Franke Function.
 
 \section*{Exercise 6}
 The main goal of exercise 6 is to analyze the performance of our models on real digital terrain data using the approach essentially conducted in previous exercises
@@ -850,9 +927,6 @@ Another intersting observation we though of mentioning is that our models are ac
 \todo[inline]{TODO: Ridge conclusion and critical model selelction. Write similar story as done for OLS using surfaceplon}
 \subsubsection*{Lasso fit}
 \todo[inline]{TODO: Lasso conclusion and critical model selelction. Write similar as done for Ridge}
-
-
-
 
 \begin{figure}
   \centering
