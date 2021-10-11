@@ -21,12 +21,23 @@ $ conda deactivate
 
 ## Usage
 
-The main report is found as a pdf, named as main.pdf, which is generated from the latex file main.tex. 
+The main report is found as a pdf, named as report/report.pdf, which is generated from the latex file main.tex. 
 
 With enviroment activateded, running examples for each task can be found as jupyter notebooks in the code folder. This will reproduce the plots used in the report.
 They can be run with the "Run all" command. 
 
 All source code is found in common.py under the code folder. For studying figures and graphs without actually running the code, please refer to the figures folder. 
 
-Thanks!
+### Notes for running the notebooks:
+   You may need to have latex locally installed in order to run using the fonts defined together with 
+   the import statements. 
+   ```sh
+   plt.rcParams.update({
+    "text.usetex": True,
+    "font.family": "serif",
+    "font.serif": ["Palatino"],
+    "font.size": 10,
+	})
+   ```
 
+Thanks!
