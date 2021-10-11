@@ -374,7 +374,7 @@ def SVDinv(A):
 
 
 @timer
-def bootstrap(x, y, t, maxdegree, n_bootstraps, model, seed, test_size=0.2, scale_X=True, scale_t=False, skip_intercept=True):
+def bootstrap(x, y, t, maxdegree, n_bootstraps, model, seed, test_size=0.2, scale_X=True, scale_t=False, skip_intercept=True, is_scikit=False):
 
     MSE_test = np.zeros(maxdegree)
     MSE_train = np.zeros(maxdegree)
@@ -386,9 +386,12 @@ def bootstrap(x, y, t, maxdegree, n_bootstraps, model, seed, test_size=0.2, scal
         X = create_X(x, y, n=degree)
         X_train, X_test, t_train, t_test = prepare_data(
             X, t_flat, seed, test_size=test_size, shuffle=True, scale_X=scale_X, scale_t=scale_t, skip_intercept=skip_intercept)
-
-        t_hat_train, t_hat_test = bootstrapping(
-            X_train, t_train, X_test, t_test, n_bootstraps, model)
+        if not is_scikit:
+            t_hat_train, t_hat_test = bootstrapping(
+                X_train, t_train, X_test, t_test, n_bootstraps, model)
+        else:
+            t_hat_train, t_hat_test = bootstrapping_lasso(
+                X_train, t_train, X_test, t_test, n_bootstraps, model)
 
         # print(f"t_test.sxhape: {t_test.shape}")
         # print(f"t_hat_test.shape: {t_hat_test.shape}")
@@ -427,6 +430,18 @@ def bootstrapping(X_train, t_train, X_test, t_test, n_bootstraps, model):
 
     return t_hat_trains, t_hat_tests
 
+def bootstrapping_lasso(X_train, t_train, X_test, t_test, n_bootstraps, model):
+    t_hat_trains = np.empty((t_train.shape[0], n_bootstraps))
+    t_hat_tests = np.empty((t_test.shape[0], n_bootstraps))
+    for i in range(n_bootstraps):
+        X, t = resample(X_train, t_train)
+        model.fit(X,t)
+        t_hat_train = model.predict(X_train)
+        t_hat_test = model.predict(X_test)
+        # Storing predictions
+        t_hat_trains[:, i] = t_hat_train.ravel()
+        t_hat_tests[:, i] = t_hat_test.ravel()
+    return t_hat_trains, t_hat_tests
 
 def plot_beta_errors_for_lambdas(summaries_df: pd.DataFrame(), degree):
     grp_by_coeff_df = summaries_df.groupby(["coeff name"])
@@ -642,7 +657,7 @@ def cross_val(k: int, model: str, X: np.ndarray, z: np.ndarray, degree: int, lmb
             model = RidgeRegression(lmb)
             model.fit(xtrain_scaled, ztrain)
         elif model == "Lasso":
-            model = lm.Lasso(alpha=lmb)
+            model = lm.Lasso(alpha=lmb, fit_intercept=False, random_state=random_state)
             model.fit(xtrain_scaled, ztrain)
         elif model == "OLS":
             model = OLS(degree=degree)
