@@ -34,6 +34,9 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage[margin=3cm]{geometry}
+%\usepackage{subfig}
+\usepackage{caption}
+\usepackage{subcaption}
 
 \usepackage{todonotes}
 \usepackage{listings}
@@ -505,7 +508,7 @@ The MSE estimated by bootstrap for the corresponding polynomial degree is also p
 \begin{figure}[h]
   \centering
   \includegraphics[scale=0.75]{figures/EX3_mse_cv_boot4.pdf}
-  \caption{\label{fig:?} Mean MSE from CV and bootstrap at ploynomial degree = 4.}
+  \caption{\label{fig:ols_cv_1} Mean MSE from CV and bootstrap at ploynomial degree = 4.}
 \end{figure}
 
 
@@ -570,7 +573,7 @@ Our implementation of Ridge regression follow closely that of Ordinary Least Squ
   \caption{\label{fig:ridge_beta_1}Plot of the weight decay on the individual predictors for our Ridge regression with a second order polynomial}
 \end{figure}
 
-Figure (\ref{fig:ridge_beta_1}) shows the effect of the regularizer for a fitted model of order 2. The figure clearly shows the weight decay, as the individual predictors start off essentially unaffected, until they are gradually decayed to 0 at independent rates. additionally, following the weight decay plot, we can understand how the regularizer affects the final model fit as already mentioned in the previous section. The case of the regularization parameter $\lambda$ achieving larger values, which forces all predictors to become 0, would result in the fitted model being a flat plane centered around 0. Thus, to study where the regularization parameter would attain an optimal fit, we plot a Search Landscape over all degrees and lambda values.
+Figure (\ref{fig:ridge_beta_1}) shows the effect of the regularizer for a fitted model of order 2. The figure clearly shows the weight decay, as the individual predictors start off essentially unaffected, until they are gradually decayed to 0 at independent rates. additionally, following the weight decay plot, we can understand how the regularizer affects the final model fit as already mentioned in the previous section. The case of the regularization parameter $\lambda$ achieving larger values, which forces all predictors to become 0, would result in the fitted model being a flat plane centered around the bias 0. Thus, to study where the regularization parameter would attain an optimal fit, we plot a Search Landscape over all degrees and lambda values.
 
 \begin{figure}
   \centering
@@ -579,9 +582,90 @@ Figure (\ref{fig:ridge_beta_1}) shows the effect of the regularizer for a fitted
   \caption{\label{fig:ridge_search_land}Plot of the Search Landscape for polynomials up to a cretain order initialized with different regularization parameter values. The red dot symbolizes surface minimum.}
 \end{figure}
 
-The search landscape in Figure (\ref{fig:ridge_search_land}) gives us predicted MSE values for a Ridge polynomial of order up to 15. With regularization parameters on a range $\lambda \in \left[10^{-9},10^{4}\right]$ As such, we can use the search landscape to make an initial guess at where the optimal degree and regularization parameter combination will be based on where the lowest MSE is located. For our Ridge regression model, that initial guess would be degree 6, with a $\lambda = 10^{-9}$.
+The search landscape in Figure (\ref{fig:ridge_search_land}) gives us predicted MSE values for a Ridge polynomial of order up to 15. With regularization parameters on a range $\lambda \in \left[10^{-9},10^{4}\right]$ As such, we can use the search landscape to make an initial guess at where the optimal degree and regularization parameter combination will be based on where the lowest MSE is located. For our Ridge regression model, that initial guess would be degree 6, with a $\lambda = 10^{-9}$ attaining a prediction error of $0.1497$. The point is marked as a red dot in Figure (\ref{fig:ridge_search_land}).
 
 Though an initial guess at the optimal Ridge model has been made, we have to further study the model by applying the resampling techniques developed and explored in \nameref{ex:2} and \nameref{ex:3}.
+
+\subsection*{Bootstrap for Ridge regression}
+We use the bootstrap method developed in \nameref{ex:2} to study the bias-variance tradeoff as function of the complexity, but also the regularization term $\lambda$. It could be seen from the search landscape that the optimal regularization term was $\lambda = 10^{-9}$ at degree 6. With these optimal parameters, a plot of the bias-variance tradeoff is constructed.
+
+\begin{figure}
+  \centering
+  \begin{subfigure}{0.49\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{figures/EX4_ridge_complexity_using_bootstrap_function_lmb200.pdf}
+      \caption{\label{fig:ridge_beta_1}Bias-Variance tradeoff as function of model complexity with Ridge regression using a regularization parameter $\lambda = 10^{-9}$}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.49\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{figures/EX4_ridge_complexity_using_bootstrap_function_lmb2013.pdf}
+      \caption{\label{fig:ridge_beta_2}Bias-Variance tradeoff as function of model complexity with Ridge regression using a regularization parameter $\lambda = 10^{4}$}
+  \end{subfigure}
+  \caption{\label{sfig:ridge_beta_1}Bias-Variance tradeoff for different values of $\lambda$ with 400 datapoints}
+\end{figure}
+
+By inspecting Figure (\ref{fig:ridge_beta_1}), it can be seen that the plot is visually identical to Figure (\ref{fig:bias-variance}). This is probably a result of the regularization term being so small that its effect on the predictors is negligible. Following Figure (\ref{fig:ridge_beta_1}), it can be seen that Ridge regression reverts to Ordinary Least Squares as the regularization parameter goes towards zero.
+
+Figure (\ref{fig:ridge_beta_2}) shows the opposite case where the regularization parameter is maxed out to $\lambda = 10^4$. Where the previous figure showed that as regularization goes to 0, Ridge reverts back to OLS, Figure (\ref{fig:ridge_beta_2}) shows the result of too much regularization as discussed in the previous subsection. Namely that the result of Ridge regression with too much regularization increases the model bias while also decreasing the model variance. Furthermore, this indicates that model predictions made with a too regularized Ridge model goes towards the model bias.
+
+\begin{figure}
+  \centering
+  \begin{subfigure}{0.49\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{figures/EX4_ridge_complexity_using_bootstrap_function_lmb400.pdf}
+      \caption{\label{fig:ridge_beta_3}Bias-Variance tradeoff as function of model complexity with Ridge regression using a regularization parameter $\lambda = 10^{-9}$}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.49\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{figures/EX4_ridge_complexity_using_bootstrap_function_lmb4013.pdf}
+      \caption{\label{fig:ridge_beta_4}Bias-Variance tradeoff as function of model complexity with Ridge regression using a regularization parameter $\lambda = 10^{4}$}
+  \end{subfigure}
+  \caption{\label{sfig:ridge_beta_2}Bias-Variance tradeoff for different values of $\lambda$ with 1600 datapoints}
+\end{figure}
+
+After increasing the number of datapoints from 400 to 1600, a new bootstrap plot for the minimum and maximum $\lambda$ is constructed in Figure (\ref{sfig:ridge_beta_2}). Comparing Figure (\ref{sfig:ridge_beta_1}) to (\ref{sfig:ridge_beta_2}), it can be seen that increasing the number of datapoints and subsequently the number of bootstraps as half the amount of datapoints does not notably affect the stability of the bias-variance tradeoff.
+
+\subsection*{Resampling Ridge using Cross Validation}
+Firstly, we perform a Cross Validation for 5 to 10 folds for the assumed optimal degree and lambda found from the search landscape. 
+
+\begin{figure}
+  \centering
+  \begin{subfigure}{0.49\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{figures/EX4_mse_cv_boot06.pdf}
+      \caption{\label{fig:mse_cv_ridge_1}Cross Validation for 5 to 10 folds for a single model degree, with bootstrap for comparison.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.49\textwidth}  
+    \centering
+    \includegraphics[width=\textwidth]{figures/EX4_mse_cv_boot16.pdf}
+    \caption{\label{fig:mse_cv_ridge_2}Cross Validation for 5 to 10 folds for a single model degree, with bootstrap for comparison.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.49\textwidth}  
+    \centering
+    \includegraphics[width=\textwidth]{figures/EX4_mse_cv_boot26.pdf}
+    \caption{\label{fig:mse_cv_ridge_3}Cross Validation for 5 to 10 folds for a single model degree, with bootstrap for comparison.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.49\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{figures/EX4_mse_cv_boot36.pdf}
+      \caption{\label{fig:mse_cv_ridge_4}Cross Validation for 5 to 10 folds for a single model degree, with bootstrap for comparison.}
+  \end{subfigure}
+  \caption{\label{sfig:ridge_cv_1}Cross validation of Ridge Regression with different values of regularization.}
+\end{figure}
+
+
+From Figure (\ref{fig:mse_cv_ridge_1}), we can see that the cross-validated MSE gains a lower value than that of the search grid. Also, as was seen in the previous section when studying Cross Validation, the prediction error is less varying than the bootstrap prediction error. However, at least for a model with complexity to the sixth-order. There is overlap between the bootstrap and cross-validation standard error, thus the bootstrap could potentially achieve better MSE than Cross Validation.
+
+Figure (\ref{fig:mse_cv_ridge_2}) plots cross validation for the same degree, but with the maximum level of regularization $\lambda = 10^4$. With a high amount of regularization, the standard error for cross validation prediction error is highly varying. Also the cross validation prediction error is consequently larger than for the bootstrap prediction error. Based on the uncertainty of the cross validation with a high amount of regularization, it is difficult to use the measurement as it is too imprecise. The standard error does however never overlap with the cross validation range in Figure (\ref{fig:mse_cv_ridge_1}). Thus it can be concluded that for a high amount of regularization, the model is not generalized and does not achieve a sufficiently low prediction error. 
+
+On the other hand, with very slight regularization, as in Figure (\ref{fig:mse_cv_ridge_1}), the model generalizes well with a relatively low MSE score. Moreover, the prediction error for cross validation seem to achieve the same values as the cross validation for OLS in Figure (\ref{fig:ols_cv_1}). Though this is to be expected as the regularization is minimal. Increasing the regularization as in Figure (\ref{fig:mse_cv_ridge_2}) and (\ref{fig:mse_cv_ridge_3}), the standard error of the predicted MSE seem to increase as well. Though this is not seen before Figure (\ref{fig:mse_cv_ridge_3}). There also seem to be a slight relationship between the standard error and number of folds, as both Figure (\ref{fig:mse_cv_ridge_3}) and (\ref{fig:mse_cv_ridge_4}) increase their standard error as folds increase.
+
+Based on the results which have just been discussed, it seems that there may not be a gain in lower prediction error by fitting yhe Franke Function using Ridge instead of OLS. In conclusion, Ridge regression might be outperformed by the OLS when fitting the Franke Function. Though a model with slight regularization can be applied, the results from Ridge regression are either on par or worse than OLS. 
 
 \section*{Exercise 5}
 The second regularized linear model which we will study is Least Absolute Shrinkage and Selection Operator (LASSO) Regression. Lasso adds a regularization term to the Cost function similarly to Ridge regression, though Lasso utilizes the L1 norm of the predictors instead of the L2 as in Ridge. \cite{Geron2019} Mathematically, adding the L1 regularizer gives us the following Cost function
@@ -591,7 +675,19 @@ The second regularized linear model which we will study is Least Absolute Shrink
 We note that the L1-norm is the same as the sum of the absolute value for each $\beta_i$. Moreover, the derivative of the absolute value is the sign-function. The resulting normal equation for Lasso regression is thus not a nice analytical expression, and is omitted for this Exercise. As a result, only the Sci-Kit implementation of Lasso regression will be studied.
 
 \subsection*{Difference between L1 and L2-norm regularization}
-The difference between the L1 and L2-norm is how it can be related to our understanding of distance. The L1-norm, mathematically defined as $\lVert \bm{\beta} \rVert_1 = \sum_{i=0}^{n-1}|\beta_i|$ is the "Manhattan Distance" of $\bm{\beta}$, i.e. the distance from two points a to b using only straight and normal lines. On the other hand, the L2-norm is mathematically defined as $\lVert \bm{\beta} \rVert_2 = \sqrt{\sum_{i=0}^{n-1}\beta_i^2}$. The L2-norm is more commonly referred to as the Euclidean distance, or the distance of a straight line drawn between a and b.
+The difference between the L1 and L2-norm is how it can be related to our understanding of distance. The L1-norm, mathematically defined as $\lVert \bm{\beta} \rVert_1 = \sum_{i=0}^{n-1}|\beta_i|$ is the "Manhattan Distance" of $\bm{\beta}$, i.e. the distance from two points a to b using only straight and normal lines. On the other hand, the L2-norm is mathematically defined as $\lVert \bm{\beta} \rVert_2 = \sqrt{\sum_{i=0}^{n-1}\beta_i^2}$. The L2-norm is more commonly referred to as the Euclidean distance, or the distance of a straight line drawn between a and b. In practice, this results in Lasso is able to suppress some predictors based on the choice of $\lambda$. Furthermore, the predictor suppression tends to eliminate the least important predictors first, such that Lasso regression can be looked at as a form of feature selection. \cite{Geron2019}
+
+When analyzing Lasso, we will not implement our own model, rather we will use the Lasso regression provided by SciKit-learn.
+
+\subsection*{Search Landscape}
+As with Ridge regression, we start off by plotting the search landscape for Lasso regression as an initial guess to where the optimal parameters might be located. 
+
+\begin{figure}
+  \centering
+  \hspace*{-3.8cm}
+  \includegraphics[scale=1.5]{figures/EX5_search_landscape_lasso.pdf}
+  \caption{\label{fig:lasso_search_land}Plot of the LASSO Search Landscape for polynomials up to a cretain order initialized with different regularization parameter values. The red dot symbolizes surface minimum.}
+\end{figure}
 
 
 \section*{Exercise 6}
