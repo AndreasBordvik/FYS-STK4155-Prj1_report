@@ -34,6 +34,9 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage[margin=3cm]{geometry}
+%\usepackage{subfig}
+\usepackage{caption}
+\usepackage{subcaption}
 
 \usepackage{todonotes}
 \usepackage{listings}
@@ -183,6 +186,7 @@ The R2 score (coefficient of determination) is another metric that can be relate
 
 \todo[inline]{TODO: Possibly more one implementation} 
 \todo[inline]{TODO: Add the plot showing all predicitons up to degree} 
+\todo[inline]{TODO: R2 score must be plottet and briefly discussed} 
 
 \subsection*{Scaling the data}
 Our motivation for scaling the data arise in the context of fitting a design matrix of predictors with different units. To avoid having to disregard some predictors in favor of others based on their unit, not necessarily their contribution to the function fit, a scaling of the data is performed. By scaling the data using one of several scaling techniques, we ensure that all predictors lie in the same reference domain, resulting in a more accurate representation of the predictors. Furthermore, scaled data generally increases model skill. SciKit-learn includes several different Scalers, such as the StandardScaler and MinMaxScaler. \cite{scikit-learn} For this discussion, the StandardScaler will be inspected.
@@ -397,25 +401,25 @@ Lastly, it should be noted that the bias-variance tradeoff measuremnet is perfor
 \end{figure}
 
 
-Figure 7(a) visualizes a polynomial degree where this point lies within the given model.  With a dataset consisting of 400 data points, one can see a rapid increase in variance at degree 11. Here the model is starting to produce results that deviate from the expected estimator values. At degree 17, there is a drastic increase in the variance, while the bias is moving towards zero. This is clear evidence of the model being overfitted to the training data. 
+Figure 7(a) visualizes a polynomial fit where we can observe indications of overfitting.  With a dataset consisting of 400 data points, one can see a rapid increase in variance at degree 11. At the same time, the bias is decreasing.  Here the model is starting to produce results that deviate from the expected estimator values. At degree 17, there is a drastic increase in the variance, while the bias is moving towards zero. This is an indication of evidence of the model being overfitted to the training data. 
 
-On the other hand, increasing the dataset to contain 1600 data points produces completely different results. The percentage of data used in training is kept constant between these two examples, resulting in the increase from 320 data points to 1280. This gives the model a significantly better foundation for generalizing on the data, hence resulting in a much lower MSE at the degrees in the higher range of the interval in question. At this number of data points, there is still no clear evidence of overfitting.  
+On the other hand, increasing the dataset to contain 1600 data points produces completely different results. The percentage of data used in training is kept constant between these two examples, resulting in the increase from 320 training data points to 1280. This gives the model a significantly better foundation for generalizing the predictors, hence resulting in a much lower MSE at the degrees in the higher range of the interval in question. At this number of data points, there is still no clear evidence of overfitting in chosen range of polynomial degrees. 
 
 \subsection*{Some words on bootstrapping}
 As described in the preceding task, we split our data into several subsets used for different purposes. The overall objective is to train a model on a given subset and then measure how well it performs on a new unseen data set. However, a dilemma that may emerge from this approach is that our data only represents a sample from an unknown distribution. We run the risk of measuring a predicted error that deviates from the actual probability by iterating through our data points only once.
 
-Therefore, we impose resampling methods on our data to produce a more realistic estimate of the error.This will help us in the the process of assesing the model. The following algorithm will demonstrate how the bootstrap is performed to achieve this:
+Therefore, we impose resampling methods on our data to produce a more realistic estimate of the error. This will help us in the the process of assesing the model. The following algorithm will demonstrate how the bootstrap is performed to achieve this:
 
-We have some data, which consists of training data:
+We have some data, which consists of \emph{training} data:
 
-$$X = [x_1,x_2,...,x_n]$$
+$$\bm{X} = [x_1,x_2,...,x_n]$$
 and their respective target labels:
 $$\bm{y} = [y_1,y_2,...,y_n]$$
 
 
-(I) A new sample is then drawn. This dataset will have the same dimension as D, but as it is drawn with replacements, they will differ from eachother as the latter has a probability of drawing the same sample mulitple times:
+(I) A new sample is then drawn. This dataset will have the same dimension as D, but as it is drawn with replacements, they will differ from eachother as the latter has a probability of drawing the same data points mulitple times:
 
-$$X^* = x_{1}^{*}, x_{2}^{*}, ... ,x_{n}^{*}$$
+$$\bm{X^*} = x_{1}^{*}, x_{2}^{*}, ... ,x_{n}^{*}$$
 $$\bm{y}^*= y_{1}^{*}, y_{2}^{*}, ... ,y_{n}^{*}$$
 
 (II)This sample is then used to create new set of predictors:
@@ -442,14 +446,14 @@ Step I-IV is then repeated $B$ times, while keeping track of each sample MSE. Af
   \begin{subfigure}{0.49\textwidth}
       \centering
       \includegraphics[width=\textwidth]{figures/EX2_model_complexity_using_bootstrap_function_n_22_testsize_0.2.pdf}
-      \caption{400 datapoints, 200 bootstraps}
+      \caption{400 datapoints, 200 bootstraps, with test size = 0.2}
       \label{fig:bootstrap_bias_var_n_20}
   \end{subfigure}
   \hfill
   \begin{subfigure}{0.49\textwidth}
       \centering
       \includegraphics[width=\textwidth]{figures/EX2_model_complexity_using_bootstrap_function_n_40_testsize_0.2.pdf}
-      \caption{1600 datapoints, 800 bootstraps}
+      \caption{1600 datapoints, 800 bootstraps, with test size = 0.2}
       \label{fig:bootstrap_bias_var_n_30}
   \end{subfigure}
 
@@ -464,14 +468,14 @@ Step I-IV is then repeated $B$ times, while keeping track of each sample MSE. Af
   \begin{subfigure}{0.49\textwidth}
       \centering
       \includegraphics[width=\textwidth]{figures/EX2_model_complexity_using_bootstrap_function_n_22_testsize_0.3.pdf}
-      \caption{400 datapoints, 200 bootstraps}
+      \caption{400 datapoints, 200 bootstraps, with test size = 0.3}
       \label{fig:bootstrap_bias_var_n_20}
   \end{subfigure}
   \hfill
   \begin{subfigure}{0.49\textwidth}
       \centering
       \includegraphics[width=\textwidth]{figures/EX2_model_complexity_using_bootstrap_function_n_40_testsize_0.3.pdf}
-      \caption{1600 datapoints, 800 bootstraps}
+      \caption{1600 datapoints, 800 bootstraps, with test size = 0.3}
       \label{fig:bootstrap_bias_var_n_30}
   \end{subfigure}
 
@@ -479,7 +483,13 @@ Step I-IV is then repeated $B$ times, while keeping track of each sample MSE. Af
      \label{fig:bootstrap_bias_var}
 \end{figure}
 
+Figure 8 visualizes a model being fit to a model with a complexity ranging from polynomial degree 1 to 15. However, in this figure, bootstrapping was implemented to resample the data. This creates different results from the plots in figure 7. In figure that 7a, the rapid increase in variance can be seen already at polynomial degree 7. At this point, the mean squared error for the test data is already greater than 1.  This can suggest that the model has started overfitting and lost its ability to generalize. 
 
+When comparing figure 8b to 7b, one can see the same trends as described above. At around degree 12 in figure 8b, the variance is starting to increase and varies greatly between the preceding degrees. This variation in values could be an indication of overfitting. 
+
+In figure 9, the same parameters for the size of data and number of bootstraps remain constant, but here the test size is increased from 0.2 to 0.3, which also creates differences in the results when comparing to figure 8. When comparing figure 8a to 9a, the pattern in 8a is of a different nature than the one present in 9a. The increase in variance can be seen at roughly the same polynomial degree, 6, but 8a shows a distinct zigzag pattern, while 9a has a smoother curve. The MSE in 9a is also magnitudes higher than in 8a. This might be due to the fact that the model in 9a has been trained on a smaller part of the data compared to 8a. This could have lead to the model in 9a being biased to certain data points, hence lost some of its abilities to generalize. 
+
+However, in figure 9b, we see the effect of a larger data set. Here the test size is also increased from figure 8b, but the variance does not suffer under the same increase we observed in figure 9a. This might be due to the fact that the model has had enough data points in the training phase to still be able to generalize well on new, unseen data. 
 
 
 \section*{\label{ex:3}Exercise 3}
@@ -487,7 +497,7 @@ In the first part of this project, an infinite number of data points could easil
 
 In the previous task, bootstrap was used to provide better estimates of a model's performance.  In this task, we will implement the cross-validation method to better measure the model's ability to generalize. 
 
-This algorithm is implemented by dividing the dataset into K parts of roughly the same size. In this project, we try K values ranging from 5 to 10, which also coincides with best-practice values \cite{Hastie2009}.  We have implemented the split into K-folds by using the method K-fold from Scikit learn model-selection \cite{link_to_doc}. This method provides us with arrays of approximately equal size, consisting of indices for choosing test- and train data.  Each fold is then used once as a test set, while the remaining K-1 folds make up the training set. The overall purpose of this method is to produce an estimate of the prediction error, given by:
+This algorithm is implemented by dividing the dataset into K parts of roughly the same size. In this project, we try K values ranging from 5 to 10, which also coincides with best-practice values. \cite{Hastie2009}  We have implemented the split into K-folds by using the method K-fold from Scikit learn model-selection. \cite{scikit-learn} This method provides us with arrays of approximately equal size, consisting of indices for choosing test- and train data.  Each fold is then used once as a test set, while the remaining K-1 folds make up the training set. The overall purpose of this method is to produce an estimate of the prediction error, given by:
 
 \[
   \text{CV}(\hat{f}) = \frac{1}{K}
@@ -496,23 +506,38 @@ This algorithm is implemented by dividing the dataset into K parts of roughly th
 
 where $\hat{f}^{-k}(x)$ denotes the fitted function, in this case the linear regression model, with the \emph{k}th part of the data removed.\cite{Hastie2009}  
 
-The following figures provide a visualizes the results of 5-10 fold cross-validation on a dataset consisting of a total of $22^2$ points\cite{notebook_exc3}. The MSE for polynomial degrees ranging from 3 to 14 is then calculated. Here we present the results from degrees 4 and 12, while the remaining is available in {.......}
+The following figures provides visualizations of the results for 5-10 fold cross-validation on a dataset consisting of a total of $484$ points. The MSE for polynomial degrees ranging from 3 to 14 is then calculated. Here we present the results from degrees 3 and 10, while the remaining is available in the github figures folder. 
 
+In Figures (\ref{fig:mse_cv_boot1}) and (\ref{fig:mse_cv_boot2}), these results are visualized. From the plots, we can see the difference in the estimated error between the two resampling methods. The first thing to notice is that the mean bootstrap error is not contained in the standard deviation for any of the five different selected folds. The estimated MSE between the two methods are consistently different, with bootstrap resulting in a higher value of a varying degree.  Both methods are dependent on hyperparameters. For the bootstrap method, the number of performed resamples can have a significant impact on the estimated error. For exmple given a small dataset, the number of times a given datapoint is re-used in the sample process might shift the predictors to be biased towards a certain pattern. This in turn, can lead to tendencies of overfitting.
 
-The MSE estimated by bootstrap for the corresponding polynomial degree is also plotted. As figure ? displays,  at degree 4, the size of K seems to be of little importance, as the mean MSE of every fold is moderately low at approximately 0.10, with a standard deviation ranging from 0.8 to .012.
+This problem is somewhat circumvented in Cross-validation, as there is no possbility for overlap between datapoints in the training data caused by a resample with replacement. However problems may although arise if limited datasets are cross-validated using a large k-value. This particular case could lead to a test sample containing significantly, and as a result unrelated, data which might lead to prediction errors unrepresentative of the model.
 
-\begin{figure}[h]
+Given our results, for the ordinary least squares regression case, cross validation might be a more favorable resampling technique as the standard error regardless of the fold used is somewhat contained. Though it is important to state that bootstrap and cross-validation are resampling techniques which do complement each other nicely as they give us separate interpretations of the estimated error. 
+
+Moreover, due to the nature of each resampling algorithm, the scaling of their respective training data is not performed equally. Whereas the bootstrap produces a mean over the entire resampled training-data, cross validation produces a separate mean for each of the K partitions of the dataset. Hence, though this would not drastically change the final estimated error as we have seen, the methods are not directly comparable as a result. 
+
+-error i bootstrap ikke inneholdt i CV
+-bootstrap konsekvent forskjellig 
+-boot significant høyere
+-bootst avhengig av hyperparameter(antall straps), sensitiv til størr på dataset
+- CV også sensitiv, spesielt ved små dataset. 
+- syns k-fold er mer robust selv med variasjoner . 
+-fordelen med CV er at man uansett vil trene og teste på all data. 
+-vanskelig å sammenligne direkte etttersom de er skalert på forskjellig grunnlag som er gitt av algoens natur. 
+over/underestimerer MSE? 
+
+\begin{figure}
   \centering
-  \includegraphics[scale=0.75]{figures/EX3_mse_cv_boot4.pdf}
-  \caption{\label{fig:?} Mean MSE from CV and bootstrap at ploynomial degree = 4.}
+  \includegraphics[scale=0.70]{figures/EX3_mse_cv_boot3.pdf}
+  \caption{\label{fig:mse_cv_boot1} Mean MSE from CV and bootstrap at ploynomial degree = 3.}
 \end{figure}
 
 
 
-\begin{figure}[h]
+\begin{figure}
   \centering
-  \includegraphics[scale=0.75]{figures/EX3_mse_cv_boot12.pdf}
-  \caption{\label{fig:?}ean MSE from CV and bootstrap at ploynomial degree = 12.}
+  \includegraphics[scale=0.70]{figures/EX3_mse_cv_boot10.pdf}
+  \caption{\label{fig:mse_cv_boot2}Mean MSE from CV and bootstrap at ploynomial degree = 10.}
 \end{figure}
 
 
@@ -569,7 +594,7 @@ Our implementation of Ridge regression follow closely that of Ordinary Least Squ
   \caption{\label{fig:ridge_beta_1}Plot of the weight decay on the individual predictors for our Ridge regression with a second order polynomial}
 \end{figure}
 
-Figure (\ref{fig:ridge_beta_1}) shows the effect of the regularizer for a fitted model of order 2. The figure clearly shows the weight decay, as the individual predictors start off essentially unaffected, until they are gradually decayed to 0 at independent rates. additionally, following the weight decay plot, we can understand how the regularizer affects the final model fit as already mentioned in the previous section. The case of the regularization parameter $\lambda$ achieving larger values, which forces all predictors to become 0, would result in the fitted model being a flat plane centered around 0. Thus, to study where the regularization parameter would attain an optimal fit, we plot a Search Landscape over all degrees and lambda values.
+Figure (\ref{fig:ridge_beta_1}) shows the effect of the regularizer for a fitted model of order 2. The figure clearly shows the weight decay, as the individual predictors start off essentially unaffected, until they are gradually decayed to 0 at independent rates. additionally, following the weight decay plot, we can understand how the regularizer affects the final model fit as already mentioned in the previous section. The case of the regularization parameter $\lambda$ achieving larger values, which forces all predictors to become 0, would result in the fitted model being a flat plane centered around the bias 0. Thus, to study where the regularization parameter would attain an optimal fit, we plot a Search Landscape over all degrees and lambda values.
 
 \begin{figure}
   \centering
@@ -578,9 +603,90 @@ Figure (\ref{fig:ridge_beta_1}) shows the effect of the regularizer for a fitted
   \caption{\label{fig:ridge_search_land}Plot of the Search Landscape for polynomials up to a cretain order initialized with different regularization parameter values. The red dot symbolizes surface minimum.}
 \end{figure}
 
-The search landscape in Figure (\ref{fig:ridge_search_land}) gives us predicted MSE values for a Ridge polynomial of order up to 15. With regularization parameters on a range $\lambda \in \left[10^{-9},10^{4}\right]$ As such, we can use the search landscape to make an initial guess at where the optimal degree and regularization parameter combination will be based on where the lowest MSE is located. For our Ridge regression model, that initial guess would be degree 6, with a $\lambda = 10^{-9}$.
+The search landscape in Figure (\ref{fig:ridge_search_land}) gives us predicted MSE values for a Ridge polynomial of order up to 15. With regularization parameters on a range $\lambda \in \left[10^{-9},10^{4}\right]$ As such, we can use the search landscape to make an initial guess at where the optimal degree and regularization parameter combination will be based on where the lowest MSE is located. For our Ridge regression model, that initial guess would be degree 6, with a $\lambda = 10^{-9}$ attaining a prediction error of $0.1497$. The point is marked as a red dot in Figure (\ref{fig:ridge_search_land}).
 
 Though an initial guess at the optimal Ridge model has been made, we have to further study the model by applying the resampling techniques developed and explored in \nameref{ex:2} and \nameref{ex:3}.
+
+\subsection*{Bootstrap for Ridge regression}
+We use the bootstrap method developed in \nameref{ex:2} to study the bias-variance tradeoff as function of the complexity, but also the regularization term $\lambda$. It could be seen from the search landscape that the optimal regularization term was $\lambda = 10^{-9}$ at degree 6. With these optimal parameters, a plot of the bias-variance tradeoff is constructed.
+
+\begin{figure}
+  \centering
+  \begin{subfigure}{0.49\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{figures/EX4_ridge_complexity_using_bootstrap_function_lmb200.pdf}
+      \caption{\label{fig:ridge_beta_1}Bias-Variance tradeoff as function of model complexity with Ridge regression using a regularization parameter $\lambda = 10^{-9}$}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.49\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{figures/EX4_ridge_complexity_using_bootstrap_function_lmb2013.pdf}
+      \caption{\label{fig:ridge_beta_2}Bias-Variance tradeoff as function of model complexity with Ridge regression using a regularization parameter $\lambda = 10^{4}$}
+  \end{subfigure}
+  \caption{\label{sfig:ridge_beta_1}Bias-Variance tradeoff for different values of $\lambda$ with 400 datapoints}
+\end{figure}
+
+By inspecting Figure (\ref{fig:ridge_beta_1}), it can be seen that the plot is visually identical to Figure (\ref{fig:bias-variance}). This is probably a result of the regularization term being so small that its effect on the predictors is negligible. Following Figure (\ref{fig:ridge_beta_1}), it can be seen that Ridge regression reverts to Ordinary Least Squares as the regularization parameter goes towards zero.
+
+Figure (\ref{fig:ridge_beta_2}) shows the opposite case where the regularization parameter is maxed out to $\lambda = 10^4$. Where the previous figure showed that as regularization goes to 0, Ridge reverts back to OLS, Figure (\ref{fig:ridge_beta_2}) shows the result of too much regularization as discussed in the previous subsection. Namely that the result of Ridge regression with too much regularization increases the model bias while also decreasing the model variance. Furthermore, this indicates that model predictions made with a too regularized Ridge model goes towards the model bias.
+
+\begin{figure}
+  \centering
+  \begin{subfigure}{0.49\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{figures/EX4_ridge_complexity_using_bootstrap_function_lmb400.pdf}
+      \caption{\label{fig:ridge_beta_3}Bias-Variance tradeoff as function of model complexity with Ridge regression using a regularization parameter $\lambda = 10^{-9}$}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.49\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{figures/EX4_ridge_complexity_using_bootstrap_function_lmb4013.pdf}
+      \caption{\label{fig:ridge_beta_4}Bias-Variance tradeoff as function of model complexity with Ridge regression using a regularization parameter $\lambda = 10^{4}$}
+  \end{subfigure}
+  \caption{\label{sfig:ridge_beta_2}Bias-Variance tradeoff for different values of $\lambda$ with 1600 datapoints}
+\end{figure}
+
+After increasing the number of datapoints from 400 to 1600, a new bootstrap plot for the minimum and maximum $\lambda$ is constructed in Figure (\ref{sfig:ridge_beta_2}). Comparing Figure (\ref{sfig:ridge_beta_1}) to (\ref{sfig:ridge_beta_2}), it can be seen that increasing the number of datapoints and subsequently the number of bootstraps as half the amount of datapoints does not notably affect the stability of the bias-variance tradeoff.
+
+\subsection*{Resampling Ridge using Cross Validation}
+Firstly, we perform a Cross Validation for 5 to 10 folds for the assumed optimal degree and lambda found from the search landscape. 
+
+\begin{figure}
+  \centering
+  \begin{subfigure}{0.49\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{figures/EX4_mse_cv_boot06.pdf}
+      \caption{\label{fig:mse_cv_ridge_1}Cross Validation for 5 to 10 folds for a single model degree, with bootstrap for comparison.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.49\textwidth}  
+    \centering
+    \includegraphics[width=\textwidth]{figures/EX4_mse_cv_boot16.pdf}
+    \caption{\label{fig:mse_cv_ridge_2}Cross Validation for 5 to 10 folds for a single model degree, with bootstrap for comparison.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.49\textwidth}  
+    \centering
+    \includegraphics[width=\textwidth]{figures/EX4_mse_cv_boot26.pdf}
+    \caption{\label{fig:mse_cv_ridge_3}Cross Validation for 5 to 10 folds for a single model degree, with bootstrap for comparison.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.49\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{figures/EX4_mse_cv_boot36.pdf}
+      \caption{\label{fig:mse_cv_ridge_4}Cross Validation for 5 to 10 folds for a single model degree, with bootstrap for comparison.}
+  \end{subfigure}
+  \caption{\label{sfig:ridge_cv_1}Cross validation of Ridge Regression with different values of regularization.}
+\end{figure}
+
+
+From Figure (\ref{fig:mse_cv_ridge_1}), we can see that the cross-validated MSE gains a lower value than that of the search grid. Also, as was seen in the previous section when studying Cross Validation, the prediction error is less varying than the bootstrap prediction error. However, at least for a model with complexity to the sixth-order. There is overlap between the bootstrap and cross-validation standard error, thus the bootstrap could potentially achieve better MSE than Cross Validation.
+
+Figure (\ref{fig:mse_cv_ridge_2}) plots cross validation for the same degree, but with the maximum level of regularization $\lambda = 10^4$. With a high amount of regularization, the standard error for cross validation prediction error is highly varying. Also the cross validation prediction error is consequently larger than for the bootstrap prediction error. Based on the uncertainty of the cross validation with a high amount of regularization, it is difficult to use the measurement as it is too imprecise. The standard error does however never overlap with the cross validation range in Figure (\ref{fig:mse_cv_ridge_1}). Thus it can be concluded that for a high amount of regularization, the model is not generalized and does not achieve a sufficiently low prediction error. 
+
+On the other hand, with very slight regularization, as in Figure (\ref{fig:mse_cv_ridge_1}), the model generalizes well with a relatively low MSE score. Moreover, the prediction error for cross validation seem to achieve the same values as the cross validation for OLS in Figure (\ref{fig:ols_cv_1}). Though this is to be expected as the regularization is minimal. Increasing the regularization as in Figure (\ref{fig:mse_cv_ridge_2}) and (\ref{fig:mse_cv_ridge_3}), the standard error of the predicted MSE seem to increase as well. Though this is not seen before Figure (\ref{fig:mse_cv_ridge_3}). There also seem to be a slight relationship between the standard error and number of folds, as both Figure (\ref{fig:mse_cv_ridge_3}) and (\ref{fig:mse_cv_ridge_4}) increase their standard error as folds increase.
+
+Based on the results which have just been discussed, it seems that there may not be a gain in lower prediction error by fitting yhe Franke Function using Ridge instead of OLS. In conclusion, Ridge regression might be outperformed by the OLS when fitting the Franke Function. Though a model with slight regularization can be applied, the results from Ridge regression are either on par or worse than OLS. 
 
 \section*{Exercise 5}
 The second regularized linear model which we will study is Least Absolute Shrinkage and Selection Operator (LASSO) Regression. Lasso adds a regularization term to the Cost function similarly to Ridge regression, though Lasso utilizes the L1 norm of the predictors instead of the L2 as in Ridge. \cite{Geron2019} Mathematically, adding the L1 regularizer gives us the following Cost function
@@ -590,7 +696,19 @@ The second regularized linear model which we will study is Least Absolute Shrink
 We note that the L1-norm is the same as the sum of the absolute value for each $\beta_i$. Moreover, the derivative of the absolute value is the sign-function. The resulting normal equation for Lasso regression is thus not a nice analytical expression, and is omitted for this Exercise. As a result, only the Sci-Kit implementation of Lasso regression will be studied.
 
 \subsection*{Difference between L1 and L2-norm regularization}
-The difference between the L1 and L2-norm is how it can be related to our understanding of distance. The L1-norm, mathematically defined as $\lVert \bm{\beta} \rVert_1 = \sum_{i=0}^{n-1}|\beta_i|$ is the "Manhattan Distance" of $\bm{\beta}$, i.e. the distance from two points a to b using only straight and normal lines. On the other hand, the L2-norm is mathematically defined as $\lVert \bm{\beta} \rVert_2 = \sqrt{\sum_{i=0}^{n-1}\beta_i^2}$. The L2-norm is more commonly referred to as the Euclidean distance, or the distance of a straight line drawn between a and b.
+The difference between the L1 and L2-norm is how it can be related to our understanding of distance. The L1-norm, mathematically defined as $\lVert \bm{\beta} \rVert_1 = \sum_{i=0}^{n-1}|\beta_i|$ is the "Manhattan Distance" of $\bm{\beta}$, i.e. the distance from two points a to b using only straight and normal lines. On the other hand, the L2-norm is mathematically defined as $\lVert \bm{\beta} \rVert_2 = \sqrt{\sum_{i=0}^{n-1}\beta_i^2}$. The L2-norm is more commonly referred to as the Euclidean distance, or the distance of a straight line drawn between a and b. In practice, this results in Lasso is able to suppress some predictors based on the choice of $\lambda$. Furthermore, the predictor suppression tends to eliminate the least important predictors first, such that Lasso regression can be looked at as a form of feature selection. \cite{Geron2019}
+
+When analyzing Lasso, we will not implement our own model, rather we will use the Lasso regression provided by SciKit-learn.
+
+\subsection*{Search Landscape}
+As with Ridge regression, we start off by plotting the search landscape for Lasso regression as an initial guess to where the optimal parameters might be located. 
+
+\begin{figure}
+  \centering
+  \hspace*{-3.8cm}
+  \includegraphics[scale=1.5]{figures/EX5_search_landscape_lasso.pdf}
+  \caption{\label{fig:lasso_search_land}Plot of the LASSO Search Landscape for polynomials up to a cretain order initialized with different regularization parameter values. The red dot symbolizes surface minimum.}
+\end{figure}
 
 
 \section*{Exercise 6}

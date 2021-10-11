@@ -566,12 +566,12 @@ def plot_beta_errors(summaary_df: pd.DataFrame(), degree, fig=plt.figure()):
     return fig
 
 
-def cross_val_OLS(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, shuffle=False, random_state=None) -> np.ndarray:
+def cross_val_OLS(k: int, X: np.ndarray, z: np.ndarray, shuffle=False, random_state=None) -> np.ndarray:
     """Function for cross validating on k folds. Scales data after split(standarscaler).
 
     Args:
         k (int): Number of folds
-        model (str): Linear regression model
+
         X (np.ndarray): Design matrix
         z (np.ndarray): target values
         lmb (Optional): lambda value
@@ -580,15 +580,8 @@ def cross_val_OLS(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, sh
     Returns:
         np.ndarray: Scores of MSE on all k folds
     """
-    if model == "Ridge":
-        model = RidgeRegression(lambda_val=lmb)
-    elif model == "Lasso":
-        model = lm.Lasso(alpha=lmb)
-    elif model == "OLS":
-        model = OLS()
 
-    else:
-        "Provide a valid model as a string(Ridge/Lasso/OLS) "
+    model = OLS()
 
     kfold = KFold(n_splits=k, shuffle=shuffle, random_state=random_state)
     scores_KFold = np.zeros(k)
@@ -611,10 +604,7 @@ def cross_val_OLS(k: int, model: str, X: np.ndarray, z: np.ndarray, lmb=None, sh
         xtrain_scaled[:, 0] = 1
         xtest_scaled[:, 0] = 1
 
-        if model == "Ridge":
-            model.fit(xtrain_scaled, ytrain, keep_intercept=False)
-        else:
-            model.fit(xtrain_scaled, ytrain)
+        model.fit(xtrain_scaled, ytrain)
 
         ypred = model.predict(xtest_scaled)
         scores_KFold[j] = MSE(ypred, ytest)
