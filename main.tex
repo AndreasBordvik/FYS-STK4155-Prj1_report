@@ -572,9 +572,11 @@ training set. Let's say each pixel position counts for the distance of 1, then t
 So you basically have several pixels of very similar values in your training data. You can also end up having several pixels in the training set and the test set that are 
 very similar and basically represents the same data point value.   
 
+$d(p,q)=\sqrt{(q_1 - p_1)^2 + (q2-p2)^2}$
+
 \subsection*{Example}
 Let’s say you resize the 7x7 image down to a 3x3 image by sampling 9 pixels from the original image of 7x7, as illustrated in figure \ref{fig:image_resizing}. Considering the resampled 3x3 image,
-the Euclidean distance between one pixel and its nearest neighbors is not 1 anymore. The distance between pixel (y=0,x=0) and its nearest neighbor (y=0,x=1) and (y=1,x=0) 
+the Euclidean distance between one pixel and its nearest neighbors is not 1 anymore. The Euclidean distance between pixel (y=0,x=0) and its nearest neighbor (y=0,x=1) and (y=1,x=0) 
 in the 3x3 image is now the Euclidean distance between pixel x0 and x3, and x0 and x21 from the original image. Therefore, picking pixels from the 3x3 image for the training
 set and the test set now results in data points within the training set and the test set not being considerably similar anymore. It also reduces the share of similar data 
 points ending up in both the training and test sets, which is important. Having many data points in the test set that are similar to the training set makes it harder to 
